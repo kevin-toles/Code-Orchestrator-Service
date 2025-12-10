@@ -1,0 +1,43 @@
+# Code-Orchestrator-Service Docker Compose
+# WBS 1.1.5: Service on port 8083 per Kitchen Brigade architecture
+
+version: "3.9"
+
+services:
+  code-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code-orchestrator-service
+    ports:
+      - "8083:8083"
+    environment:
+      - COS_HOST=0.0.0.0
+      - COS_PORT=8083
+      - COS_LOG_LEVEL=INFO
+      - COS_MODEL_CACHE_DIR=/app/cache/models
+      # HuggingFace model IDs
+      - COS_CODET5_MODEL=Salesforce/codet5p-220m
+      - COS_GRAPHCODEBERT_MODEL=microsoft/graphcodebert-base
+      - COS_CODEBERT_MODEL=microsoft/codebert-base
+    volumes:
+      - model-cache:/app/cache/models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    # GPU support (uncomment for CUDA)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  model-cache:
+    driver: local
