@@ -81,7 +81,7 @@ def test_phase1_service_starts():
 | 2.1.3 | Add model config file | `config/models.json` with HF IDs | Config validated at startup |
 | 2.1.4 | Implement graceful degradation | Fallback to smaller models on OOM | Service stays up on GPU OOM |
 
-#### 2.2 CodeT5+ Generator Agent
+#### 2.2 CodeT5+ Extractor (Model Wrapper)
 | ID | Task | Acceptance Criteria | Test |
 |----|------|---------------------|------|
 | 2.2.1 | Load `Salesforce/codet5p-220m` | Model loads in <30s | `test_codet5_loads` |
@@ -91,11 +91,11 @@ def test_phase1_service_starts():
 
 **TDD Test (Write First):**
 ```python
-# tests/unit/test_codet5_agent.py
+# tests/unit/test_codet5_extractor.py
 def test_codet5_extracts_terms():
     """CodeT5+ extracts meaningful technical terms from chapter text."""
-    agent = CodeT5Agent()
-    result = agent.extract_terms(
+    extractor = CodeT5Extractor()
+    result = extractor.extract_terms(
         "This chapter covers multi-stage document chunking with overlap for RAG pipelines"
     )
     
@@ -106,7 +106,7 @@ def test_codet5_extracts_terms():
     assert len(result.related_terms) >= 2
 ```
 
-#### 2.3 GraphCodeBERT Validator Agent
+#### 2.3 GraphCodeBERT Validator (Model Wrapper)
 | ID | Task | Acceptance Criteria | Test |
 |----|------|---------------------|------|
 | 2.3.1 | Load `microsoft/graphcodebert-base` | Model loads in <20s | `test_graphcodebert_loads` |
@@ -116,13 +116,13 @@ def test_codet5_extracts_terms():
 
 **TDD Test (Write First):**
 ```python
-# tests/unit/test_graphcodebert_agent.py
+# tests/unit/test_graphcodebert_validator.py
 def test_graphcodebert_filters_generic_terms():
     """GraphCodeBERT filters out overly generic terms."""
-    agent = GraphCodeBERTAgent()
+    validator = GraphCodeBERTValidator()
     terms = ["chunking", "RAG", "split", "data", "embedding"]
     
-    result = agent.validate_terms(
+    result = validator.validate_terms(
         terms=terms,
         original_query="LLM document processing",
         domain="ai-ml"
@@ -135,7 +135,7 @@ def test_graphcodebert_filters_generic_terms():
     assert "data" in result.rejected_terms   # Too generic
 ```
 
-#### 2.4 CodeBERT Ranker Agent
+#### 2.4 CodeBERT Ranker (Model Wrapper)
 | ID | Task | Acceptance Criteria | Test |
 |----|------|---------------------|------|
 | 2.4.1 | Load `microsoft/codebert-base` | Model loads in <20s | `test_codebert_loads` |
@@ -145,13 +145,13 @@ def test_graphcodebert_filters_generic_terms():
 
 **TDD Test (Write First):**
 ```python
-# tests/unit/test_codebert_agent.py
+# tests/unit/test_codebert_ranker.py
 def test_codebert_ranks_by_relevance():
     """CodeBERT ranks terms by semantic similarity to query."""
-    agent = CodeBERTAgent()
+    ranker = CodeBERTRanker()
     terms = ["chunking", "tokenization", "networking", "HTTP"]
     
-    result = agent.rank_terms(
+    result = ranker.rank_terms(
         terms=terms,
         query="LLM document chunking for RAG"
     )
@@ -167,14 +167,14 @@ def test_codebert_ranks_by_relevance():
 **Phase 2 Integration Test:**
 ```python
 def test_phase2_all_models_load():
-    """All three models load successfully and respond."""
+    """All three model wrappers load successfully and respond."""
     response = httpx.get("http://localhost:8083/ready")
     assert response.status_code == 200
     
     data = response.json()
-    assert data["models"]["codet5"] == "loaded"
-    assert data["models"]["graphcodebert"] == "loaded"
-    assert data["models"]["codebert"] == "loaded"
+    assert data["models"]["codet5"] == "loaded"       # Extractor
+    assert data["models"]["graphcodebert"] == "loaded" # Validator
+    assert data["models"]["codebert"] == "loaded"      # Ranker
 ```
 
 ---
@@ -466,7 +466,7 @@ def test_phase6_performance_requirements():
 ## Acceptance Criteria Summary
 
 ### Must Have (MVP)
-- [ ] CodeT5+, GraphCodeBERT, CodeBERT models load and respond
+- [ ] CodeT5+ Extractor, GraphCodeBERT Validator, CodeBERT Ranker model wrappers load and respond
 - [ ] /api/v1/extract endpoint returns consensus terms
 - [ ] /api/v1/search endpoint returns curated results
 - [ ] Domain filtering removes false positives
@@ -486,26 +486,12 @@ def test_phase6_performance_requirements():
 
 ---
 
-## Definition of Done
-
-Each phase is considered DONE when:
-
-1. **All unit tests pass** (`pytest tests/unit/`)
-2. **All integration tests pass** (`pytest tests/integration/`)
-3. **Code coverage ≥80%** (measured by pytest-cov)
-4. **No SonarQube blockers** (code quality gate)
-5. **Documentation updated** (README, API docs)
-6. **Docker image builds** (`docker build` succeeds)
-7. **Docker Compose starts** (all services healthy)
-
----
-
 ## Timeline
 
 | Phase | Sprint | Days | Deliverable |
 |-------|--------|------|-------------|
 | 1 | Sprint 1 | 1-3 | Service shell, health endpoints |
-| 2 | Sprint 1 | 4-7 | All 3 models loading, agent classes |
+| 2 | Sprint 1 | 4-7 | All 3 models loading, model wrapper classes |
 | 3 | Sprint 2 | 1-4 | LangGraph orchestration, /extract endpoint |
 | 4 | Sprint 2 | 5-7 | Search integration, /search endpoint |
 | 5 | Sprint 3 | 1-4 | llm-document-enhancer integration |

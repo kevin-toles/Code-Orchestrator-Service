@@ -15,7 +15,7 @@ Pattern: Integration tests per CODING_PATTERNS_ANALYSIS.md
 import pytest
 from fastapi.testclient import TestClient
 
-from src.agents.registry import FakeModelRegistry
+from src.models.registry import FakeModelRegistry
 from src.api.health import get_health_service
 from src.main import app
 
@@ -122,36 +122,36 @@ class TestPhase2ModelsLoad:
         assert data["service"] == "code-orchestrator-service"
 
 
-class TestPhase2AgentClasses:
-    """Integration tests for agent class existence and protocols."""
+class TestPhase2ModelWrapperClasses:
+    """Integration tests for model wrapper class existence and protocols."""
 
-    def test_all_agent_classes_importable(self) -> None:
-        """All agent classes can be imported."""
-        from src.agents.codebert_agent import CodeBERTAgent
-        from src.agents.codet5_agent import CodeT5Agent
-        from src.agents.graphcodebert_agent import GraphCodeBERTAgent
+    def test_all_model_wrapper_classes_importable(self) -> None:
+        """All model wrapper classes can be imported."""
+        from src.models.codebert_ranker import CodeBERTRanker
+        from src.models.codet5_extractor import CodeT5Extractor
+        from src.models.graphcodebert_validator import GraphCodeBERTValidator
 
-        assert CodeT5Agent is not None
-        assert GraphCodeBERTAgent is not None
-        assert CodeBERTAgent is not None
+        assert CodeT5Extractor is not None
+        assert GraphCodeBERTValidator is not None
+        assert CodeBERTRanker is not None
 
     def test_all_protocols_importable(self) -> None:
         """All protocols can be imported."""
-        from src.agents.protocols import (
-            GeneratorAgentProtocol,
+        from src.models.protocols import (
+            ExtractorProtocol,
             ModelRegistryProtocol,
-            RankerAgentProtocol,
-            ValidatorAgentProtocol,
+            RankerProtocol,
+            ValidatorProtocol,
         )
 
         assert ModelRegistryProtocol is not None
-        assert GeneratorAgentProtocol is not None
-        assert ValidatorAgentProtocol is not None
-        assert RankerAgentProtocol is not None
+        assert ExtractorProtocol is not None
+        assert ValidatorProtocol is not None
+        assert RankerProtocol is not None
 
     def test_fake_registry_implements_protocol(self) -> None:
         """FakeModelRegistry implements ModelRegistryProtocol interface."""
-        from src.agents.registry import FakeModelRegistry
+        from src.models.registry import FakeModelRegistry
 
         registry = FakeModelRegistry()
 

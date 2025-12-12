@@ -122,15 +122,15 @@ A multi-model orchestration service that dynamically generates contextually-rele
 │  │                    /extract, /validate, /search                        │  │
 │  └───────────────────────────────┬───────────────────────────────────────┘  │
 │                                  │                                           │
-│  ┌───────────────────────────────▼───────────────────────────────────────┐  │
-│  │                      Agent Orchestrator                                │  │
+│  ┌───────────────────────────────▼───────────────────────────────────┐  │
+│  │                  Model Wrapper Orchestrator                            │  │
 │  │                   (LangGraph State Machine)                            │  │
 │  └───┬───────────────────────┬───────────────────────┬───────────────────┘  │
 │      │                       │                       │                       │
 │      ▼                       ▼                       ▼                       │
 │  ┌─────────────┐       ┌─────────────┐       ┌─────────────┐                │
 │  │  CodeT5+    │       │GraphCodeBERT│       │  CodeBERT   │                │
-│  │  Agent      │       │   Agent     │       │   Agent     │                │
+│  │  Extractor  │       │  Validator  │       │   Ranker    │                │
 │  │ (Generator) │       │ (Validator) │       │  (Ranker)   │                │
 │  └─────────────┘       └─────────────┘       └─────────────┘                │
 │                                                                              │
@@ -227,7 +227,7 @@ The Semantic Search Service QUERIES these systems - it doesn't contain them.
 
 ## Multi-Model Coordination Flow
 
-### Agent Conversation Diagram
+### Model Wrapper Orchestration Diagram
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -239,10 +239,10 @@ The Semantic Search Service QUERIES these systems - it doesn't contain them.
 ┌──────────────────────────────────────────────────────────────────────────────┐
 │                         ORCHESTRATOR STATE MACHINE                            │
 │                                                                               │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
-│  │ STATE 1: GENERATION                                                      │ │
-│  │ ┌─────────────────────────────────────────────────────────────────────┐ │ │
-│  │ │ CodeT5+ Agent                                                        │ │ │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
+│  │ STATE 1: EXTRACTION                                                     │ │
+│  │ ┌─────────────────────────────────────────────────────────────────────────┐ │ │
+│  │ │ CodeT5+ Extractor                                                    │ │ │
 │  │ │                                                                       │ │ │
 │  │ │ Input:  "Extract technical search terms for: LLM code understanding  │ │ │
 │  │ │          with multi-stage chunking for RAG"                          │ │ │
@@ -256,10 +256,10 @@ The Semantic Search Service QUERIES these systems - it doesn't contain them.
 │  └─────────────────────────────────┬───────────────────────────────────────┘ │
 │                                    │                                          │
 │                                    ▼                                          │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
 │  │ STATE 2: VALIDATION                                                      │ │
-│  │ ┌─────────────────────────────────────────────────────────────────────┐ │ │
-│  │ │ GraphCodeBERT Agent                                                  │ │ │
+│  │ ┌─────────────────────────────────────────────────────────────────────────┐ │ │
+│  │ │ GraphCodeBERT Validator                                              │ │ │
 │  │ │                                                                       │ │ │
 │  │ │ Input:  Generated terms + Original query + Domain context            │ │ │
 │  │ │                                                                       │ │ │
@@ -277,10 +277,10 @@ The Semantic Search Service QUERIES these systems - it doesn't contain them.
 │  └─────────────────────────────────┬───────────────────────────────────────┘ │
 │                                    │                                          │
 │                                    ▼                                          │
-│  ┌─────────────────────────────────────────────────────────────────────────┐ │
+│  ┌─────────────────────────────────────────────────────────────────────────────┐ │
 │  │ STATE 3: RANKING                                                         │ │
-│  │ ┌─────────────────────────────────────────────────────────────────────┐ │ │
-│  │ │ CodeBERT Agent                                                       │ │ │
+│  │ ┌─────────────────────────────────────────────────────────────────────────┐ │ │
+│  │ │ CodeBERT Ranker                                                      │ │ │
 │  │ │                                                                       │ │ │
 │  │ │ Input:  Validated terms + Original query embedding                   │ │ │
 │  │ │                                                                       │ │ │
@@ -470,9 +470,9 @@ components:
 ## Next Steps
 
 1. **Phase 1**: Basic FastAPI structure with health endpoints
-2. **Phase 2**: Implement CodeT5+ generator agent
-3. **Phase 3**: Add GraphCodeBERT validator agent
-4. **Phase 4**: Add CodeBERT ranker agent
+2. **Phase 2**: Implement CodeT5+ Extractor (model wrapper)
+3. **Phase 3**: Add GraphCodeBERT Validator (model wrapper)
+4. **Phase 4**: Add CodeBERT Ranker (model wrapper)
 5. **Phase 5**: Implement LangGraph orchestration
 6. **Phase 6**: Add Line Cook (code generation) integration
 7. **Phase 7**: Integration tests with semantic-search-service

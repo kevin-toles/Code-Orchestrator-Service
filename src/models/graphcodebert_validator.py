@@ -1,11 +1,14 @@
 """
-Code-Orchestrator-Service - GraphCodeBERT Validator Agent
+Code-Orchestrator-Service - GraphCodeBERT Term Validator
 
-WBS 2.3: GraphCodeBERT Validator Agent
+WBS 2.3: GraphCodeBERT Validator (Model Wrapper)
 Validates and filters technical terms using GraphCodeBERT model.
 
+NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
+Autonomous agents (LangGraph workflows) live in the ai-agents service.
+
 Patterns Applied:
-- Agent Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
+- Model Wrapper Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
 - FakeModelRegistry for testing (no real HuggingFace model in unit tests)
 - Pydantic response models for structured output
 
@@ -19,12 +22,12 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from src.agents.registry import ModelRegistry
+from src.models.registry import ModelRegistry
 from src.core.exceptions import ModelNotReadyError
 from src.core.logging import get_logger
 
 if TYPE_CHECKING:
-    from src.agents.registry import ModelRegistryProtocol
+    from src.models.registry import ModelRegistryProtocol
 
 # Get logger
 logger = get_logger(__name__)
@@ -139,18 +142,18 @@ class ValidationResult(BaseModel):
     """Reason for each rejection (term -> reason)."""
 
 
-class GraphCodeBERTAgent:
-    """GraphCodeBERT Validator Agent for term validation and filtering.
+class GraphCodeBERTValidator:
+    """GraphCodeBERT model wrapper for term validation and filtering.
 
     WBS 2.3: Validates terms against query context and domain.
 
-    Pattern: Agent Pattern per Kitchen Brigade model
+    NOTE: This is a HuggingFace model wrapper, NOT an autonomous agent.
     - Validator role: Filters and validates candidate terms
     - Uses model from registry (Anti-Pattern #12 prevention)
     """
 
     def __init__(self, registry: ModelRegistryProtocol | None = None) -> None:
-        """Initialize GraphCodeBERT agent.
+        """Initialize GraphCodeBERT validator.
 
         Args:
             registry: ModelRegistry instance (or FakeModelRegistry for testing)
@@ -166,7 +169,7 @@ class GraphCodeBERTAgent:
             raise ModelNotReadyError("GraphCodeBERT model not loaded in registry")
 
         self._model, self._tokenizer = model_tuple
-        logger.info("graphcodebert_agent_initialized")
+        logger.info("graphcodebert_validator_initialized")
 
     def validate_terms(
         self,

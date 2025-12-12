@@ -1,11 +1,14 @@
 """
-Code-Orchestrator-Service - CodeT5+ Generator Agent
+Code-Orchestrator-Service - CodeT5+ Keyword Extractor
 
-WBS 2.2: CodeT5+ Generator Agent
+WBS 2.2: CodeT5+ Extractor (Model Wrapper)
 Extracts technical terms from text using CodeT5+ model.
 
+NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
+Autonomous agents (LangGraph workflows) live in the ai-agents service.
+
 Patterns Applied:
-- Agent Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
+- Model Wrapper Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
 - FakeModelRegistry for testing (no real HuggingFace model in unit tests)
 - Pydantic response models for structured output
 
@@ -22,12 +25,12 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from src.agents.registry import ModelRegistry
+from src.models.registry import ModelRegistry
 from src.core.exceptions import ModelNotReadyError
 from src.core.logging import get_logger
 
 if TYPE_CHECKING:
-    from src.agents.registry import ModelRegistryProtocol
+    from src.models.registry import ModelRegistryProtocol
 
 # Get logger
 logger = get_logger(__name__)
@@ -46,13 +49,13 @@ class ExtractionResult(BaseModel):
     """Related/supporting terms identified in the text."""
 
 
-class CodeT5Agent:
-    """CodeT5+ Generator Agent for term extraction.
+class CodeT5Extractor:
+    """CodeT5+ model wrapper for keyword extraction.
 
     WBS 2.2: Extracts technical terms from chapter text using CodeT5+ model.
 
-    Pattern: Agent Pattern per Kitchen Brigade model
-    - Generator role: Creates/extracts candidate terms
+    NOTE: This is a HuggingFace model wrapper, NOT an autonomous agent.
+    - Extractor role: Generates candidate keywords from text
     - Uses model from registry (Anti-Pattern #12 prevention)
 
     Attributes:
@@ -62,7 +65,7 @@ class CodeT5Agent:
     DEFAULT_TIMEOUT_SECONDS: float = 30.0
 
     def __init__(self, registry: ModelRegistryProtocol | None = None) -> None:
-        """Initialize CodeT5 agent.
+        """Initialize CodeT5 extractor.
 
         Args:
             registry: ModelRegistry instance (or FakeModelRegistry for testing)
@@ -78,7 +81,7 @@ class CodeT5Agent:
             raise ModelNotReadyError("CodeT5 model not loaded in registry")
 
         self._model, self._tokenizer = model_tuple
-        logger.info("codet5_agent_initialized")
+        logger.info("codet5_extractor_initialized")
 
     @contextmanager
     def _timeout_context(self, seconds: float) -> Generator[None, None, None]:

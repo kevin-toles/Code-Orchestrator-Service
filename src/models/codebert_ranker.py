@@ -1,11 +1,14 @@
 """
-Code-Orchestrator-Service - CodeBERT Ranker Agent
+Code-Orchestrator-Service - CodeBERT Similarity Ranker
 
-WBS 2.4: CodeBERT Ranker Agent
+WBS 2.4: CodeBERT Ranker (Model Wrapper)
 Generates embeddings and ranks terms by semantic relevance using CodeBERT model.
 
+NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
+Autonomous agents (LangGraph workflows) live in the ai-agents service.
+
 Patterns Applied:
-- Agent Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
+- Model Wrapper Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
 - FakeModelRegistry for testing (no real HuggingFace model in unit tests)
 - Pydantic response models for structured output
 
@@ -21,12 +24,12 @@ import numpy as np
 import numpy.typing as npt
 from pydantic import BaseModel
 
-from src.agents.registry import ModelRegistry
+from src.models.registry import ModelRegistry
 from src.core.exceptions import ModelNotReadyError
 from src.core.logging import get_logger
 
 if TYPE_CHECKING:
-    from src.agents.registry import ModelRegistryProtocol
+    from src.models.registry import ModelRegistryProtocol
 
 # Get logger
 logger = get_logger(__name__)
@@ -55,18 +58,18 @@ class RankingResult(BaseModel):
     """Terms sorted by relevance score descending."""
 
 
-class CodeBERTAgent:
-    """CodeBERT Ranker Agent for embedding generation and term ranking.
+class CodeBERTRanker:
+    """CodeBERT Ranker for embedding generation and term ranking.
 
     WBS 2.4: Generates 768-dim embeddings and ranks terms by cosine similarity.
 
-    Pattern: Agent Pattern per Kitchen Brigade model
+    Pattern: Model Wrapper Pattern per HuggingFace integration
     - Ranker role: Scores and ranks candidate terms
     - Uses model from registry (Anti-Pattern #12 prevention)
     """
 
     def __init__(self, registry: ModelRegistryProtocol | None = None) -> None:
-        """Initialize CodeBERT agent.
+        """Initialize CodeBERT ranker.
 
         Args:
             registry: ModelRegistry instance (or FakeModelRegistry for testing)
@@ -82,7 +85,7 @@ class CodeBERTAgent:
             raise ModelNotReadyError("CodeBERT model not loaded in registry")
 
         self._model, self._tokenizer = model_tuple
-        logger.info("codebert_agent_initialized")
+        logger.info("codebert_ranker_initialized")
 
     def get_embedding(self, text: str) -> npt.NDArray[np.floating[Any]]:
         """Generate embedding vector for text.

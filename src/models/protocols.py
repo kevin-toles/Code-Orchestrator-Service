@@ -1,8 +1,16 @@
 """
-Code-Orchestrator-Service - Agent Protocols
+Code-Orchestrator-Service - Model Protocols
 
 WBS 2.1-2.4: Model Loading Infrastructure
 Defines Protocol interfaces for duck typing support.
+
+NOTE: These are HuggingFace model wrapper protocols, NOT autonomous agent protocols.
+Autonomous agents (LangGraph workflows) live in the ai-agents service.
+
+Naming Convention:
+- ExtractorProtocol: For models that extract/generate terms (CodeT5+)
+- ValidatorProtocol: For models that validate/filter terms (GraphCodeBERT)
+- RankerProtocol: For models that rank terms by relevance (CodeBERT)
 
 Patterns Applied:
 - Protocol typing for duck typing (CODING_PATTERNS_ANALYSIS.md line 130)
@@ -42,11 +50,11 @@ class ModelRegistryProtocol(Protocol):
         ...
 
 
-class GeneratorAgentProtocol(Protocol):
-    """Protocol for Generator agents (CodeT5+).
+class ExtractorProtocol(Protocol):
+    """Protocol for Extractor models (CodeT5+).
 
-    Agents that generate/extract terms from text.
-    WBS 2.2: CodeT5+ Generator Agent
+    Model wrappers that generate/extract terms from text.
+    WBS 2.2: CodeT5+ Extractor
     """
 
     def extract_terms(self, text: str, timeout_seconds: float = 30.0) -> Any:
@@ -58,11 +66,15 @@ class GeneratorAgentProtocol(Protocol):
         ...
 
 
-class ValidatorAgentProtocol(Protocol):
-    """Protocol for Validator agents (GraphCodeBERT).
+# Backward compatibility alias
+GeneratorModelProtocol = ExtractorProtocol
 
-    Agents that validate and filter terms.
-    WBS 2.3: GraphCodeBERT Validator Agent
+
+class ValidatorProtocol(Protocol):
+    """Protocol for Validator models (GraphCodeBERT).
+
+    Model wrappers that validate and filter terms.
+    WBS 2.3: GraphCodeBERT Validator
     """
 
     def validate_terms(
@@ -82,11 +94,15 @@ class ValidatorAgentProtocol(Protocol):
         ...
 
 
-class RankerAgentProtocol(Protocol):
-    """Protocol for Ranker agents (CodeBERT).
+# Backward compatibility alias
+ValidatorModelProtocol = ValidatorProtocol
 
-    Agents that generate embeddings and rank terms.
-    WBS 2.4: CodeBERT Ranker Agent
+
+class RankerProtocol(Protocol):
+    """Protocol for Ranker models (CodeBERT).
+
+    Model wrappers that generate embeddings and rank terms.
+    WBS 2.4: CodeBERT Ranker
     """
 
     def get_embedding(self, text: str) -> npt.NDArray[np.floating[Any]]:
@@ -104,3 +120,7 @@ class RankerAgentProtocol(Protocol):
     def rank_terms(self, terms: list[str], query: str) -> Any:
         """Rank terms by relevance to query."""
         ...
+
+
+# Backward compatibility alias
+RankerModelProtocol = RankerProtocol
