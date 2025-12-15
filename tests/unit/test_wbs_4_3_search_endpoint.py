@@ -1,7 +1,7 @@
 """
 WBS 4.3: Full Search Endpoint Tests (RED Phase)
 
-Tests for POST /api/v1/search:
+Tests for POST /v1/search:
 - 4.3.1: Full pipeline: extract → search → curate
 - 4.3.2: Request validation
 - 4.3.3: Response schema
@@ -19,14 +19,14 @@ from src.main import app
 
 
 class TestSearchEndpoint:
-    """Tests for POST /api/v1/search endpoint."""
+    """Tests for POST /v1/search endpoint."""
 
     def test_search_endpoint_exists(self) -> None:
-        """POST /api/v1/search endpoint exists."""
+        """POST /v1/search endpoint exists."""
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={"query": "test", "domain": "ai-ml"},
         )
 
@@ -38,7 +38,7 @@ class TestSearchEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "LLM document chunking with overlap",
                 "domain": "ai-ml",
@@ -52,7 +52,7 @@ class TestSearchEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "Multi-stage document chunking",
                 "domain": "ai-ml",
@@ -68,7 +68,7 @@ class TestSearchEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "RAG pipeline embedding",
                 "domain": "ai-ml",
@@ -86,7 +86,7 @@ class TestSearchEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "LLM RAG chunking embedding vector",
                 "domain": "ai-ml",
@@ -111,7 +111,7 @@ class TestSearchValidation:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={"domain": "ai-ml"},  # Missing query
         )
 
@@ -122,7 +122,7 @@ class TestSearchValidation:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={"query": "test"},  # Missing domain
         )
 
@@ -133,7 +133,7 @@ class TestSearchValidation:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "LLM chunking",
                 "domain": "ai-ml",
@@ -149,7 +149,7 @@ class TestSearchValidation:
 
         # top_k should be between 1 and 100
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "test",
                 "domain": "ai-ml",
@@ -173,7 +173,7 @@ class TestSearchResponseSchema:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "document processing",
                 "domain": "ai-ml",
@@ -189,7 +189,7 @@ class TestSearchResponseSchema:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "neural network",
                 "domain": "ai-ml",
@@ -204,7 +204,7 @@ class TestSearchResponseSchema:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "transformer attention",
                 "domain": "ai-ml",
@@ -224,14 +224,14 @@ class TestPhase4Integration:
     """Phase 4 Integration Test per WBS_IMPLEMENTATION.md."""
 
     def test_phase4_full_search_pipeline(self) -> None:
-        """POST /api/v1/search executes full pipeline with curation.
+        """POST /v1/search executes full pipeline with curation.
 
         This is the official Phase 4 Integration Test from WBS.
         """
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "Multi-stage document chunking with overlap for RAG",
                 "domain": "ai-ml",
@@ -260,7 +260,7 @@ class TestPhase4Integration:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "memory chunk allocation",  # Could match C++ AND AI
                 "domain": "ai-ml",
@@ -278,7 +278,7 @@ class TestPhase4Integration:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "LLM document chunking",
                 "domain": "ai-ml",
@@ -307,7 +307,7 @@ class TestSearchPerformance:
 
         start = time.time()
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "semantic search embeddings",
                 "domain": "ai-ml",
@@ -323,7 +323,7 @@ class TestSearchPerformance:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/search",
+            "/v1/search",
             json={
                 "query": "vector database",
                 "domain": "ai-ml",

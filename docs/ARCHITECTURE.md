@@ -409,15 +409,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExtractionResult'
 
-  /api/v1/validate:
+  /v1/validate:
     post:
       summary: Validate terms against domain context
 
-  /api/v1/search:
+  /v1/search:
     post:
       summary: Full pipeline - extract, validate, and search
 
-  /api/v1/generate:
+  /v1/generate:
     post:
       summary: Generate code from curated context
 

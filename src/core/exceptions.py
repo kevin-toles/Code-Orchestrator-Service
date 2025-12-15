@@ -37,3 +37,12 @@ class ModelNotReadyError(CodeOrchestratorError):
 class ConfigurationError(CodeOrchestratorError):
     """Raised when configuration is invalid or missing."""
     pass
+
+
+class SBERTModelError(CodeOrchestratorError):
+    """Raised when SBERT model operations fail.
+    
+    WBS M2.1.7: Namespaced exception per Anti-Pattern #7 (exception shadowing).
+    Does NOT shadow builtins like RuntimeError or ConnectionError.
+    """
+    pass

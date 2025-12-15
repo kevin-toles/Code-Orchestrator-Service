@@ -1,7 +1,7 @@
 """
 WBS 4.3: Full Search Endpoint
 
-POST /api/v1/search - Full pipeline: extract → search → curate
+POST /v1/search - Full pipeline: extract → search → curate
 
 Patterns Applied:
 - FastAPI router pattern
@@ -72,7 +72,7 @@ class SearchResponse(BaseModel):
 # Router
 # =============================================================================
 
-search_router = APIRouter(prefix="/api/v1", tags=["search"])
+search_router = APIRouter(prefix="/v1", tags=["search"])
 
 
 @search_router.post("/search", response_model=SearchResponse)

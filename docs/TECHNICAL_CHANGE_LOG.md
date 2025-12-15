@@ -18,7 +18,204 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-12-15
+
+### CL-010: SBERT Migration Complete (M5 Documentation & Rollout)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-15 |
+| **WBS Item** | SBERT_EXTRACTION_MIGRATION_WBS.md - M5 Documentation & Rollout |
+| **Change Type** | Documentation |
+| **Summary** | SBERT migration complete. Updated README with API endpoint documentation. |
+| **Files Changed** | `README.md` |
+| **Rationale** | Final phase of SBERT extraction/migration per Kitchen Brigade architecture |
+| **Git Commit** | Pending |
+
+**Migration Summary:**
+
+| Phase | Status | Tests |
+|-------|--------|-------|
+| M1 Code Migration | ✅ Complete | 45 tests |
+| M2 API Endpoint Layer | ✅ Complete | - |
+| M3 API Client Refactor | ✅ Complete | - |
+| M4 Test Migration | ✅ Complete | - |
+| M5 Documentation | ✅ Complete | - |
+
+**SBERT API Endpoints (Kitchen Brigade - Sous Chef):**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/embeddings` | POST | Generate 384-dim SBERT embeddings |
+| `/api/v1/similarity` | POST | Compute cosine similarity |
+| `/api/v1/similar-chapters` | POST | Find top-k similar chapters |
+
+---
+
+## 2025-12-14
+
+### CL-009: Phase M2 API Endpoint Layer Complete
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-14 |
+| **WBS Item** | WBS 5.2 Phase M2 (API Endpoint Layer) |
+| **Change Type** | Feature |
+| **Summary** | Complete SBERT API with similarity, embeddings, batch, and similar-chapters endpoints |
+| **Files Changed** | `src/api/similarity.py`, `src/main.py`, `src/models/sbert/__init__.py`, `tests/integration/test_wbs_5_2_similarity_endpoint.py` |
+| **Rationale** | TDD implementation per SBERT_EXTRACTION_MIGRATION_WBS.md M2.1-M2.4 |
+| **Git Commit** | Pending |
+
+**Endpoints Implemented:**
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/v1/similarity` | POST | Compute cosine similarity between two texts |
+| `/v1/embeddings` | POST | Generate 384-dim embeddings for batch of texts |
+| `/v1/similarity/batch` | POST | Compute similarity for multiple pairs |
+| `/v1/similar-chapters` | POST | Find top-k similar chapters with threshold |
+
+**Pydantic Models (M2.4.7 REFACTOR):**
+
+| Model | Fields |
+|-------|--------|
+| `SimilarityRequest` | `text1: str`, `text2: str` |
+| `SimilarityResponse` | `score: float`, `model: str`, `processing_time_ms: float` |
+| `EmbeddingsRequest` | `texts: list[str]` |
+| `EmbeddingsResponse` | `embeddings: list[list[float]]`, `model: str`, `processing_time_ms: float` |
+| `BatchSimilarityRequest` | `pairs: list[SimilarityPair]` |
+| `BatchSimilarityResponse` | `scores: list[float]`, `model: str`, `processing_time_ms: float` |
+| `SimilarChaptersRequest` | `query: str`, `chapters: list[ChapterInput]`, `top_k: int`, `threshold: float` |
+| `SimilarChaptersResponse` | `chapters: list[SimilarChapterResult]`, `method: str`, `model: str`, `processing_time_ms: float` |
+
+**Test Summary:**
+
+| Phase | Tests | Description |
+|-------|-------|-------------|
+| M1 (Code Migration) | 29 | SemanticSimilarityEngine, dependencies, anti-pattern compliance |
+| M2.1 (Model Loading) | 16 | Singleton, thread safety, graceful degradation |
+| M2.2 (Embeddings) | 26 | Embeddings endpoint, validation, batch processing |
+| M2.3 (Batch Similarity) | 11 | Similarity symmetry (3), batch similarity (8) |
+| M2.4 (Similar Chapters) | 13 | Similar chapters (5), threshold (4), method metadata (4) |
+| **Total** | **95** | All passing |
+
+**Anti-Pattern Compliance:**
+
+| Anti-Pattern | Resolution |
+|--------------|------------|
+| S1192 (magic values) | `DEFAULT_MODEL_NAME`, `EMBEDDING_DIMENSIONS` exported from `__init__.py` |
+| #6 (duplicate code) | Singleton `SBERTModelLoader` shared across endpoints |
+| #7 (exception handling) | `SBERTModelError` with proper inheritance |
+| #9 (API design) | FastAPI router pattern with Pydantic models |
+| #10 (state mutation) | `asyncio.Lock` for thread safety |
+| #12 (connection pooling) | Cached model instance via singleton |
+
+**Quality Gates:**
+- ✅ pytest: 88 WBS 5.2 tests passing
+- ✅ ruff check: 0 errors
+- ✅ mypy: 0 errors
+
+---
+
 ## 2025-01-20
+
+### CL-008: Phase M2.2 API Routes Complete
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-01-20 |
+| **WBS Item** | WBS 5.2 Phase M2.2 (API Routes) |
+| **Change Type** | Feature |
+| **Summary** | Similarity and embeddings API endpoints with full TDD |
+| **Files Changed** | `src/api/similarity.py`, `src/main.py`, `tests/integration/test_wbs_5_2_similarity_endpoint.py` |
+| **Rationale** | TDD implementation for SBERT-powered semantic similarity API |
+| **Git Commit** | Pending |
+
+**Endpoints Implemented:**
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/v1/similarity` | POST | Compute cosine similarity between two texts |
+| `/v1/embeddings` | POST | Generate 384-dim embeddings for batch of texts |
+
+**Request/Response Models:**
+
+| Model | Fields |
+|-------|--------|
+| `SimilarityRequest` | `text1: str`, `text2: str` |
+| `SimilarityResponse` | `score: float`, `model: str`, `processing_time_ms: float` |
+| `EmbeddingsRequest` | `texts: list[str]` |
+| `EmbeddingsResponse` | `embeddings: list[list[float]]`, `model: str`, `processing_time_ms: float` |
+
+**Tests Added (M2.2):**
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestSimilarityEndpointExists | 5 | Endpoint existence and response format |
+| TestSimilarityRequestValidation | 4 | 422 responses for invalid input |
+| TestSimilarityResponseMetadata | 3 | Model info and timing |
+| TestEmbeddingsEndpointExists | 5 | Endpoint existence and 384-dim vectors |
+| TestEmbeddingsRequestValidation | 3 | 422 responses for invalid input |
+| TestEmbeddingsBatchProcessing | 4 | Batch processing and timing |
+| TestSimilarityAntiPatternCompliance | 2 | Singleton and error structure |
+
+**Test Count:** 71 tests passing (M1: 29, M2.1: 16, M2.2: 26)
+
+**Quality Gates:**
+- ✅ pytest: 71 WBS 5.2 tests passing
+- ✅ ruff check: 0 errors
+- ✅ mypy: 0 errors
+
+---
+
+### CL-007: Phase M2.1 Model Loading Infrastructure Complete
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-01-20 |
+| **WBS Item** | WBS 5.2 Phase M2.1 (Model Loading Infrastructure) |
+| **Change Type** | Feature |
+| **Summary** | SBERTModelLoader singleton with thread safety and graceful degradation |
+| **Files Changed** | `src/models/sbert/model_loader.py`, `src/core/exceptions.py`, `tests/unit/models/test_wbs_5_2_sbert_model_loader.py` |
+| **Rationale** | TDD implementation following RED → GREEN → REFACTOR cycle per M2 API Endpoint Layer |
+| **Git Commit** | Pending |
+
+**Implementation Details:**
+
+| Component | Description |
+|-----------|-------------|
+| `SBERTModelLoader` | Singleton wrapper for SemanticSimilarityEngine with thread-safe initialization |
+| `SBERTModelProtocol` | Duck-typing Protocol per CODING_PATTERNS_ANALYSIS.md line 130 |
+| `SBERTModelError` | Namespaced exception (Anti-Pattern #7 compliance) |
+| `get_sbert_model()` | Factory function for singleton access |
+| `reset_sbert_model()` | Test helper for singleton reset |
+
+**Anti-Pattern Compliance:**
+
+| Anti-Pattern | Resolution |
+|--------------|------------|
+| #6 Duplicate Code | Single SBERTModelLoader instance (singleton pattern) |
+| #7 Exception Shadowing | SBERTModelError inherits CodeOrchestratorError |
+| #10 State Mutation | asyncio.Lock() protects concurrent embedding computation |
+| #12 Connection Pooling | Cached model instance, lazy initialization |
+
+**Tests Added (M2.1):**
+
+| Test Class | Tests | Purpose |
+|------------|-------|---------|
+| TestSBERTModelSingleton | 5 | Singleton pattern verification |
+| TestSBERTModelThreadSafety | 3 | asyncio.Lock and concurrent access |
+| TestSBERTGracefulDegradation | 5 | TF-IDF fallback and error handling |
+| TestSBERTModelLoaderAntiPatternCompliance | 3 | Exception inheritance and protocol adherence |
+
+**Test Count:** 45 tests passing (M1: 29, M2.1: 16)
+
+**Quality Gates:**
+- ✅ pytest: 45 tests passing
+- ✅ ruff check: 0 errors
+- ✅ mypy: 0 errors
+
+---
 
 ### CL-006: Phase M1.3 Anti-Pattern Audit Complete
 

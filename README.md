@@ -118,13 +118,63 @@ uvicorn src.main:app --reload --port 8080
 
 ## 📡 API Endpoints
 
+### Keyword Extraction & Code Generation
+
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/v1/extract` | POST | Extract search terms from query |
-| `/api/v1/validate` | POST | Validate terms against domain |
-| `/api/v1/search` | POST | Full pipeline: extract + search |
-| `/api/v1/generate` | POST | Generate code from context |
+| `/v1/extract` | POST | Extract search terms from query |
+| `/v1/validate` | POST | Validate terms against domain |
+| `/v1/search` | POST | Full pipeline: extract + search |
+| `/v1/generate` | POST | Generate code from context |
 | `/health` | GET | Health check |
+
+### SBERT Semantic Similarity API
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/embeddings` | POST | Generate 384-dim SBERT embeddings |
+| `/api/v1/similarity` | POST | Compute cosine similarity between texts |
+| `/api/v1/similar-chapters` | POST | Find top-k similar chapters |
+
+#### Embeddings Endpoint
+
+```bash
+curl -X POST http://localhost:8083/api/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -d '{"texts": ["Machine learning fundamentals", "Deep neural networks"]}'
+```
+
+Response:
+```json
+{
+  "embeddings": [[0.123, 0.456, ...], [0.789, 0.012, ...]],  // 384 dimensions each
+  "method": "sentence_transformers"
+}
+```
+
+#### Similarity Endpoint
+
+```bash
+curl -X POST http://localhost:8083/api/v1/similarity \
+  -H "Content-Type: application/json" \
+  -d '{"text1": "Python programming", "text2": "Python development"}'
+```
+
+Response:
+```json
+{
+  "score": 0.89,
+  "method": "sentence_transformers"
+}
+```
+
+#### Similar Chapters Endpoint
+
+```bash
+curl -X POST http://localhost:8083/api/v1/similar-chapters \
+  -H "Content-Type: application/json" \
+  -d '{"chapters": [{"id": "ch1", "content": "..."}, ...], "query_chapter_id": "ch1", "top_k": 5}'
+```
 
 ### Example Request
 

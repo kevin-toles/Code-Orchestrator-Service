@@ -19,12 +19,16 @@ Patterns applied from CODING_PATTERNS_ANALYSIS.md:
 """
 
 from src.models.sbert.semantic_similarity_engine import (
+    DEFAULT_MODEL_NAME,
+    EMBEDDING_DIMENSIONS,
     SemanticSimilarityEngine,
     SimilarityConfig,
     SimilarityResult,
 )
 
 __all__ = [
+    "DEFAULT_MODEL_NAME",
+    "EMBEDDING_DIMENSIONS",
     "SemanticSimilarityEngine",
     "SimilarityConfig",
     "SimilarityResult",

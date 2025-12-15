@@ -1,8 +1,8 @@
 """
-WBS 3.2 Integration Tests - /api/v1/extract Endpoint
+WBS 3.2 Integration Tests - /v1/extract Endpoint
 
 Phase 3 Integration Test per WBS_IMPLEMENTATION.md:
-- POST /api/v1/extract returns consensus terms
+- POST /v1/extract returns consensus terms
 - search_terms[0].models_agreed >= 2
 - metadata.processing_time_ms < 5000
 
@@ -17,15 +17,15 @@ from src.main import app
 
 
 class TestExtractEndpoint:
-    """Tests for POST /api/v1/extract endpoint."""
+    """Tests for POST /v1/extract endpoint."""
 
     def test_extract_endpoint_exists(self) -> None:
-        """POST /api/v1/extract endpoint exists."""
+        """POST /v1/extract endpoint exists."""
         client = TestClient(app)
 
         # Should not return 404
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={"query": "test", "domain": "ai-ml"},
         )
 
@@ -36,7 +36,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "LLM document chunking with overlap",
                 "domain": "ai-ml",
@@ -50,7 +50,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "LLM document chunking with overlap",
                 "domain": "ai-ml",
@@ -66,7 +66,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "LLM document chunking with overlap",
                 "domain": "ai-ml",
@@ -86,7 +86,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "LLM document chunking",
                 "domain": "ai-ml",
@@ -102,7 +102,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "RAG pipeline",
                 "domain": "ai-ml",
@@ -118,7 +118,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "semantic search embeddings",
                 "domain": "ai-ml",
@@ -134,7 +134,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={"domain": "ai-ml"},  # Missing query
         )
 
@@ -145,7 +145,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={"query": "test"},  # Missing domain
         )
 
@@ -156,7 +156,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "transformer attention mechanism",
                 "domain": "ai-ml",
@@ -175,7 +175,7 @@ class TestExtractEndpoint:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "vector database indexing",
                 "domain": "ai-ml",
@@ -198,7 +198,7 @@ class TestExtractEndpointOptions:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "LLM chunking",
                 "domain": "ai-ml",
@@ -216,7 +216,7 @@ class TestExtractEndpointOptions:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "LLM RAG chunking embedding vector database semantic search",
                 "domain": "ai-ml",
@@ -236,7 +236,7 @@ class TestExtractMetadataDetails:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "document processing",
                 "domain": "ai-ml",
@@ -252,7 +252,7 @@ class TestExtractMetadataDetails:
         client = TestClient(app)
 
         response = client.post(
-            "/api/v1/extract",
+            "/v1/extract",
             json={
                 "query": "neural network training",
                 "domain": "ai-ml",

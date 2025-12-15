@@ -67,7 +67,7 @@ class ExtractResponse(BaseModel):
 # Router
 # =============================================================================
 
-extract_router = APIRouter(prefix="/api/v1", tags=["extract"])
+extract_router = APIRouter(prefix="/v1", tags=["extract"])
 
 
 @extract_router.post("/extract", response_model=ExtractResponse)
