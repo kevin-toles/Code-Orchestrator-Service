@@ -60,6 +60,45 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full details.
 | **Qwen2.5-Coder-32B** | 32B | Primary - Production |
 | **Qwen2.5-Coder-7B** | 7.6B | Fallback - Development |
 
+### Semantic Similarity (SBERT)
+| Model | Dimensions | Best For |
+|-------|------------|----------|
+| **all-MiniLM-L6-v2** | 384 | Semantic embeddings, similar chapters |
+
+## 📦 Dependencies
+
+### Required Dependencies
+Core packages that must be installed for the service to function:
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `fastapi` | >=0.109.0 | REST API framework |
+| `transformers` | >=4.36.0 | HuggingFace model loading |
+| `torch` | >=2.1.0 | PyTorch backend |
+| `sentence-transformers` | >=2.2.2 | SBERT semantic embeddings |
+| `scikit-learn` | ~=1.3.0 | TF-IDF fallback, cosine similarity |
+| `httpx` | >=0.26.0 | HTTP client (connection pooling per anti-pattern #12) |
+
+### Optional Dependencies (Graceful Degradation)
+The service implements a three-tier fallback for semantic similarity:
+
+1. **SBERT** (Primary): Uses `sentence-transformers` for high-quality 384-dim embeddings
+2. **TF-IDF** (Fallback): Uses `scikit-learn` when SBERT model unavailable
+3. **Service Error** (Last Resort): Returns error response, service stays up
+
+This ensures the service remains operational even if the SBERT model fails to load.
+
+```python
+# Example: Check which mode is active
+from src.models.sbert.semantic_similarity_engine import SemanticSimilarityEngine
+
+engine = SemanticSimilarityEngine()
+if engine.is_using_fallback:
+    print("Running in TF-IDF fallback mode")
+else:
+    print("Running with SBERT embeddings")
+```
+
 ## 🚀 Quick Start
 
 ```bash

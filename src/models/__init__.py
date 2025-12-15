@@ -14,10 +14,9 @@ Patterns applied from CODING_PATTERNS_ANALYSIS.md:
 """
 
 from src.models.codebert_ranker import CodeBERTRanker, RankedTerm, RankingResult
-from src.models.codet5_extractor import CodeT5Extractor, TermExtractionResult
+from src.models.codet5_extractor import CodeT5Extractor, ExtractionResult
 from src.models.graphcodebert_validator import (
     GraphCodeBERTValidator,
-    ValidatedTerm,
     ValidationResult,
 )
 from src.models.protocols import (
@@ -31,10 +30,9 @@ from src.models.registry import FakeModelRegistry, ModelRegistry
 __all__ = [
     # Extractors
     "CodeT5Extractor",
-    "TermExtractionResult",
+    "ExtractionResult",
     # Validators
     "GraphCodeBERTValidator",
-    "ValidatedTerm",
     "ValidationResult",
     # Rankers
     "CodeBERTRanker",

@@ -12,6 +12,11 @@ transformers>=4.36.0
 torch>=2.1.0
 sentence-transformers>=2.2.2
 
+# SBERT Dependencies (WBS 5.2 / M1.2)
+# scikit-learn: Required for TF-IDF fallback when sentence-transformers unavailable
+# Per Comp_Static_Analysis_Report #22: Use ~= for compatible release pinning
+scikit-learn~=1.3.0
+
 # HTTP Client (shared per anti-pattern #12)
 httpx>=0.26.0
 

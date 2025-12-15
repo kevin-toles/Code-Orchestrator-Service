@@ -2,7 +2,13 @@
 
 ## Executive Summary
 
-A standalone microservice that coordinates multiple specialized code understanding models (CodeT5+, GraphCodeBERT, CodeBERT) to dynamically extract, validate, and rank search terms from natural language queries. This service replaces hardcoded keyword mappings with intelligent, context-aware term generation.
+A standalone microservice that coordinates multiple specialized models (SBERT, CodeT5+, GraphCodeBERT, CodeBERT) to dynamically extract, validate, and rank search terms from natural language queries. This service replaces hardcoded keyword mappings with intelligent, context-aware term generation.
+
+**Models Hosted:**
+- **SBERT** (`all-MiniLM-L6-v2`) - Text/NL semantic similarity for requirements translation
+- **CodeT5+** - Code term extraction and generation
+- **GraphCodeBERT** - Code structure validation  
+- **CodeBERT** - NL↔Code bimodal search and ranking
 
 This service acts as the **"Sous Chef"** in the Kitchen Brigade architecture—interpreting orders (queries), preparing ingredients (keywords), curating results, and auditing output before serving to the customer.
 
@@ -24,6 +30,7 @@ The platform follows a **Kitchen Brigade** organizational model where each servi
 │                                                                              │
 │  👨‍🍳 SOUS CHEF (Code Understanding Orchestrator) ← THIS SERVICE             │
 │     └─→ SMART: Interprets the order                                         │
+│     └─→ SBERT: Translates NL requirements, finds similar chapters           │
 │     └─→ Extracts keywords/concepts using code understanding models          │
 │     └─→ Sends keyword list to Cookbook                                      │
 │                                                                              │

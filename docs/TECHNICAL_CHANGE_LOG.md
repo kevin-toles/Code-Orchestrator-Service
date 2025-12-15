@@ -18,6 +18,122 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-01-20
+
+### CL-006: Phase M1.3 Anti-Pattern Audit Complete
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-01-20 |
+| **WBS Item** | WBS 5.2 Phase M1.3 (Anti-Pattern Audit) |
+| **Change Type** | Fix, Refactor |
+| **Summary** | SBERT engine audited and fixed for anti-pattern compliance |
+| **Files Changed** | `src/models/sbert/semantic_similarity_engine.py`, `tests/unit/models/test_wbs_5_2_sbert_engine.py` |
+| **Rationale** | TDD compliance for Phase M1 - ensure code quality before Phase M2 integration |
+| **Git Commit** | Pending |
+
+**Anti-Pattern Fixes Applied:**
+
+| Issue | Resolution |
+|-------|------------|
+| E402 (ruff) | Added `# noqa: E402` to intentional post-try/except sklearn imports |
+| unused type: ignore | Removed unnecessary `type: ignore[assignment]` comment on line 124 |
+| S1192 | Verified - `DEFAULT_MODEL_NAME` constant already extracted (2 occurrences allowed) |
+| #7 exception shadowing | Verified - no bare except clauses found |
+| S3776 | Verified - all functions have cognitive complexity < 15 |
+| mypy | Passed with zero errors after unused ignore removal |
+
+**Tests Added (M1.3):**
+
+| Test Class | Test Method | Purpose |
+|------------|-------------|---------|
+| TestImportStructureCompliance | test_ruff_e402_resolved | Validates noqa comments present on sklearn imports |
+| TestImportStructureCompliance | test_import_order_is_intentional | Validates graceful degradation pattern maintained |
+| TestAntiPatternCompliance | test_s1192_no_magic_strings_tripled | Validates S1192 compliance (no 3+ duplicate literals) |
+| TestAntiPatternCompliance | test_s3776_cognitive_complexity_under_limit | Validates S3776 compliance (CC < 15) |
+
+**Test Count:** 29 tests passing (M1.1: 19, M1.2: 6, M1.3: 4)
+
+---
+
+### CL-005: Phase M1.1-M1.2 Code Migration & Dependency Setup
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-01-20 |
+| **WBS Item** | WBS 5.2 Phase M1.1 (Code Migration), M1.2 (Dependency Setup) |
+| **Change Type** | Feature |
+| **Summary** | SBERT SemanticSimilarityEngine migrated from llm-document-enhancer to Code-Orchestrator-Service |
+| **Files Changed** | See list below |
+| **Rationale** | Kitchen Brigade architecture - Sous Chef (Code-Orchestrator) hosts all understanding models |
+| **Git Commit** | Pending |
+
+**Files Created:**
+- `src/models/sbert/__init__.py` - Package initialization
+- `src/models/sbert/semantic_similarity_engine.py` - Full engine with 384-dim SBERT embeddings
+- `tests/unit/models/__init__.py` - Test package init
+- `tests/unit/models/test_wbs_5_2_sbert_engine.py` - TDD test suite (29 tests)
+
+**Files Modified:**
+- `src/models/__init__.py` - Fixed broken imports (ExtractionResult, removed ValidatedTerm)
+- `requirements.txt` - Added `scikit-learn~=1.3.0` for TF-IDF fallback
+- `README.md` - Added SBERT dependencies section
+
+**Engine API Modifications:**
+- Constructor: `__init__(config, *, model_name)` - config-first signature
+- Added `_tfidf_vectorizer` alias for backward compatibility
+- Added `compute_similarity_matrix(texts: list[str] | NDArray)` - accepts text lists
+- Added `find_similar(query='text', candidates=[...])` - text-based convenience API
+
+---
+
+## 2025-12-14
+
+### CL-004: SBERT Integration Planning (Architecture Update)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-14 |
+| **WBS Item** | WBS 5.2 (SBERT Integration) |
+| **Change Type** | Documentation |
+| **Summary** | Architecture updated to include SBERT as a core model hosted by Code-Orchestrator-Service |
+| **Files Changed** | `docs/ARCHITECTURE.md` |
+| **Rationale** | SBERT is a participant in Kitchen Brigade - helps translate NL requirements from LLM gateway before CodeBERT/CodeT5+ processing |
+| **Git Commit** | Pending |
+
+**Architecture Changes:**
+
+| Section | Update |
+|---------|--------|
+| Executive Summary | Added SBERT to model list alongside CodeT5+, GraphCodeBERT, CodeBERT |
+| Kitchen Brigade Diagram | Added "SBERT: Translates NL requirements, finds similar chapters" to Sous Chef role |
+| Model List | SBERT (`all-MiniLM-L6-v2`) - Text/NL semantic similarity |
+
+**New API Endpoints (Planned - WBS 5.2):**
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/v1/similarity` | Compare texts semantically |
+| POST | `/v1/embeddings` | Generate text embeddings |
+| POST | `/v1/similar-chapters` | Find similar chapters across corpus |
+
+**Migration Impact:**
+- `llm-document-enhancer` will migrate from local SBERT to API calls
+- `SemanticSimilarityEngine` will become an API client
+- No breaking changes - fallback to local SBERT if API unavailable
+
+**Kitchen Brigade Alignment:**
+- ✅ Sous Chef hosts ALL understanding models (SBERT, CodeBERT, GraphCodeBERT, CodeT5+)
+- ✅ SBERT helps translate NL requirements before code-specific processing
+- ✅ Service separation maintained (processing vs intelligence)
+
+**Cross-References:**
+- Platform TECHNICAL_CHANGE_LOG.md: CL-009 (SBERT Migration)
+- AI_CODING_PLATFORM_WBS.md: Phase 5.2 (SBERT Integration)
+- SBERT_EXTRACTION_MIGRATION_WBS.md: Detailed TDD migration plan
+
+---
+
 ## 2025-12-11
 
 ### CL-003: Rename Agent to Extractor/Validator/Ranker
