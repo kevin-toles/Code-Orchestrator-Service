@@ -22,6 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.extract import extract_router
 from src.api.health import router as health_router
+from src.api.keywords import keywords_router
 from src.api.search import search_router
 from src.api.similarity import similarity_router
 from src.api.topics import router as topics_router
@@ -123,6 +124,7 @@ app.add_middleware(
 # Include routers
 app.include_router(health_router)
 app.include_router(extract_router)
+app.include_router(keywords_router, prefix="/api")  # MSE-1.4: Keywords endpoint
 app.include_router(search_router)
 app.include_router(similarity_router)
 app.include_router(topics_router)
