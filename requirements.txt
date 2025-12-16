@@ -12,6 +12,11 @@ transformers>=4.36.0
 torch>=2.1.0
 sentence-transformers>=2.2.2
 
+# BERTopic for Topic Clustering (BERTOPIC_INTEGRATION_WBS.md)
+bertopic>=0.16.0
+hdbscan>=0.8.29  # Required by BERTopic
+umap-learn>=0.5.3  # Required by BERTopic
+
 # SBERT Dependencies (WBS 5.2 / M1.2)
 # scikit-learn: Required for TF-IDF fallback when sentence-transformers unavailable
 # Per Comp_Static_Analysis_Report #22: Use ~= for compatible release pinning

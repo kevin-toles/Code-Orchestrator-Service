@@ -18,6 +18,169 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-12-18
+
+### CL-013: BERTopic Cluster Endpoint (Phase B2.2)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-16 |
+| **WBS Item** | BERTOPIC_INTEGRATION_WBS.md - Phase B2.2 |
+| **Change Type** | Feature |
+| **Summary** | POST /api/v1/cluster endpoint for document clustering with topic assignments. Full TDD RED→GREEN→REFACTOR cycle. |
+| **Files Changed** | `src/api/topics.py` (EXTENDED), `tests/unit/api/test_wbs_b2_2_cluster_endpoint.py` (NEW) |
+| **Rationale** | API endpoint to cluster documents and return per-document topic assignments with chapter metadata |
+| **Git Commit** | Pending |
+
+**Implementation Details:**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Document Analysis | ✅ Complete | CODING_PATTERNS_ANALYSIS.md Anti-Pattern 2.2 (dataclasses) reviewed |
+| Anti-Pattern Audit | ✅ Complete | 0 SonarQube issues |
+| RED Phase | ✅ Complete | 19 tests written before implementation |
+| GREEN Phase | ✅ Complete | cluster endpoint added, all 19 tests pass |
+| REFACTOR Phase | ✅ Complete | Helper method `_build_cluster_assignments()` extracted |
+
+**New Files:**
+
+| File | Purpose |
+|------|---------|
+| `tests/unit/api/test_wbs_b2_2_cluster_endpoint.py` | 19 unit tests for cluster endpoint |
+
+**Endpoint Details:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/cluster` | POST | Cluster documents with chapter metadata |
+
+**Request/Response Schemas:**
+
+Request:
+```json
+{
+  "corpus": ["Chapter 1 text...", "Chapter 2 text..."],
+  "chapter_index": [{"book": "arch.json", "chapter": 1, "title": "Ch 1"}],
+  "embeddings": null,
+  "embedding_model": "all-MiniLM-L6-v2"
+}
+```
+
+Response:
+```json
+{
+  "assignments": [{"book": "arch.json", "chapter": 1, "title": "Ch 1", "topic_id": 0, "topic_name": "...", "confidence": 0.87}],
+  "topics": [...],
+  "topic_count": 15,
+  "processing_time_ms": 1234.5
+}
+```
+
+---
+
+### CL-012: BERTopic Topics Endpoint (Phase B2.1)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-16 |
+| **WBS Item** | BERTOPIC_INTEGRATION_WBS.md - Phase B2.1 |
+| **Change Type** | Feature |
+| **Summary** | POST /api/v1/topics endpoint for topic discovery. Full TDD RED→GREEN→REFACTOR cycle. |
+| **Files Changed** | `src/api/topics.py` (NEW), `src/main.py`, `tests/unit/api/test_wbs_b2_1_topics_endpoint.py` (NEW) |
+| **Rationale** | API endpoint to expose BERTopic topic clustering for corpus analysis |
+| **Git Commit** | Pending |
+
+**Implementation Details:**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Document Analysis | ✅ Complete | CODING_PATTERNS_ANALYSIS.md, BERTOPIC_INTEGRATION_WBS.md reviewed |
+| Anti-Pattern Audit | ✅ Complete | 0 SonarQube issues |
+| RED Phase | ✅ Complete | 16 tests written before implementation |
+| GREEN Phase | ✅ Complete | `topics.py` created, all 16 tests pass |
+| REFACTOR Phase | ✅ Complete | Helper method extracted for complexity |
+
+**New Files:**
+
+| File | Purpose |
+|------|---------|
+| `src/api/topics.py` | POST /api/v1/topics endpoint |
+| `tests/unit/api/test_wbs_b2_1_topics_endpoint.py` | 16 unit tests for endpoint |
+
+**Endpoint Details:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/topics` | POST | Discover topics from corpus |
+
+**Request/Response Schemas:**
+
+Request:
+```json
+{
+  "corpus": ["doc1", "doc2", ...],
+  "min_topic_size": 2,
+  "embedding_model": "all-MiniLM-L6-v2"
+}
+```
+
+Response:
+```json
+{
+  "topics": [{"topic_id": 0, "name": "...", "keywords": [...], "size": 5}],
+  "topic_count": 15,
+  "model_info": {"embedding_model": "...", "bertopic_version": "..."},
+  "processing_time_ms": 1234.5
+}
+```
+
+---
+
+### CL-011: BERTopic Integration Complete (Topic Clustering)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-18 |
+| **WBS Item** | BERTOPIC_INTEGRATION_WBS.md - Phase B1 |
+| **Change Type** | Feature |
+| **Summary** | BERTopic topic clustering integrated with TDD methodology. Full RED→GREEN→REFACTOR cycle complete. |
+| **Files Changed** | `src/models/bertopic_clusterer.py` (NEW), `src/models/protocols.py`, `requirements.txt`, `tests/unit/models/test_bertopic_clusterer.py` (NEW) |
+| **Rationale** | Enable topic-based chapter clustering for cross-referencing per BERTOPIC_SENTENCE_TRANSFORMERS_DESIGN.md |
+| **Git Commit** | Pending |
+
+**Implementation Details:**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Document Analysis | ✅ Complete | AI_CODING_PLATFORM_ARCHITECTURE.md, BERTOPIC_SENTENCE_TRANSFORMERS_DESIGN.md reviewed |
+| Anti-Pattern Audit | ✅ Complete | S1172, S3776, SonarQube issues addressed |
+| RED Phase | ✅ Complete | 24 tests written before implementation |
+| GREEN Phase | ✅ Complete | `bertopic_clusterer.py` created, all 24 tests pass |
+| REFACTOR Phase | ✅ Complete | Cognitive complexity reduced, helper methods extracted |
+
+**New Files:**
+
+| File | Purpose |
+|------|---------|
+| `src/models/bertopic_clusterer.py` | BERTopic wrapper with KMeans fallback |
+| `tests/unit/models/test_bertopic_clusterer.py` | 24 unit tests for topic clustering |
+
+**Protocol Added:**
+
+| Protocol | Methods |
+|----------|---------|
+| `TopicClustererProtocol` | `cluster()`, `get_topic_info()`, `topics`, `embedding_model`, `is_using_fallback` |
+
+**Dependencies Added:**
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `bertopic` | >=0.16.0 | Topic modeling |
+| `hdbscan` | >=0.8.29 | Density clustering (BERTopic dependency) |
+| `umap-learn` | >=0.5.3 | Dimensionality reduction (BERTopic dependency) |
+
+---
+
 ## 2025-12-15
 
 ### CL-010: SBERT Migration Complete (M5 Documentation & Rollout)

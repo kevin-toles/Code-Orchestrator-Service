@@ -124,3 +124,41 @@ class RankerProtocol(Protocol):
 
 # Backward compatibility alias
 RankerModelProtocol = RankerProtocol
+
+
+class TopicClustererProtocol(Protocol):
+    """Protocol for TopicClusterer models (BERTopic).
+
+    Model wrappers that cluster documents into semantic topics.
+    WBS: BERTOPIC_INTEGRATION_WBS.md
+
+    Enables FakeTopicClusterer for testing without BERTopic.
+    Pattern: Protocol typing for duck typing
+    """
+
+    @property
+    def topics(self) -> list[Any]:
+        """Get list of discovered topics."""
+        ...
+
+    @property
+    def embedding_model(self) -> str:
+        """Get the embedding model name."""
+        ...
+
+    @property
+    def is_using_fallback(self) -> bool:
+        """Check if using fallback clustering."""
+        ...
+
+    def cluster(
+        self,
+        corpus: list[str],
+        embeddings: npt.NDArray[np.floating[Any]] | None = None,
+    ) -> Any:
+        """Cluster documents into topics."""
+        ...
+
+    def get_topic_info(self, topic_id: int) -> Any:
+        """Get information about a specific topic."""
+        ...
