@@ -336,6 +336,29 @@ The Semantic Search Service QUERIES these systems - it doesn't contain them.
 | **CodeT5+** | Generator | Encoder-decoder architecture enables text generation; trained on NL↔Code pairs | `Salesforce/codet5p-220m` |
 | **GraphCodeBERT** | Validator | Understands code structure via data flow graphs; catches semantic mismatches | `microsoft/graphcodebert-base` |
 | **CodeBERT** | Ranker | Fast embeddings for similarity scoring; well-established baseline | `microsoft/codebert-base` |
+| **SBERT** | Similarity | Semantic similarity for chapter cross-referencing; 384-dim embeddings | `sentence-transformers/all-MiniLM-L6-v2` |
+| **BERTopic** | Topic Clustering | Discovers semantic topics across documents; enables topic-based grouping | `bertopic>=0.16.0` + SBERT |
+
+### Topic Clustering (BERTopic Integration)
+
+BERTopic clusters chapters into semantic topics for cross-referencing:
+
+```
+Input: Corpus of chapter texts
+        ↓
+BERTopic (or KMeans fallback)
+        ↓
+Output: TopicResults {
+    topics: [TopicInfo(topic_id=0, name="Repository Pattern", keywords=[...]), ...]
+    assignments: [TopicAssignment(topic_id=0, confidence=0.87), ...]
+}
+```
+
+| Component | Purpose |
+|-----------|---------|
+| `TopicClusterer` | BERTopic wrapper with KMeans fallback |
+| `TopicClustererProtocol` | Duck typing interface for testing |
+| `FakeTopicClusterer` | Test double with predictable results |
 
 ### Code Generation (Line Cook)
 

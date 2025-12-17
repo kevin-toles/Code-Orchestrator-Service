@@ -1,8 +1,6 @@
 # Code-Orchestrator-Service Docker Compose
 # WBS 1.1.5: Service on port 8083 per Kitchen Brigade architecture
 
-version: "3.9"
-
 services:
   code-orchestrator:
     build:

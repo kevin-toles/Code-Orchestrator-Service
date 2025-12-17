@@ -120,6 +120,42 @@ class BatchSimilarityResponse(BaseModel):
 
 
 # =============================================================================
+# Request/Response Models - Similarity Matrix
+# Full pairwise similarity matrix for a corpus of texts
+# =============================================================================
+
+
+class SimilarityMatrixRequest(BaseModel):
+    """Request body for similarity matrix endpoint."""
+
+    texts: list[str] = Field(
+        ...,
+        min_length=1,
+        description="List of texts to compute pairwise similarity for",
+    )
+
+    @field_validator("texts")
+    @classmethod
+    def validate_texts_not_empty(cls, v: list[str]) -> list[str]:
+        """Validate that no text in the list is empty."""
+        for i, text in enumerate(v):
+            if not text or text.strip() == "":
+                raise ValueError(f"Text at index {i} cannot be empty")
+        return v
+
+
+class SimilarityMatrixResponse(BaseModel):
+    """Response from similarity matrix endpoint."""
+
+    similarity_matrix: list[list[float]] = Field(
+        ...,
+        description="NxN similarity matrix where N is the number of texts",
+    )
+    model: str = Field(..., description="Model name used for computation")
+    processing_time_ms: float = Field(..., description="Processing time in milliseconds")
+
+
+# =============================================================================
 # Request/Response Models - Similar Chapters (M2.4)
 # Per SBERT_EXTRACTION_MIGRATION_WBS.md M2.4.1-M2.4.7
 # Per TIER_RELATIONSHIP_DIAGRAM.md - Similar chapters with tier-aware relevance
@@ -391,6 +427,64 @@ def _compute_pairwise_similarities(
         scores.append(similarity)
 
     return scores
+
+
+# =============================================================================
+# Similarity Matrix Endpoint
+# Compute full pairwise similarity matrix for a corpus
+# =============================================================================
+
+
+@similarity_router.post("/similarity/matrix", response_model=SimilarityMatrixResponse)
+async def compute_similarity_matrix(
+    request: SimilarityMatrixRequest,
+) -> SimilarityMatrixResponse:
+    """Compute full pairwise similarity matrix for a corpus of texts.
+
+    Returns an NxN matrix where entry [i][j] is the cosine similarity
+    between text i and text j.
+
+    Args:
+        request: SimilarityMatrixRequest with list of texts
+
+    Returns:
+        SimilarityMatrixResponse with similarity matrix, model info, and timing
+
+    Raises:
+        HTTPException: If model fails to compute similarity matrix
+    """
+    start_time = time.perf_counter()
+
+    try:
+        model_loader = get_sbert_model()
+
+        # Compute embeddings for all texts
+        embeddings = model_loader.compute_embeddings(request.texts)
+
+        # Compute full pairwise similarity matrix
+        # embeddings shape: (n_texts, embedding_dim)
+        # Since embeddings are L2-normalized, cosine = dot product
+        similarity_matrix = np.dot(embeddings, embeddings.T)
+
+        # Clip to [-1, 1] to handle numerical precision issues
+        similarity_matrix = np.clip(similarity_matrix, -1.0, 1.0)
+
+        # Convert to list for JSON serialization
+        matrix_list = similarity_matrix.tolist()
+
+        processing_time_ms = (time.perf_counter() - start_time) * 1000
+
+        return SimilarityMatrixResponse(
+            similarity_matrix=matrix_list,
+            model=model_loader.get_status()["model_name"],
+            processing_time_ms=processing_time_ms,
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to compute similarity matrix: {str(e)}",
+        ) from e
 
 
 # =============================================================================
