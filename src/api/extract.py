@@ -36,7 +36,7 @@ class ExtractRequest(BaseModel):
     """Request body for extract endpoint."""
 
     query: str = Field(..., min_length=1, description="Query to extract terms from")
-    domain: str = Field(..., min_length=1, description="Domain context for extraction")
+    domain: str | None = Field(default=None, description="Domain context for extraction (optional)")
     options: ExtractOptions | None = None
 
 

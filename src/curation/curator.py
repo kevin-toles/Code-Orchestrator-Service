@@ -40,12 +40,12 @@ class ResultCurator:
         self,
         results: list[SearchResult],
         query: str,
-        domain: str,
+        domain: str | None = None,
     ) -> list[SearchResult]:
         """Curate results: filter by domain, dedupe, rank.
 
         Full curation pipeline:
-        1. Filter by domain
+        1. Filter by domain (if provided)
         2. Remove duplicates
         3. Rank by relevance
         4. Filter by minimum score
@@ -53,13 +53,13 @@ class ResultCurator:
         Args:
             results: Raw search results
             query: Original query for relevance ranking
-            domain: Target domain for filtering
+            domain: Target domain for filtering (optional)
 
         Returns:
             Curated list of SearchResult
         """
-        # Step 1: Filter by domain
-        filtered = self.filter_by_domain(results, domain)
+        # Step 1: Filter by domain (skip if no domain provided)
+        filtered = self.filter_by_domain(results, domain) if domain else results
 
         # Step 2: Remove duplicates
         deduped = self.remove_duplicates(filtered)

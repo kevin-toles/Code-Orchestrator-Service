@@ -34,7 +34,7 @@ class SearchRequest(BaseModel):
     """Request body for search endpoint."""
 
     query: str = Field(..., min_length=1, description="Search query")
-    domain: str = Field(..., min_length=1, description="Domain context")
+    domain: str | None = Field(default=None, description="Domain context (optional)")
     options: SearchOptions | None = None
 
 
