@@ -18,6 +18,90 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-12-18
+
+### CL-016: EEP-6 Diagram Similarity (Enhanced Enrichment Pipeline Phase 6)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-18 |
+| **WBS Item** | ENHANCED_ENRICHMENT_PIPELINE_WBS.md - Phase EEP-6 |
+| **Change Type** | Feature |
+| **Summary** | Diagram extraction and similarity computation for detecting related architecture diagrams across chapters. Detects Figure/Diagram/Architecture references and ASCII art, uses SBERT for semantic similarity. Full TDD RED→GREEN→REFACTOR cycle. |
+| **Files Changed** | `src/models/diagram_extractor.py` (NEW), `tests/unit/models/test_eep6_diagram_similarity.py` (NEW) |
+| **Rationale** | Flag chapters with similar architecture diagrams to improve cross-referencing quality |
+| **Git Commit** | `509e681` |
+
+**Implementation Details:**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Document Analysis | ✅ Complete | Steps 1-3: Hierarchy, Guideline, Conflict review |
+| Anti-Pattern Audit | ✅ Complete | S1192, S3776, S1172, #12 all verified |
+| RED Phase | ✅ Complete | 50 tests written before implementation |
+| GREEN Phase | ✅ Complete | All 50 tests pass |
+| REFACTOR Phase | ✅ Complete | ruff check passes, 0 SonarQube issues |
+
+**Acceptance Criteria Met:**
+
+| AC | Description | Status |
+|----|-------------|--------|
+| AC-6.1.1 | Detect "Figure X", "Diagram X", "Architecture diagram" patterns | ✅ |
+| AC-6.1.2 | Detect ASCII art diagrams (box drawing characters) | ✅ |
+| AC-6.1.3 | Return `DiagramReference(type, caption, context)` | ✅ |
+| AC-6.2.1 | Extract caption text | ✅ |
+| AC-6.2.2 | Extract surrounding context (paragraph before/after) | ✅ |
+| AC-6.2.3 | Use SBERT to embed description | ✅ |
+| AC-6.3.1 | Compare diagram descriptions using SBERT | ✅ |
+| AC-6.3.2 | Flag chapters with similar architecture diagrams | ✅ |
+| AC-6.4.1 | TDD cycle with 15+ tests | ✅ (50 tests) |
+
+**New Files:**
+
+| File | Purpose |
+|------|---------|
+| `src/models/diagram_extractor.py` | DiagramExtractor class, Protocol, dataclasses |
+| `tests/unit/models/test_eep6_diagram_similarity.py` | 50 unit tests for diagram similarity |
+
+**New Dataclasses:**
+
+| Dataclass | Fields | Purpose |
+|-----------|--------|---------|
+| `DiagramType` (Enum) | FIGURE, DIAGRAM, ARCHITECTURE, ASCII_ART | Type of diagram detected |
+| `DiagramReference` | diagram_type, caption, context, line_number | Reference to diagram in text |
+| `DiagramExtractorConfig` | context_lines_before/after, ascii_art_threshold, sbert_model_name | Configuration |
+| `DiagramSimilarityResult` | score, source_diagram_index, target_diagram_index | Comparison result |
+
+**DiagramExtractor Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `extract_diagrams(text)` | Extract all diagram references from text |
+| `embed_diagram(diagram)` | SBERT embed diagram description |
+| `compute_similarity(d1, d2)` | Cosine similarity between diagrams |
+| `compare_chapter_diagrams(src, tgt)` | Compare all diagrams between chapters |
+| `get_max_diagram_similarity(src, tgt)` | Get max similarity score |
+
+**Detection Patterns:**
+
+| Pattern | Regex | Example Match |
+|---------|-------|---------------|
+| Figure | `(?i)figure\s+[\d.]+` | "Figure 3.1: Architecture" |
+| Diagram | `(?i)diagram\s+[\d.]+` | "Diagram 2.5.1: Data Flow" |
+| Architecture | `(?i)architecture\s+diagram` | "Architecture Diagram: Service Mesh" |
+| ASCII Art | Box chars density ≥ 5% | `┌───┐`, `+----+` |
+
+**Patterns Applied:**
+
+- Protocol pattern (CODING_PATTERNS_ANALYSIS.md line 130)
+- FakeDiagramExtractor for testing
+- Dataclasses for structured output
+- Embedding cached via `_embedding_cache` dict (Anti-Pattern #12 prevention)
+- Lazy-loaded SBERT model (Anti-Pattern #12 prevention)
+- Constants for string literals and thresholds (S1192 compliance)
+
+---
+
 ## 2025-01-14
 
 ### CL-015: EEP-2 Concept Extraction Layer (Enhanced Enrichment Pipeline Phase 2)
