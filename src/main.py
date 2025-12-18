@@ -20,6 +20,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.api.codebert import router as codebert_router
+from src.api.concepts import concepts_router
+from src.api.embed import router as embed_router
 from src.api.extract import extract_router
 from src.api.health import router as health_router
 from src.api.keywords import keywords_router
@@ -128,6 +131,9 @@ app.include_router(keywords_router, prefix="/api")  # MSE-1.4: Keywords endpoint
 app.include_router(search_router)
 app.include_router(similarity_router)
 app.include_router(topics_router)
+app.include_router(embed_router)  # EEP-1.5.7: Multi-modal embedding endpoints
+app.include_router(concepts_router, prefix="/api")  # EEP-2.4: Concept extraction endpoint
+app.include_router(codebert_router)  # EEP-5.2: CodeBERT embedding endpoint
 
 
 # =============================================================================

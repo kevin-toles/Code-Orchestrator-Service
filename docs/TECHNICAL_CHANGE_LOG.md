@@ -18,6 +18,152 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-01-14
+
+### CL-015: EEP-2 Concept Extraction Layer (Enhanced Enrichment Pipeline Phase 2)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-01-14 |
+| **WBS Item** | ENHANCED_ENRICHMENT_PIPELINE_WBS.md - Phase EEP-2 |
+| **Change Type** | Feature |
+| **Summary** | Concept extraction layer that matches EEP-1 filtered keywords against domain taxonomy to extract domain concepts with confidence scores. Includes hierarchical concept relationships and domain classification. Full TDD RED→GREEN→REFACTOR cycle. |
+| **Files Changed** | `src/models/concept_extractor.py` (NEW), `src/api/concepts.py` (NEW), `src/main.py` (MODIFIED), `tests/unit/models/test_eep2_concept_extraction.py` (NEW), `tests/unit/api/test_eep2_concepts_api.py` (NEW) |
+| **Rationale** | Extract domain concepts from text/keywords by matching against taxonomy keywords for enrichment pipeline |
+| **Git Commit** | Pending |
+
+**Implementation Details:**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Document Analysis | ✅ Complete | Steps 1-3: Hierarchy, Guideline, Conflict review |
+| Anti-Pattern Audit | ✅ Complete | S1192, S3776, S1172, S3457, #7, #12 all verified |
+| RED Phase | ✅ Complete | 61 tests written (46 model, 15 API) |
+| GREEN Phase | ✅ Complete | All 61 tests pass |
+| REFACTOR Phase | ✅ Complete | ruff check passes, 0 SonarQube issues |
+
+**New Files:**
+
+| File | Purpose |
+|------|---------|
+| `src/models/concept_extractor.py` | ConceptExtractor class, Protocol, dataclasses |
+| `src/api/concepts.py` | POST /api/v1/concepts endpoint |
+| `tests/unit/models/test_eep2_concept_extraction.py` | 46 unit tests for ConceptExtractor |
+| `tests/unit/api/test_eep2_concepts_api.py` | 15 API endpoint tests |
+
+**New Dataclasses:**
+
+| Dataclass | Fields | Purpose |
+|-----------|--------|---------|
+| `ExtractedConcept` | name, confidence, domain, tier, parent_concept | Single extracted concept |
+| `ConceptExtractionResult` | concepts, domain_scores, primary_domain, total_matches | Extraction result container |
+| `ConceptExtractorConfig` | domain_taxonomy_path, tier_taxonomy_path, enable_hierarchical, min_confidence | Configuration |
+
+**ConceptExtractor Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `extract_concepts(text)` | Extract concepts from text |
+| `extract_concepts_from_keywords(keywords)` | Extract from EEP-1 keywords |
+| `get_domain_concepts(domain)` | Get all concepts for a domain |
+| `get_tier_concepts(tier)` | Get all concepts for a tier |
+| `classify_domain(text)` | Classify text into primary domain |
+| `get_concept_hierarchy()` | Get hierarchical concept tree |
+
+**API Schema (AC-2.4.2, AC-2.4.3 Compliant):**
+
+| Field | Type | WBS Ref | Description |
+|-------|------|---------|-------------|
+| Request: `text` | string | AC-2.4.2 | Text to extract concepts from |
+| Request: `domain` | string | AC-2.4.2 | Domain context for filtering |
+| Response: `concepts` | array | AC-2.4.3 | List of extracted concepts |
+| Response: `domain_score` | float | AC-2.4.3 | Primary domain confidence (0.0-1.0) |
+| Response: `domain_scores` | dict | Extended | All domain scores (backward compat) |
+
+**API Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/concepts` | POST | Extract concepts from text/keywords |
+| `/api/v1/concepts/domains` | GET | Get all domains with concepts |
+| `/api/v1/concepts/domains/{domain}` | GET | Get concepts for specific domain |
+
+**Patterns Applied:**
+
+- Protocol pattern (CODING_PATTERNS_ANALYSIS.md line 130)
+- FakeConceptExtractor for testing
+- Dataclasses for structured output
+- Taxonomy cached at init (Anti-Pattern #12 prevention)
+- Constants for string literals (S1192 compliance)
+
+---
+
+## 2025-12-17
+
+### CL-014: EEP-1 Domain-Aware Keyword Filtering (Enhanced Enrichment Pipeline Phase 1)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-17 |
+| **WBS Item** | ENHANCED_ENRICHMENT_PIPELINE_WBS.md - Phase EEP-1 |
+| **Change Type** | Feature |
+| **Summary** | Domain-aware keyword filtering with custom technical stopwords and domain taxonomy integration. Full TDD RED→GREEN→REFACTOR cycle. |
+| **Files Changed** | `src/models/tfidf_extractor.py` (EXTENDED), `config/technical_stopwords.json` (NEW), `tests/unit/models/test_eep1_stopword_filtering.py` (NEW) |
+| **Rationale** | Filter technical book artifacts (chapter, figure, table) and support domain-specific keyword boosting for enrichment pipeline |
+| **Git Commit** | Pending |
+
+**Implementation Details:**
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| Document Analysis | ✅ Complete | Steps 1-3: Hierarchy, Guideline, Conflict review |
+| Anti-Pattern Audit | ✅ Complete | S1192, S3776, S1172, S3457, #7, #12 all verified |
+| RED Phase | ✅ Complete | 34 tests written before implementation |
+| GREEN Phase | ✅ Complete | All 34 tests pass, 28 legacy tests pass |
+| REFACTOR Phase | ✅ Complete | SonarQube issues fixed (S1700, S5795) |
+
+**New Files:**
+
+| File | Purpose |
+|------|---------|
+| `config/technical_stopwords.json` | Technical book stopwords by category |
+| `tests/unit/models/test_eep1_stopword_filtering.py` | 34 unit tests for EEP-1 features |
+
+**Config Extensions (KeywordExtractorConfig):**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `custom_stopwords_path` | `Path \| None` | `None` | Path to custom stopwords JSON |
+| `merge_stopwords` | `bool` | `True` | Merge with sklearn English stopwords |
+| `domain_taxonomy_path` | `Path \| None` | `None` | Path to domain taxonomy JSON |
+| `active_domain` | `str \| None` | `None` | Active domain for filtering rules |
+
+**Technical Stopword Categories:**
+
+| Category | Example Terms | Count |
+|----------|---------------|-------|
+| `document_structure` | chapter, section, figure, table | 26 |
+| `meta_words` | isbn, copyright, edition, publisher | 21 |
+| `programming_noise` | example, listing, code, output | 30 |
+| `common_filler` | following, previous, shown, given | 36 |
+
+**New Methods (TfidfKeywordExtractor):**
+
+| Method | Description |
+|--------|-------------|
+| `get_effective_stopwords()` | Returns cached frozenset of all effective stopwords |
+| `_load_custom_stopwords()` | Load and flatten stopwords from JSON |
+| `_load_domain_taxonomy()` | Load and validate domain taxonomy |
+
+**Backward Compatibility:**
+
+- ✅ Default config unchanged (4 tests verify)
+- ✅ `stop_words="english"` still works
+- ✅ `extract_keywords()` signature unchanged
+- ✅ `extract_keywords_with_scores()` signature unchanged
+
+---
+
 ## 2025-12-18
 
 ### CL-013: BERTopic Cluster Endpoint (Phase B2.2)

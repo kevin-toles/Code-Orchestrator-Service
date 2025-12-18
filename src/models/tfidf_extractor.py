@@ -2,12 +2,18 @@
 TF-IDF Keyword Extractor
 
 WBS: MSE-1.1 - TF-IDF Keyword Extractor Module
+WBS: EEP-1 - Domain-Aware Keyword Filtering (Enhanced Enrichment Pipeline)
 Repository: Code-Orchestrator-Service (Sous Chef)
 
 This module provides keyword extraction from document corpora using TF-IDF.
 Unlike the existing TF-IDF fallback in semantic_similarity_engine.py (which returns
 embeddings for similarity computation), this extractor returns **top-k keywords**
 per document for metadata enrichment tagging.
+
+EEP-1 Extensions:
+- EEP-1.1: Custom technical stopwords loading from config/technical_stopwords.json
+- EEP-1.2: KeywordExtractorConfig extensions (custom_stopwords_path, merge_stopwords)
+- EEP-1.3: Domain-specific filtering via domain_taxonomy.json integration
 
 Role in Kitchen Brigade Architecture:
 - Code-Orchestrator-Service (Sous Chef) hosts all NLP/ML models
@@ -18,8 +24,9 @@ Architecture: Service Layer Pattern
 Anti-Patterns Addressed (per CODING_PATTERNS_ANALYSIS.md):
 - S1192: Reuses TFIDF_MAX_FEATURES constant from semantic_similarity_engine.py
 - #2.2: Full type annotations on all public methods
-- #12: Single TfidfVectorizer instance per extractor class
+- #12: Single TfidfVectorizer instance per extractor class; stopwords cached
 - #7: No exception shadowing (uses TfidfExtractionError)
+- S3776: Cognitive complexity kept under 15
 
 Constants imported from semantic_similarity_engine.py:
 - TFIDF_MAX_FEATURES: int = 5000
@@ -27,8 +34,11 @@ Constants imported from semantic_similarity_engine.py:
 
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -90,10 +100,20 @@ class KeywordExtractorConfig:
         min_df: Minimum document frequency for terms (default: 1)
         max_df: Maximum document frequency ratio for terms (default: 0.95)
         default_top_k: Default number of top keywords to return (default: 10)
+        custom_stopwords_path: Path to JSON file with custom stopwords (default: None)
+        merge_stopwords: If True, merge custom with sklearn English; if False, replace (default: True)
+        domain_taxonomy_path: Path to domain taxonomy JSON for filtering (default: None)
+        active_domain: Domain key to use for filtering (default: None)
 
     Note:
         max_features default (5000) is imported from TFIDF_MAX_FEATURES
         in semantic_similarity_engine.py per S1192 compliance.
+
+    EEP-1 Extensions:
+        - custom_stopwords_path: Load technical book stopwords from JSON
+        - merge_stopwords: Control whether to merge or replace sklearn stopwords
+        - domain_taxonomy_path: Load domain-specific filtering rules
+        - active_domain: Select which domain's rules to apply
     """
 
     max_features: int = TFIDF_MAX_FEATURES
@@ -102,6 +122,12 @@ class KeywordExtractorConfig:
     min_df: int = DEFAULT_MIN_DF
     max_df: float = DEFAULT_MAX_DF
     default_top_k: int = DEFAULT_TOP_K
+    # EEP-1.2: Custom stopwords extension
+    custom_stopwords_path: Path | None = None
+    merge_stopwords: bool = True
+    # EEP-1.3: Domain taxonomy extension
+    domain_taxonomy_path: Path | None = None
+    active_domain: str | None = None
 
 
 @dataclass
@@ -132,6 +158,13 @@ class TfidfKeywordExtractor:
     embedding vectors for similarity computation), this extractor returns
     human-readable keyword lists for tagging and enrichment.
 
+    EEP-1 Extensions:
+        - Custom technical stopwords loading from JSON configuration
+        - Stopword merging with sklearn English stopwords
+        - Domain-specific filtering via domain taxonomy integration
+        - Blacklist/whitelist pattern matching
+        - Score adjustments for domain-relevant terms
+
     Example:
         >>> extractor = TfidfKeywordExtractor()
         >>> corpus = ["Machine learning and AI", "Python for data science"]
@@ -149,10 +182,104 @@ class TfidfKeywordExtractor:
 
         Args:
             config: Configuration for the extractor. Uses defaults if not provided.
+
+        Raises:
+            FileNotFoundError: If custom_stopwords_path or domain_taxonomy_path does not exist.
+            json.JSONDecodeError: If custom_stopwords_path or domain_taxonomy_path is invalid JSON.
+            ValueError: If active_domain is set but not found in domain taxonomy.
         """
         self._config = config if config is not None else KeywordExtractorConfig()
         self._vectorizer: TfidfVectorizer | None = None
         self._feature_names: list[str] | None = None
+
+        # EEP-1.2: Load and cache custom stopwords (Anti-pattern #12: cache, don't reload per request)
+        self._custom_stopwords: set[str] = set()
+        self._effective_stopwords: frozenset[str] | None = None
+        if self._config.custom_stopwords_path is not None:
+            self._load_custom_stopwords()
+
+        # EEP-1.3: Load and cache domain taxonomy
+        self._domain_taxonomy: dict[str, Any] | None = None
+        self._active_domain_config: dict[str, Any] | None = None
+        if self._config.domain_taxonomy_path is not None:
+            self._load_domain_taxonomy()
+
+    def _load_custom_stopwords(self) -> None:
+        """Load custom stopwords from JSON file.
+
+        The JSON file should have categories as keys with lists of stopwords:
+        {
+            "document_structure": ["chapter", "section", ...],
+            "meta_words": ["isbn", "copyright", ...],
+            ...
+        }
+
+        Raises:
+            FileNotFoundError: If the custom_stopwords_path file does not exist.
+            json.JSONDecodeError: If the file is not valid JSON.
+        """
+        if self._config.custom_stopwords_path is None:
+            return
+
+        stopwords_path = Path(self._config.custom_stopwords_path)
+        with stopwords_path.open() as f:
+            data = json.load(f)
+
+        # Flatten all categories into a single set
+        all_stopwords: set[str] = set()
+        for category_words in data.values():
+            if isinstance(category_words, list):
+                all_stopwords.update(word.lower() for word in category_words)
+
+        self._custom_stopwords = all_stopwords
+
+    def _load_domain_taxonomy(self) -> None:
+        """Load domain taxonomy configuration from JSON file.
+
+        Raises:
+            FileNotFoundError: If domain_taxonomy_path does not exist.
+            json.JSONDecodeError: If the file is not valid JSON.
+            ValueError: If active_domain is set but not found in taxonomy.
+        """
+        if self._config.domain_taxonomy_path is None:
+            return
+
+        taxonomy_path = Path(self._config.domain_taxonomy_path)
+        with taxonomy_path.open() as f:
+            self._domain_taxonomy = json.load(f)
+
+        # Validate active_domain if specified
+        if self._config.active_domain is not None:
+            if self._domain_taxonomy is None or self._config.active_domain not in self._domain_taxonomy:
+                msg = f"Unknown domain: '{self._config.active_domain}'. Available domains: {list(self._domain_taxonomy.keys()) if self._domain_taxonomy else []}"
+                raise ValueError(msg)
+            self._active_domain_config = self._domain_taxonomy[self._config.active_domain]
+
+    def get_effective_stopwords(self) -> frozenset[str]:
+        """Get the effective set of stopwords used for filtering.
+
+        Returns a cached frozenset of all stopwords, combining sklearn English
+        stopwords with custom stopwords based on configuration.
+
+        Returns:
+            Frozenset of all effective stopwords.
+
+        Note:
+            Anti-pattern #12 compliance: Stopwords are computed once and cached.
+        """
+        if self._effective_stopwords is not None:
+            return self._effective_stopwords
+
+        if self._config.merge_stopwords:
+            # Merge custom stopwords with sklearn English stopwords
+            from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+            merged = set(ENGLISH_STOP_WORDS) | self._custom_stopwords
+            self._effective_stopwords = frozenset(merged)
+        else:
+            # Use only custom stopwords (replace sklearn English)
+            self._effective_stopwords = frozenset(self._custom_stopwords)
+
+        return self._effective_stopwords
 
     @property
     def config(self) -> KeywordExtractorConfig:
@@ -177,6 +304,9 @@ class TfidfKeywordExtractor:
             For small corpora (1-2 documents), min_df and max_df are adjusted
             to avoid sklearn's "max_df corresponds to < documents than min_df"
             error when max_df * n_docs < min_df.
+
+            EEP-1.2: When custom_stopwords_path is set, uses merged/replaced
+            stopwords instead of default sklearn English stopwords.
         """
         # Adjust min_df/max_df for small corpora to avoid sklearn errors
         # When corpus_size=1, max_df=0.95 means max_doc_count=0.95 which is < min_df=1
@@ -188,10 +318,19 @@ class TfidfKeywordExtractor:
             min_df = 1
             max_df = 1.0
 
+        # EEP-1.2: Use effective stopwords when custom stopwords are configured
+        stop_words: str | list[str]
+        if self._config.custom_stopwords_path is not None:
+            # Convert frozenset to list for sklearn
+            stop_words = list(self.get_effective_stopwords())
+        else:
+            # Use default sklearn behavior
+            stop_words = self._config.stop_words
+
         return TfidfVectorizer(
             max_features=self._config.max_features,
             ngram_range=self._config.ngram_range,
-            stop_words=self._config.stop_words,
+            stop_words=stop_words,
             min_df=min_df,
             max_df=max_df,
         )

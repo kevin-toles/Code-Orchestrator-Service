@@ -167,6 +167,29 @@ class SemanticSimilarityEngine:
         """Check if the engine is using TF-IDF fallback instead of Sentence Transformers."""
         return self._using_fallback
 
+    def embed(self, text: str) -> NDArray[np.float64]:
+        """Embed a single text string.
+
+        Args:
+            text: Input text to embed.
+
+        Returns:
+            1D numpy array embedding.
+        """
+        embeddings = self.compute_embeddings([text])
+        return embeddings[0]
+
+    def batch_embed(self, texts: list[str]) -> NDArray[np.float64]:
+        """Embed multiple texts.
+
+        Args:
+            texts: List of input texts.
+
+        Returns:
+            2D numpy array of embeddings.
+        """
+        return self.compute_embeddings(texts)
+
     def compute_embeddings(
         self, corpus: list[str]
     ) -> NDArray[np.float64]:
