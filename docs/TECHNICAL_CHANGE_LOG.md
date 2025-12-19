@@ -18,6 +18,30 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-12-19
+
+### CL-017: Gateway-First Communication Pattern Documentation
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-19 |
+| **WBS Item** | Architecture Documentation |
+| **Change Type** | Documentation |
+| **Summary** | Added Gateway-First Communication Pattern section to ARCHITECTURE.md. External applications MUST route through Gateway:8080 to access Code-Orchestrator-Service. |
+| **Files Changed** | `docs/ARCHITECTURE.md` |
+| **Rationale** | Explicitly document that external apps cannot call Code-Orchestrator:8083 directly. All external access must go through Gateway. Internal platform services (ai-agents, Gateway) may call directly. |
+| **Git Commit** | Pending |
+
+**Communication Pattern:**
+
+| Source | Target | Route | Status |
+|--------|--------|-------|--------|
+| External app | Code-Orchestrator | Via Gateway:8080 | ✅ REQUIRED |
+| Platform service (ai-agents) | Code-Orchestrator | Direct:8083 | ✅ Allowed |
+| Platform service (Gateway) | Code-Orchestrator | Direct:8083 | ✅ Allowed |
+
+---
+
 ## 2025-12-18
 
 ### CL-016: EEP-6 Diagram Similarity (Enhanced Enrichment Pipeline Phase 6)

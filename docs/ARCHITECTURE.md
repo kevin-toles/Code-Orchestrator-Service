@@ -14,6 +14,34 @@ This service acts as the **"Sous Chef"** in the Kitchen Brigade architecture—i
 
 ---
 
+## ⚠️ Gateway-First Communication Pattern
+
+**CRITICAL RULE**: External applications MUST access platform services through the Gateway.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                    SERVICE COMMUNICATION PATTERN                             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  EXTERNAL → Code-Orchestrator: Via Gateway:8080 (REQUIRED)                  │
+│  ──────────────────────────────────────────────────────────                  │
+│  Applications outside the AI Platform must route through Gateway.           │
+│                                                                              │
+│  ✅ llm-document-enhancer → Gateway:8080 → Code-Orchestrator:8083           │
+│  ❌ llm-document-enhancer → Code-Orchestrator:8083 (VIOLATION!)             │
+│                                                                              │
+│  INTERNAL (Platform Services): Direct calls allowed                          │
+│  ───────────────────────────────────────────────────                         │
+│  Platform services (ai-agents, audit-service) may call directly.            │
+│                                                                              │
+│  ✅ ai-agents:8082 → Code-Orchestrator:8083 (internal)                      │
+│  ✅ Gateway:8080 → Code-Orchestrator:8083 (internal)                        │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## Kitchen Brigade Architecture Model
 
 ### The Analogy
