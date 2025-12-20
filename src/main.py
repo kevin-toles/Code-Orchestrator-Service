@@ -26,6 +26,7 @@ from src.api.embed import router as embed_router
 from src.api.extract import extract_router
 from src.api.health import router as health_router
 from src.api.keywords import keywords_router
+from src.api.metadata import metadata_router
 from src.api.search import search_router
 from src.api.similarity import similarity_router
 from src.api.topics import router as topics_router
@@ -134,6 +135,7 @@ app.include_router(topics_router)
 app.include_router(embed_router)  # EEP-1.5.7: Multi-modal embedding endpoints
 app.include_router(concepts_router, prefix="/api")  # EEP-2.4: Concept extraction endpoint
 app.include_router(codebert_router)  # EEP-5.2: CodeBERT embedding endpoint
+app.include_router(metadata_router, prefix="/api")  # CME-1.4: Metadata extraction endpoint
 
 
 # =============================================================================

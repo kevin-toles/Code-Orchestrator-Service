@@ -18,6 +18,66 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-01-XX
+
+### CL-018: CME-1.0 Phase 1 - Configurable Metadata Extraction Endpoint
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-01-XX |
+| **WBS Item** | CME-1.1 through CME-1.5 |
+| **Change Type** | Feature |
+| **Summary** | New POST /api/v1/metadata/extract endpoint with configurable options for keyword extraction, concept extraction, noise filtering, domain detection, and quality scoring. Full TDD implementation with 96 tests. |
+| **Files Changed** | See below |
+| **Rationale** | Provide unified metadata extraction with caller-controllable parameters (AC-2.1 through AC-2.8) |
+| **Git Commit** | Pending |
+
+**New Files Created:**
+- `src/models/metadata_models.py` - Pydantic request/response models (15 tests)
+- `src/validators/noise_filter.py` - Noise filtering for 8 categories (33 tests)
+- `src/validators/__init__.py` - Package exports
+- `src/extractors/metadata_extractor.py` - Unified extraction pipeline (25 tests)
+- `src/extractors/__init__.py` - Package exports
+- `src/api/metadata.py` - FastAPI router with POST /extract endpoint (23 tests)
+- `tests/unit/models/test_metadata_models.py` - Model tests
+- `tests/unit/validators/test_noise_filter.py` - Noise filter tests
+- `tests/unit/extractors/test_metadata_extractor.py` - Extractor tests
+- `tests/unit/api/test_metadata_extract.py` - API endpoint tests
+
+**Modified Files:**
+- `src/main.py` - Register metadata_router
+
+**Acceptance Criteria Fulfilled:**
+| AC | Description | Status |
+|----|-------------|--------|
+| AC-2.1 | POST /api/v1/metadata/extract registered | ✅ |
+| AC-2.2 | Keywords with term, score, is_technical | ✅ |
+| AC-2.3 | Concepts with name, confidence, domain, tier | ✅ |
+| AC-2.4 | Rejected keywords with reasons | ✅ |
+| AC-2.5 | Quality score 0.0-1.0 | ✅ |
+| AC-2.6 | Domain detection with confidence | ✅ |
+| AC-2.7 | Empty text validation (422) | ✅ |
+| AC-2.8 | Invalid options validation (422) | ✅ |
+
+**Anti-Patterns Applied:**
+- S1192: Constants at module level (no duplicate strings)
+- S3776: Cognitive complexity < 15 via helper methods
+- Anti-Pattern #12: Singleton pattern for extractors
+- AC-6.5: Full type annotations (mypy --strict)
+
+**Test Summary:**
+- WBS-1.1: 15 tests (metadata_models)
+- WBS-1.2: 33 tests (noise_filter)
+- WBS-1.3: 25 tests (metadata_extractor)
+- WBS-1.4: 23 tests (API endpoint)
+- **Total: 96 tests passing**
+
+**Coverage:**
+- metadata_models.py: 98%
+- noise_filter.py: 99%
+
+---
+
 ## 2025-12-19
 
 ### CL-017: Gateway-First Communication Pattern Documentation
