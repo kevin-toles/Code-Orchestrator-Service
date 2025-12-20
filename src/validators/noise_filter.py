@@ -150,7 +150,7 @@ PAGE_MARKER_TERMS: Final[frozenset[str]] = frozenset({
 
 # Pattern for broken contractions: 'll, n't, 's, 've, 'd, 're, 'm
 CONTRACTION_PATTERN: Final[re.Pattern[str]] = re.compile(
-    r"^[''`]?(ll|nt|n't|s|ve|d|re|m)$",
+    r"^['`]?(ll|nt|n't|s|ve|d|re|m)$",
     re.IGNORECASE,
 )
 

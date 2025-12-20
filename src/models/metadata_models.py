@@ -16,7 +16,7 @@ AC Reference:
 TDD Phase: GREEN (implement to pass tests)
 
 Anti-Patterns Avoided:
-- S1192: Constants extracted to module level
+- S1192: Constants imported from constants.py (WBS-1.1.6)
 - AC-6.5: Full type annotations throughout
 - Anti-Pattern #7: Proper exception naming (uses Pydantic ValidationError)
 """
@@ -27,32 +27,21 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
-
-# =============================================================================
-# Module Constants (S1192 compliance)
-# =============================================================================
-
-# Default option values
-DEFAULT_TOP_K_KEYWORDS: int = 15
-DEFAULT_TOP_K_CONCEPTS: int = 10
-DEFAULT_MIN_KEYWORD_CONFIDENCE: float = 0.3
-DEFAULT_MIN_CONCEPT_CONFIDENCE: float = 0.3
-DEFAULT_SUMMARY_RATIO: float = 0.2
-
-# Validation bounds
-MIN_TOP_K: int = 1
-MAX_TOP_K: int = 100
-MIN_CONFIDENCE: float = 0.0
-MAX_CONFIDENCE: float = 1.0
-MIN_SCORE: float = 0.0
-MAX_SCORE: float = 1.0
-MIN_TEXT_LENGTH: int = 1
-
-# Error messages
-ERROR_TEXT_EMPTY: str = "text cannot be empty"
-ERROR_TOP_K_RANGE: str = f"top_k must be between {MIN_TOP_K} and {MAX_TOP_K}"
-ERROR_CONFIDENCE_RANGE: str = f"confidence must be between {MIN_CONFIDENCE} and {MAX_CONFIDENCE}"
-ERROR_SCORE_RANGE: str = f"score must be between {MIN_SCORE} and {MAX_SCORE}"
+from src.models.constants import (
+    DEFAULT_MIN_CONCEPT_CONFIDENCE,
+    DEFAULT_MIN_KEYWORD_CONFIDENCE,
+    DEFAULT_SUMMARY_RATIO,
+    DEFAULT_TOP_K_CONCEPTS,
+    DEFAULT_TOP_K_KEYWORDS,
+    ERROR_TEXT_EMPTY,
+    MAX_CONFIDENCE,
+    MAX_SCORE,
+    MAX_TOP_K,
+    MIN_CONFIDENCE,
+    MIN_SCORE,
+    MIN_TEXT_LENGTH,
+    MIN_TOP_K,
+)
 
 
 # =============================================================================
@@ -344,11 +333,6 @@ class MetadataExtractionResponse(BaseModel):
 # =============================================================================
 
 __all__ = [
-    # Constants
-    "DEFAULT_TOP_K_KEYWORDS",
-    "DEFAULT_TOP_K_CONCEPTS",
-    "DEFAULT_MIN_KEYWORD_CONFIDENCE",
-    "DEFAULT_MIN_CONCEPT_CONFIDENCE",
     # Models
     "MetadataExtractionOptions",
     "MetadataExtractionRequest",

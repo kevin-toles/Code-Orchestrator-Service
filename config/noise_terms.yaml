@@ -1,0 +1,155 @@
+# =============================================================================
+# Noise Terms Configuration
+# =============================================================================
+# WBS: CME-1.2.13 - External YAML configuration for noise filtering
+#
+# This file defines noise terms for the 8-category filtering system.
+# Modify this file to customize noise filtering without code changes.
+#
+# Reference: AC-2.4 - Noise Filtering with rejected.keywords and rejected.reasons
+# =============================================================================
+
+# OCR Watermarks: Publisher/site watermarks from PDF conversion
+watermarks:
+  - oceanofpdf
+  - ebscohost
+  - packt
+  - oreilly
+  - manning
+  - springer
+  - wiley
+  - apress
+  - pearson
+  - allitebooks
+  - foxebook
+  - pdfhive
+  - bookzz
+  - libgen
+
+# URL Fragments: Broken URL components from hyperlink extraction
+url_fragments:
+  - www
+  - http
+  - https
+  - com
+  - org
+  - net
+  - edu
+  - gov
+  - html
+  - htm
+  - php
+  - asp
+
+# Generic Filler: Common words with no technical value
+generic_filler:
+  - using
+  - used
+  - use
+  - one
+  - two
+  - three
+  - new
+  - first
+  - second
+  - third
+  - example
+  - examples
+  - also
+  - many
+  - much
+  - well
+  - way
+  - need
+  - make
+  - see
+  - get
+  - set
+  - can
+  - may
+  - like
+  - just
+  - even
+  - know
+  - take
+  - come
+  - want
+  - look
+  - give
+
+# Code Artifacts: Programming language keywords and constructs
+code_artifacts:
+  - self
+  - cls
+  - none
+  - true
+  - false
+  - return
+  - import
+  - from
+  - class
+  - def
+  - if
+  - else
+  - elif
+  - for
+  - while
+  - try
+  - except
+  - finally
+  - with
+  - as
+  - lambda
+  - yield
+  - pass
+  - break
+  - continue
+  - raise
+  - assert
+  - global
+  - nonlocal
+  - del
+
+# Page Markers: Document structure terms
+page_markers:
+  - chapter
+  - section
+  - figure
+  - table
+  - page
+  - appendix
+  - index
+  - contents
+  - bibliography
+  - references
+  - glossary
+  - preface
+  - introduction
+  - conclusion
+  - summary
+  - abstract
+  - acknowledgments
+
+# =============================================================================
+# Pattern-Based Filtering (Regex)
+# =============================================================================
+# These are applied via regex patterns in code, not configurable here:
+# - Broken Contractions: 'll, n't, 's, 've, 'd, 're, 'm
+# - Underscore Prefix: _add, __init__
+# - Single Characters: any single character
+# - Pure Numbers: any numeric-only string
+# =============================================================================
+
+# =============================================================================
+# Rejection Reason Codes
+# =============================================================================
+# Each category maps to a rejection reason for traceability:
+# - watermarks       -> noise_watermark
+# - url_fragments    -> noise_url_fragment
+# - generic_filler   -> generic_filler
+# - code_artifacts   -> code_artifact
+# - page_markers     -> noise_page_marker
+# - contractions     -> broken_contraction (regex-based)
+# - single_char      -> single_char (length-based)
+# - pure_number      -> pure_number (regex-based)
+# =============================================================================

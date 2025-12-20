@@ -223,7 +223,7 @@ class MetadataExtractor:
         Args:
             text: The text to extract metadata from.
             title: Optional title for context.
-            book_title: Optional book title for context.
+            book_title: Optional book title for domain inference.
             options: Extraction options.
 
         Returns:
@@ -231,6 +231,8 @@ class MetadataExtractor:
         """
         start_time = time.perf_counter()
         options = options or MetadataExtractionOptions()
+        # book_title reserved for future domain inference enhancement
+        _ = book_title
 
         result = ExtractionResult(text_length=len(text))
 
