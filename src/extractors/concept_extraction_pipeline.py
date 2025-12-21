@@ -31,6 +31,12 @@ from src.validators.noise_filter import (
     BatchFilterResult,
     NoiseFilter,
 )
+from src.nlp.yake_extractor import YAKEConfig, YAKEExtractor
+from src.nlp.textrank_extractor import TextRankConfig, TextRankExtractor
+from src.nlp.ensemble_merger import EnsembleMerger, ExtractedTerm as MergerExtractedTerm
+from src.nlp.stemmer import deduplicate_by_stem
+from src.nlp.semantic_dedup import SemanticDedupConfig, SemanticDeduplicator
+from src.nlp.concept_validator import ConceptValidator, ConceptValidationConfig
 
 
 # =============================================================================
@@ -42,6 +48,7 @@ STAGE_NOISE_FILTER: Final[str] = "noise_filter"
 STAGE_YAKE: Final[str] = "yake"
 STAGE_TEXTRANK: Final[str] = "textrank"
 STAGE_STEM_DEDUP: Final[str] = "stem_dedup"
+STAGE_CONCEPT_VALIDATION: Final[str] = "concept_validation"
 STAGE_SEMANTIC_DEDUP: Final[str] = "semantic_dedup"
 STAGE_GRAPHCODEBERT: Final[str] = "graphcodebert"
 
@@ -53,6 +60,7 @@ DEFAULT_TEXTRANK_WORDS: Final[int] = 20
 DEFAULT_HDBSCAN_MIN_CLUSTER_SIZE: Final[int] = 2
 DEFAULT_SEMANTIC_SIMILARITY_THRESHOLD: Final[float] = 0.8
 DEFAULT_GRAPHCODEBERT_THRESHOLD: Final[float] = 0.7
+DEFAULT_SBERT_VALIDATION_THRESHOLD: Final[float] = 0.35
 
 # Default protected terms for stemming
 DEFAULT_PROTECTED_TERMS: Final[list[str]] = [
@@ -118,6 +126,12 @@ class ConceptExtractionConfig:
     enable_semantic_dedup: bool = True
     hdbscan_min_cluster_size: int = DEFAULT_HDBSCAN_MIN_CLUSTER_SIZE
     semantic_similarity_threshold: float = DEFAULT_SEMANTIC_SIMILARITY_THRESHOLD
+
+    # Stage 4.5: Concept Validation (SBERT seed + pattern filter)
+    enable_concept_validation: bool = True
+    enable_pattern_filter: bool = True  # Author/noise patterns
+    enable_sbert_validation: bool = True  # Semantic similarity to seeds
+    sbert_validation_threshold: float = DEFAULT_SBERT_VALIDATION_THRESHOLD
 
     # Stage 5: GraphCodeBERT (Optional)
     enable_graphcodebert: bool = False  # Off by default
@@ -192,6 +206,37 @@ class ConceptExtractionPipeline:
         # Stage 1: NoiseFilter (AC-1.4)
         self._noise_filter = NoiseFilter()
 
+        # Stage 2: Ensemble Extraction (HCE-2.0, AC-2.8)
+        yake_config = YAKEConfig(
+            top_n=self.config.yake_top_n,
+            n_gram_size=self.config.yake_n_gram_size,
+            dedup_threshold=self.config.yake_dedup_threshold,
+        )
+        self._yake_extractor = YAKEExtractor(config=yake_config)
+
+        textrank_config = TextRankConfig(words=self.config.textrank_words)
+        self._textrank_extractor = TextRankExtractor(config=textrank_config)
+
+        self._ensemble_merger = EnsembleMerger()
+
+        # Stage 4: Semantic Deduplication (HCE-4.0, AC-4.6)
+        semantic_config = SemanticDedupConfig(
+            min_cluster_size=self.config.hdbscan_min_cluster_size,
+            similarity_threshold=self.config.semantic_similarity_threshold,
+        )
+        self._semantic_deduplicator = SemanticDeduplicator(config=semantic_config)
+
+        # Stage 4.5: Concept Validation (SBERT seed + pattern filter)
+        validation_config = ConceptValidationConfig(
+            enable_pattern_filter=self.config.enable_pattern_filter,
+            enable_sbert_validation=self.config.enable_sbert_validation,
+            sbert_similarity_threshold=self.config.sbert_validation_threshold,
+        )
+        self._concept_validator = ConceptValidator(
+            config=validation_config,
+            deduplicator=self._semantic_deduplicator,  # Share SBERT engine
+        )
+
     def extract(self, text: str) -> ConceptExtractionResult:
         """Extract concepts from text using the hybrid pipeline.
 
@@ -216,7 +261,9 @@ class ConceptExtractionPipeline:
         }
         dedup_stats: dict[str, int] = {
             "stem_removed": 0,
+            "validation_rejected": 0,
             "semantic_clusters": 0,
+            "semantic_removed": 0,
             "final_count": 0,
         }
 
@@ -226,13 +273,54 @@ class ConceptExtractionPipeline:
             filtered_text, filter_stats = self._apply_noise_filter(text)
             stages_executed.append(STAGE_NOISE_FILTER)
 
-        # TODO: Stage 2 - YAKE + TextRank (HCE-2.0)
-        # TODO: Stage 3 - Morphological Dedup (HCE-3.0)
-        # TODO: Stage 4 - SBERT + HDBSCAN (HCE-4.0)
-        # TODO: Stage 5 - GraphCodeBERT (existing, optional)
+        # Stage 2: YAKE + TextRank Ensemble Extraction (HCE-2.0, AC-2.8)
+        yake_terms: list[tuple[str, float]] = []
+        textrank_terms: list[str] = []
 
-        # Placeholder: Return empty concepts until HCE-2.0
-        concepts: list[ExtractedTerm] = []
+        if self.config.enable_yake:
+            yake_terms = self._yake_extractor.extract(filtered_text)
+            extraction_stats["yake_count"] = len(yake_terms)
+            stages_executed.append(STAGE_YAKE)
+
+        if self.config.enable_textrank:
+            textrank_terms = self._textrank_extractor.extract(filtered_text)
+            extraction_stats["textrank_count"] = len(textrank_terms)
+            stages_executed.append(STAGE_TEXTRANK)
+
+        # Merge results using EnsembleMerger
+        merged_terms = self._ensemble_merger.merge(yake_terms, textrank_terms)
+        extraction_stats["merged_count"] = len(merged_terms)
+
+        # Convert to pipeline's ExtractedTerm format
+        concepts: list[ExtractedTerm] = [
+            ExtractedTerm(term=t.term, score=t.score, source=t.source)  # type: ignore[arg-type]
+            for t in merged_terms
+        ]
+
+        # Post-filter: Remove concepts containing noise terms (AC-1.4)
+        if self.config.enable_noise_filter:
+            concepts = self._filter_noise_concepts(concepts)
+
+        # Stage 3: Morphological Dedup (HCE-3.0, AC-3.5)
+        if self.config.enable_stem_dedup:
+            concepts, stem_removed = self._apply_stem_deduplication(concepts)
+            dedup_stats["stem_removed"] = stem_removed
+            stages_executed.append(STAGE_STEM_DEDUP)
+
+        # Stage 4.5: Concept Validation (Pattern + SBERT)
+        if self.config.enable_concept_validation:
+            concepts, validation_rejected = self._apply_concept_validation(concepts)
+            dedup_stats["validation_rejected"] = validation_rejected
+            stages_executed.append(STAGE_CONCEPT_VALIDATION)
+
+        # Stage 4: Semantic Dedup (HCE-4.0, AC-4.6)
+        if self.config.enable_semantic_dedup:
+            concepts, semantic_stats = self._apply_semantic_deduplication(concepts)
+            dedup_stats["semantic_clusters"] = semantic_stats["cluster_count"]
+            dedup_stats["semantic_removed"] = semantic_stats["removed_count"]
+            stages_executed.append(STAGE_SEMANTIC_DEDUP)
+
+        # TODO: Stage 5 - GraphCodeBERT (existing, optional)
 
         # Calculate duration
         duration_ms = int((time.time() - start_time) * 1000)
@@ -281,3 +369,132 @@ class ConceptExtractionPipeline:
         }
 
         return filtered_text, filter_stats
+
+    def _filter_noise_concepts(
+        self,
+        concepts: list[ExtractedTerm],
+    ) -> list[ExtractedTerm]:
+        """Filter out concepts containing noise words.
+
+        Post-extraction filter to remove concepts that contain
+        watermarks or other noise (AC-1.4).
+
+        Args:
+            concepts: List of extracted terms to filter.
+
+        Returns:
+            List of concepts without noise.
+        """
+        filtered_concepts: list[ExtractedTerm] = []
+
+        for concept in concepts:
+            # Split concept term into words and check each
+            words = concept.term.split()
+            batch_result = self._noise_filter.filter_batch(words)
+
+            # Only keep concept if none of its words were rejected
+            if len(batch_result.rejected) == 0:
+                filtered_concepts.append(concept)
+
+        return filtered_concepts
+
+    def _apply_stem_deduplication(
+        self,
+        concepts: list[ExtractedTerm],
+    ) -> tuple[list[ExtractedTerm], int]:
+        """Apply morphological deduplication using stemming.
+
+        Stage 3 of the pipeline (HCE-3.0, AC-3.5).
+        Groups concepts by stem and keeps first occurrence.
+
+        Args:
+            concepts: List of extracted terms to deduplicate.
+
+        Returns:
+            Tuple of (deduplicated_concepts, removed_count).
+        """
+        if not concepts:
+            return [], 0
+
+        # Convert to MergerExtractedTerm for stemmer compatibility
+        merger_terms = [
+            MergerExtractedTerm(term=c.term, score=c.score, source=c.source)
+            for c in concepts
+        ]
+
+        # Apply stem deduplication
+        deduped_terms, removed_count = deduplicate_by_stem(merger_terms)
+
+        # Convert back to pipeline's ExtractedTerm format
+        result = [
+            ExtractedTerm(term=t.term, score=t.score, source=t.source)  # type: ignore[arg-type]
+            for t in deduped_terms
+        ]
+
+        return result, removed_count
+
+    def _apply_concept_validation(
+        self,
+        concepts: list[ExtractedTerm],
+    ) -> tuple[list[ExtractedTerm], int]:
+        """Apply concept validation using pattern filter and SBERT.
+
+        Stage 4.5 of the pipeline. Validates that extracted terms are
+        real programming concepts, not author names or noise.
+
+        Args:
+            concepts: List of extracted terms to validate.
+
+        Returns:
+            Tuple of (validated_concepts, rejected_count).
+        """
+        if not concepts:
+            return [], 0
+
+        # Extract term strings for validation
+        term_strings = [c.term for c in concepts]
+
+        # Run validation
+        result = self._concept_validator.validate(term_strings)
+
+        # Filter concepts to only valid ones
+        valid_set = set(result.valid_concepts)
+        validated = [c for c in concepts if c.term in valid_set]
+
+        rejected_count = len(concepts) - len(validated)
+        return validated, rejected_count
+
+    def _apply_semantic_deduplication(
+        self,
+        concepts: list[ExtractedTerm],
+    ) -> tuple[list[ExtractedTerm], dict[str, int]]:
+        """Apply semantic deduplication using SBERT + HDBSCAN.
+
+        Stage 4 of the pipeline (HCE-4.0, AC-4.6).
+        Clusters semantically similar concepts and keeps shortest term.
+
+        Args:
+            concepts: List of extracted terms to deduplicate.
+
+        Returns:
+            Tuple of (deduplicated_concepts, stats_dict).
+        """
+        if not concepts:
+            return [], {"cluster_count": 0, "removed_count": 0}
+
+        # Convert to MergerExtractedTerm for semantic deduplicator compatibility
+        merger_terms = [
+            MergerExtractedTerm(term=c.term, score=c.score, source=c.source)
+            for c in concepts
+        ]
+
+        # Apply semantic deduplication
+        deduped_terms, stats = self._semantic_deduplicator.deduplicate(merger_terms)
+
+        # Convert back to pipeline's ExtractedTerm format
+        result = [
+            ExtractedTerm(term=t.term, score=t.score, source=t.source)  # type: ignore[arg-type]
+            for t in deduped_terms
+        ]
+
+        return result, stats

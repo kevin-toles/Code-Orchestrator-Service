@@ -37,3 +37,11 @@ opentelemetry-instrumentation-fastapi>=0.43b0
 
 # LangGraph for Agent Orchestration (Phase 3)
 langgraph>=0.0.28
+
+# HCE-2.0: YAKE + TextRank Ensemble Extraction
+yake>=0.4.8
+summa>=1.2.0
+
+# HCE-4.0: SBERT + HDBSCAN Semantic Deduplication
+# Note: hdbscan already installed (line 20) for bertopic, version constrained
+# Using existing hdbscan>=0.8.29,<0.8.41 for scikit-learn 1.3.x compatibility

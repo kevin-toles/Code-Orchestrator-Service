@@ -1,0 +1,1648 @@
+{
+  "created_at": "2025-12-21T00:23:53.089275",
+  "source_file": "/Users/kevintoles/POC/llm-document-enhancer/books/enriched/A Philosophy of Software Design.json",
+  "pipeline_config": {
+    "use_hybrid_extraction": true,
+    "top_k_concepts": 10,
+    "min_concept_confidence": 0.3,
+    "filter_noise": true
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "title": "Segment 1 (pages 2-9)",
+      "content_length": 6908,
+      "old_concepts": [
+        "conclusion",
+        "examples",
+        "comments",
+        "design",
+        "code",
+        "interface",
+        "names",
+        "modules",
+        "duplication",
+        "general"
+      ],
+      "new_concepts": [
+        {
+          "name": "Information Hiding",
+          "score": 0.9625673582168713
+        },
+        {
+          "name": "Complexity",
+          "score": 0.9547009263278388
+        },
+        {
+          "name": "Taking",
+          "score": 0.9381500259348459
+        },
+        {
+          "name": "modules",
+          "score": 0.5
+        },
+        {
+          "name": "little",
+          "score": 0.5
+        },
+        {
+          "name": "general",
+          "score": 0.5
+        },
+        {
+          "name": "duplication",
+          "score": 0.5
+        },
+        {
+          "name": "Code",
+          "score": 0.97034095448857
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 471
+      },
+      "dedup_stats": {
+        "stem_removed": 2,
+        "semantic_clusters": 1,
+        "semantic_removed": 23,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 2,
+      "title": "Segment 2 (pages 10-17)",
+      "content_length": 15711,
+      "old_concepts": [
+        "design",
+        "complex",
+        "problem",
+        "systems",
+        "code",
+        "coding",
+        "develop",
+        "program",
+        "students",
+        "great"
+      ],
+      "new_concepts": [
+        {
+          "name": "book",
+          "score": 0.9894278750588394
+        },
+        {
+          "name": "complexity",
+          "score": 0.9855184737807352
+        },
+        {
+          "name": "code",
+          "score": 0.97564771249459
+        },
+        {
+          "name": "problems",
+          "score": 0.9720626947938543
+        },
+        {
+          "name": "systems",
+          "score": 0.9712631963571241
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9612013494466803
+        },
+        {
+          "name": "ideas",
+          "score": 0.9559603913496845
+        },
+        {
+          "name": "principles",
+          "score": 0.9553410689002346
+        },
+        {
+          "name": "Students",
+          "score": 0.9425360927255558
+        },
+        {
+          "name": "design",
+          "score": 0.9963319202848283
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 401
+      },
+      "dedup_stats": {
+        "stem_removed": 6,
+        "semantic_clusters": 1,
+        "semantic_removed": 16,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 3,
+      "title": "Segment 3 (pages 18-26)",
+      "content_length": 17344,
+      "old_concepts": [
+        "design",
+        "complexity",
+        "dependencies",
+        "depend",
+        "dependency",
+        "dependent",
+        "change",
+        "changed",
+        "developer",
+        "code"
+      ],
+      "new_concepts": [
+        {
+          "name": "Complexity",
+          "score": 0.9955352731366667
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9687430791077654
+        },
+        {
+          "name": "obvious",
+          "score": 0.9659121572708065
+        },
+        {
+          "name": "Cognitive",
+          "score": 0.9646713509786516
+        },
+        {
+          "name": "obscurity",
+          "score": 0.9607739353034507
+        },
+        {
+          "name": "Web",
+          "score": 0.9889111026395906
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 259
+      },
+      "dedup_stats": {
+        "stem_removed": 6,
+        "semantic_clusters": 1,
+        "semantic_removed": 23,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 4,
+      "title": "Segment 4 (pages 27-35)",
+      "content_length": 17261,
+      "old_concepts": [
+        "designer",
+        "modules",
+        "tactical",
+        "tactically",
+        "code",
+        "approach",
+        "development",
+        "small",
+        "engineers",
+        "investment"
+      ],
+      "new_concepts": [
+        {
+          "name": "module",
+          "score": 0.9887775080963584
+        },
+        {
+          "name": "interface",
+          "score": 0.9860133813348747
+        },
+        {
+          "name": "approach",
+          "score": 0.979544525455164
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9775725635018412
+        },
+        {
+          "name": "good design",
+          "score": 0.9723619059810485
+        },
+        {
+          "name": "time",
+          "score": 0.9704936259880824
+        },
+        {
+          "name": "system",
+          "score": 0.9702640832544835
+        },
+        {
+          "name": "code base",
+          "score": 0.9667422578545939
+        },
+        {
+          "name": "engineers",
+          "score": 0.9660102379567029
+        },
+        {
+          "name": "Facebook",
+          "score": 0.9648646628542412
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 288
+      },
+      "dedup_stats": {
+        "stem_removed": 5,
+        "semantic_clusters": 1,
+        "semantic_removed": 14,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 5,
+      "title": "Segment 5 (pages 36-43)",
+      "content_length": 15700,
+      "old_concepts": [
+        "interface",
+        "complex",
+        "file",
+        "provides",
+        "provided",
+        "abstractions",
+        "abstraction",
+        "accessed",
+        "access",
+        "accesses"
+      ],
+      "new_concepts": [
+        {
+          "name": "complexity",
+          "score": 0.9853281308042044
+        },
+        {
+          "name": "classes",
+          "score": 0.967826874626856
+        },
+        {
+          "name": "int",
+          "score": 0.5
+        },
+        {
+          "name": "simple",
+          "score": 0.5
+        },
+        {
+          "name": "informal",
+          "score": 0.5
+        },
+        {
+          "name": "file",
+          "score": 0.9896774597680721
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 266
+      },
+      "dedup_stats": {
+        "stem_removed": 2,
+        "semantic_clusters": 1,
+        "semantic_removed": 25,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 6,
+      "title": "Segment 6 (pages 44-51)",
+      "content_length": 16879,
+      "old_concepts": [
+        "classes",
+        "information",
+        "parameters",
+        "request",
+        "requests",
+        "modules",
+        "interface",
+        "hiding",
+        "hides",
+        "design"
+      ],
+      "new_concepts": [
+        {
+          "name": "classes",
+          "score": 0.9866621618924742
+        },
+        {
+          "name": "module",
+          "score": 0.9754631505671637
+        },
+        {
+          "name": "parameter",
+          "score": 0.9741635450374543
+        },
+        {
+          "name": "Temporal decomposition",
+          "score": 0.9732139601213919
+        },
+        {
+          "name": "interface",
+          "score": 0.9717406960005573
+        },
+        {
+          "name": "methods",
+          "score": 0.9624625040784953
+        },
+        {
+          "name": "file",
+          "score": 0.9598852114781466
+        },
+        {
+          "name": "string",
+          "score": 0.9589032436407203
+        },
+        {
+          "name": "requested",
+          "score": 0.5
+        },
+        {
+          "name": "modules",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 251
+      },
+      "dedup_stats": {
+        "stem_removed": 4,
+        "semantic_clusters": 3,
+        "semantic_removed": 10,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 7,
+      "title": "Segment 7 (pages 52-59)",
+      "content_length": 14385,
+      "old_concepts": [
+        "methods",
+        "purpose",
+        "text",
+        "classes",
+        "position",
+        "positions",
+        "positive",
+        "module",
+        "interface",
+        "need"
+      ],
+      "new_concepts": [
+        {
+          "name": "position",
+          "score": 0.9865248861707658
+        },
+        {
+          "name": "user",
+          "score": 0.9861678979471219
+        },
+        {
+          "name": "cursor",
+          "score": 0.9773684062527348
+        },
+        {
+          "name": "backspace",
+          "score": 0.9678168823793288
+        },
+        {
+          "name": "positive",
+          "score": 0.5
+        },
+        {
+          "name": "created method",
+          "score": 0.5
+        },
+        {
+          "name": "general",
+          "score": 0.5
+        },
+        {
+          "name": "API",
+          "score": 0.9819553662711402
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 215
+      },
+      "dedup_stats": {
+        "stem_removed": 4,
+        "semantic_clusters": 1,
+        "semantic_removed": 17,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 8,
+      "title": "Segment 8 (pages 60-67)",
+      "content_length": 15414,
+      "old_concepts": [
+        "methods",
+        "classes",
+        "layer",
+        "functionality",
+        "interface",
+        "variable",
+        "variables",
+        "provided",
+        "provides",
+        "decorators"
+      ],
+      "new_concepts": [
+        {
+          "name": "functionality",
+          "score": 0.9837016291204541
+        },
+        {
+          "name": "classes",
+          "score": 0.9824877312761339
+        },
+        {
+          "name": "text",
+          "score": 0.97909324070015
+        },
+        {
+          "name": "interface",
+          "score": 0.970999489026178
+        },
+        {
+          "name": "layers",
+          "score": 0.9684092123678271
+        },
+        {
+          "name": "object",
+          "score": 0.9676506874401072
+        },
+        {
+          "name": "decorators",
+          "score": 0.5
+        },
+        {
+          "name": "decorates",
+          "score": 0.5
+        },
+        {
+          "name": "implements",
+          "score": 0.5
+        },
+        {
+          "name": "interfaces",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 250
+      },
+      "dedup_stats": {
+        "stem_removed": 6,
+        "semantic_clusters": 3,
+        "semantic_removed": 11,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 9,
+      "title": "Segment 9 (pages 68-76)",
+      "content_length": 16480,
+      "old_concepts": [
+        "complexity",
+        "classes",
+        "methods",
+        "interface",
+        "chapters",
+        "create",
+        "created",
+        "function",
+        "functionality",
+        "functions"
+      ],
+      "new_concepts": [
+        {
+          "name": "complexity",
+          "score": 0.9920116224408627
+        },
+        {
+          "name": "parameters",
+          "score": 0.9768988202530673
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.952886147634953
+        },
+        {
+          "name": "subdivision",
+          "score": 0.9517293267893328
+        },
+        {
+          "name": "code",
+          "score": 0.9734386577111471
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 231
+      },
+      "dedup_stats": {
+        "stem_removed": 5,
+        "semantic_clusters": 1,
+        "semantic_removed": 23,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 10,
+      "title": "Segment 10 (pages 77-87)",
+      "content_length": 19197,
+      "old_concepts": [
+        "method",
+        "code",
+        "classes",
+        "undo",
+        "actions",
+        "text",
+        "purposes",
+        "examples",
+        "information",
+        "special"
+      ],
+      "new_concepts": [
+        {
+          "name": "undo",
+          "score": 0.9893467032864708
+        },
+        {
+          "name": "selection",
+          "score": 0.9872084565618586
+        },
+        {
+          "name": "History",
+          "score": 0.9855724344725268
+        },
+        {
+          "name": "insertion cursor",
+          "score": 0.9823020768535807
+        },
+        {
+          "name": "mechanism",
+          "score": 0.9764229813950758
+        },
+        {
+          "name": "actions",
+          "score": 0.9730739636845515
+        },
+        {
+          "name": "generally",
+          "score": 0.5
+        },
+        {
+          "name": "code",
+          "score": 0.9950973551766499
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 368
+      },
+      "dedup_stats": {
+        "stem_removed": 4,
+        "semantic_clusters": 1,
+        "semantic_removed": 19,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 11,
+      "title": "Segment 11 (pages 88-95)",
+      "content_length": 15040,
+      "old_concepts": [
+        "method",
+        "code",
+        "catch",
+        "complex",
+        "errors",
+        "handled",
+        "handles",
+        "interface",
+        "tried",
+        "try"
+      ],
+      "new_concepts": [
+        {
+          "name": "n\u2019t",
+          "score": 0.9775529164096974
+        },
+        {
+          "name": "unset",
+          "score": 0.9615450485799699
+        },
+        {
+          "name": "Errors",
+          "score": 0.9615106794708038
+        },
+        {
+          "name": "exceptional",
+          "score": 0.5
+        },
+        {
+          "name": "catch",
+          "score": 0.5
+        },
+        {
+          "name": "data",
+          "score": 0.5
+        },
+        {
+          "name": "defining",
+          "score": 0.5
+        },
+        {
+          "name": "defined",
+          "score": 0.5
+        },
+        {
+          "name": "code",
+          "score": 0.9906778342342891
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 238
+      },
+      "dedup_stats": {
+        "stem_removed": 5,
+        "semantic_clusters": 1,
+        "semantic_removed": 20,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 12,
+      "title": "Segment 12 (pages 96-104)",
+      "content_length": 19001,
+      "old_concepts": [
+        "error",
+        "exceptions",
+        "exceptional",
+        "methods",
+        "server",
+        "file",
+        "approach",
+        "approaches",
+        "examples",
+        "application"
+      ],
+      "new_concepts": [
+        {
+          "name": "selection",
+          "score": 0.9796991373634621
+        },
+        {
+          "name": "Web server",
+          "score": 0.97429783473372
+        },
+        {
+          "name": "NFS",
+          "score": 0.9726172333885393
+        },
+        {
+          "name": "Java substring method",
+          "score": 0.9722545252445413
+        },
+        {
+          "name": "URL",
+          "score": 0.9702401803496724
+        },
+        {
+          "name": "exceptional",
+          "score": 0.5
+        },
+        {
+          "name": "selecting",
+          "score": 0.5
+        },
+        {
+          "name": "code",
+          "score": 0.9779968290820544
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 294
+      },
+      "dedup_stats": {
+        "stem_removed": 6,
+        "semantic_clusters": 1,
+        "semantic_removed": 16,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 13,
+      "title": "Segment 13 (pages 105-116)",
+      "content_length": 20546,
+      "old_concepts": [
+        "design",
+        "documentation",
+        "comments",
+        "comment",
+        "code",
+        "develop",
+        "line",
+        "good",
+        "method",
+        "implement"
+      ],
+      "new_concepts": [
+        {
+          "name": "n\u2019t",
+          "score": 0.9850071335039404
+        },
+        {
+          "name": "interface",
+          "score": 0.9844716733476817
+        },
+        {
+          "name": "good",
+          "score": 0.9832213588440553
+        },
+        {
+          "name": "time",
+          "score": 0.9771214519446659
+        },
+        {
+          "name": "method",
+          "score": 0.9721647502501872
+        },
+        {
+          "name": "module",
+          "score": 0.9613912034463321
+        },
+        {
+          "name": "code",
+          "score": 0.9900659367569378
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 309
+      },
+      "dedup_stats": {
+        "stem_removed": 6,
+        "semantic_clusters": 1,
+        "semantic_removed": 19,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 14,
+      "title": "Segment 14 (pages 117-124)",
+      "content_length": 14272,
+      "old_concepts": [
+        "comments",
+        "comment",
+        "level",
+        "code",
+        "private",
+        "variable",
+        "variables",
+        "returned",
+        "add",
+        "lengths"
+      ],
+      "new_concepts": [
+        {
+          "name": "n\u2019t",
+          "score": 0.9793677140939092
+        },
+        {
+          "name": "variable",
+          "score": 0.9773179306938303
+        },
+        {
+          "name": "declaration",
+          "score": 0.9431646416863307
+        },
+        {
+          "name": "method",
+          "score": 0.9420339270531379
+        },
+        {
+          "name": "copy",
+          "score": 0.9419022889637352
+        },
+        {
+          "name": "add",
+          "score": 0.9387813582348156
+        },
+        {
+          "name": "variables",
+          "score": 0.5
+        },
+        {
+          "name": "private",
+          "score": 0.5
+        },
+        {
+          "name": "level",
+          "score": 0.5
+        },
+        {
+          "name": "line",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 230
+      },
+      "dedup_stats": {
+        "stem_removed": 3,
+        "semantic_clusters": 1,
+        "semantic_removed": 16,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 15,
+      "title": "Segment 15 (pages 125-135)",
+      "content_length": 19269,
+      "old_concepts": [
+        "object",
+        "methods",
+        "code",
+        "returned",
+        "information",
+        "index",
+        "indexes",
+        "classes",
+        "providing",
+        "provides"
+      ],
+      "new_concepts": [
+        {
+          "name": "put assigning PKHash",
+          "score": 0.9782716974414064
+        },
+        {
+          "name": "information",
+          "score": 0.9778467216180378
+        },
+        {
+          "name": "indexlookup",
+          "score": 0.5
+        },
+        {
+          "name": "level",
+          "score": 0.5
+        },
+        {
+          "name": "getnext",
+          "score": 0.5
+        },
+        {
+          "name": "RPC",
+          "score": 0.9836138980161278
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 304
+      },
+      "dedup_stats": {
+        "stem_removed": 6,
+        "semantic_clusters": 1,
+        "semantic_removed": 19,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 16,
+      "title": "Segment 16 (pages 136-143)",
+      "content_length": 13180,
+      "old_concepts": [
+        "comment",
+        "comments",
+        "code",
+        "status",
+        "bugs",
+        "servers",
+        "readers",
+        "classes",
+        "variables",
+        "variable"
+      ],
+      "new_concepts": [
+        {
+          "name": "documentation",
+          "score": 0.981045343769486
+        },
+        {
+          "name": "obvious",
+          "score": 0.9756857267614951
+        },
+        {
+          "name": "servers",
+          "score": 0.9752830427220885
+        },
+        {
+          "name": "bug",
+          "score": 0.9646731527004554
+        },
+        {
+          "name": "add",
+          "score": 0.9628235569495859
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9613416127573686
+        },
+        {
+          "name": "information",
+          "score": 0.9489616973777908
+        },
+        {
+          "name": "obvious central place",
+          "score": 0.9473970871350337
+        },
+        {
+          "name": "choosing",
+          "score": 0.5
+        },
+        {
+          "name": "indexlookup",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 330
+      },
+      "dedup_stats": {
+        "stem_removed": 2,
+        "semantic_clusters": 1,
+        "semantic_removed": 19,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 17,
+      "title": "Segment 17 (pages 144-151)",
+      "content_length": 13380,
+      "old_concepts": [
+        "names",
+        "named",
+        "block",
+        "variable",
+        "variables",
+        "value",
+        "code",
+        "different",
+        "difference",
+        "uses"
+      ],
+      "new_concepts": [
+        {
+          "name": "readers",
+          "score": 0.9403247855748821
+        },
+        {
+          "name": "generic",
+          "score": 0.9167995402916134
+        },
+        {
+          "name": "entity",
+          "score": 0.9163011376269459
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9647772960605099
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 183
+      },
+      "dedup_stats": {
+        "stem_removed": 3,
+        "semantic_clusters": 1,
+        "semantic_removed": 27,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 18,
+      "title": "Segment 18 (pages 152-159)",
+      "content_length": 16078,
+      "old_concepts": [
+        "comments",
+        "comment",
+        "design",
+        "coding",
+        "code",
+        "changing",
+        "changes",
+        "developers",
+        "write",
+        "methods"
+      ],
+      "new_concepts": [
+        {
+          "name": "system",
+          "score": 0.9843118821999277
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9804865972103671
+        },
+        {
+          "name": "designed",
+          "score": 0.5
+        },
+        {
+          "name": "develops",
+          "score": 0.5
+        },
+        {
+          "name": "changes",
+          "score": 0.5
+        },
+        {
+          "name": "change",
+          "score": 0.5
+        },
+        {
+          "name": "time",
+          "score": 0.5
+        },
+        {
+          "name": "good",
+          "score": 0.5
+        },
+        {
+          "name": "code",
+          "score": 0.9948726701587777
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 229
+      },
+      "dedup_stats": {
+        "stem_removed": 5,
+        "semantic_clusters": 1,
+        "semantic_removed": 19,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 19,
+      "title": "Segment 19 (pages 160-167)",
+      "content_length": 13282,
+      "old_concepts": [
+        "code",
+        "coding",
+        "consistency",
+        "consistent",
+        "comments",
+        "comment",
+        "documentation",
+        "document",
+        "developers",
+        "place"
+      ],
+      "new_concepts": [
+        {
+          "name": "n\u2019t",
+          "score": 0.974725575821868
+        },
+        {
+          "name": "code",
+          "score": 0.990601977673447
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 217
+      },
+      "dedup_stats": {
+        "stem_removed": 5,
+        "semantic_clusters": 1,
+        "semantic_removed": 23,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 20,
+      "title": "Segment 20 (pages 168-175)",
+      "content_length": 11653,
+      "old_concepts": [
+        "code",
+        "examples",
+        "returned",
+        "works",
+        "chapters",
+        "useful",
+        "uses",
+        "generic",
+        "event",
+        "threads"
+      ],
+      "new_concepts": [
+        {
+          "name": "reader",
+          "score": 0.9633876915529586
+        },
+        {
+          "name": "information",
+          "score": 0.9624109493013155
+        },
+        {
+          "name": "number",
+          "score": 0.9284155682350544
+        },
+        {
+          "name": "n\u2019t",
+          "score": 0.9213561319091319
+        },
+        {
+          "name": "connections",
+          "score": 0.9201221877270251
+        },
+        {
+          "name": "Generic",
+          "score": 0.9194775640030548
+        },
+        {
+          "name": "numbytes",
+          "score": 0.5
+        },
+        {
+          "name": "names",
+          "score": 0.5
+        },
+        {
+          "name": "named",
+          "score": 0.5
+        },
+        {
+          "name": "event",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 164
+      },
+      "dedup_stats": {
+        "stem_removed": 4,
+        "semantic_clusters": 1,
+        "semantic_removed": 14,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 21,
+      "title": "Segment 21 (pages 176-183)",
+      "content_length": 15586,
+      "old_concepts": [
+        "tested",
+        "design",
+        "development",
+        "inheritance",
+        "inherit",
+        "methods",
+        "classes",
+        "implement",
+        "implementations",
+        "implementation"
+      ],
+      "new_concepts": [
+        {
+          "name": "unit",
+          "score": 0.9777483206972015
+        },
+        {
+          "name": "code",
+          "score": 0.9679770573265247
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 253
+      },
+      "dedup_stats": {
+        "stem_removed": 10,
+        "semantic_clusters": 1,
+        "semantic_removed": 21,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 22,
+      "title": "Segment 22 (pages 184-192)",
+      "content_length": 17753,
+      "old_concepts": [
+        "performance",
+        "perform",
+        "buffer",
+        "code",
+        "allocating",
+        "allocate",
+        "allocations",
+        "designing",
+        "make",
+        "making"
+      ],
+      "new_concepts": [
+        {
+          "name": "chunk",
+          "score": 0.9796608844630871
+        },
+        {
+          "name": "path",
+          "score": 0.9741901379563791
+        },
+        {
+          "name": "special",
+          "score": 0.9599569810538378
+        },
+        {
+          "name": "perform",
+          "score": 0.5
+        },
+        {
+          "name": "code",
+          "score": 0.9930689110075077
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 287
+      },
+      "dedup_stats": {
+        "stem_removed": 4,
+        "semantic_clusters": 1,
+        "semantic_removed": 22,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 23,
+      "title": "Segment 23 (pages 193-200)",
+      "content_length": 6868,
+      "old_concepts": [
+        "problems",
+        "investments",
+        "dispatcher",
+        "general",
+        "ideas",
+        "needed",
+        "information",
+        "generic",
+        "conditions",
+        "definition"
+      ],
+      "new_concepts": [
+        {
+          "name": "design",
+          "score": 0.9833384573434263
+        },
+        {
+          "name": "good design",
+          "score": 0.9548141049813044
+        },
+        {
+          "name": "path allocating internal",
+          "score": 0.9436150940356816
+        },
+        {
+          "name": "designer",
+          "score": 0.5
+        },
+        {
+          "name": "file",
+          "score": 0.5
+        },
+        {
+          "name": "parameters",
+          "score": 0.5
+        },
+        {
+          "name": "abstractions",
+          "score": 0.5
+        },
+        {
+          "name": "interface",
+          "score": 0.5
+        },
+        {
+          "name": "thing",
+          "score": 0.5
+        },
+        {
+          "name": "complexity",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 176
+      },
+      "dedup_stats": {
+        "stem_removed": 5,
+        "semantic_clusters": 1,
+        "semantic_removed": 17,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 24,
+      "title": "Segment 24 (pages 201-208)",
+      "content_length": 5356,
+      "old_concepts": [
+        "code",
+        "coding",
+        "interface",
+        "design",
+        "method",
+        "module",
+        "general",
+        "implementation",
+        "memory",
+        "special"
+      ],
+      "new_concepts": [
+        {
+          "name": "NFS server crash",
+          "score": 0.9968495452966651
+        },
+        {
+          "name": "Web site colors",
+          "score": 0.9951140268135773
+        },
+        {
+          "name": "NFS server",
+          "score": 0.9882401040314533
+        },
+        {
+          "name": "Tcl unset",
+          "score": 0.9821346190096055
+        },
+        {
+          "name": "Java",
+          "score": 0.9852272093203435
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 175
+      },
+      "dedup_stats": {
+        "stem_removed": 3,
+        "semantic_clusters": 1,
+        "semantic_removed": 29,
+        "final_count": 0
+      }
+    },
+    {
+      "chapter_number": 25,
+      "title": "Segment 25 (pages 209-210)",
+      "content_length": 676,
+      "old_concepts": [
+        "lerner",
+        "professor",
+        "award",
+        "understood",
+        "easily",
+        "berkeley",
+        "distinguished",
+        "young",
+        "hopper",
+        "murray"
+      ],
+      "new_concepts": [
+        {
+          "name": "ACM Grace Murray",
+          "score": 0.9636968215776165
+        },
+        {
+          "name": "received",
+          "score": 0.5
+        },
+        {
+          "name": "distributed operating systems",
+          "score": 0.5
+        },
+        {
+          "name": "bs",
+          "score": 0.5
+        },
+        {
+          "name": "numerous",
+          "score": 0.5
+        },
+        {
+          "name": "yale",
+          "score": 0.5
+        }
+      ],
+      "pipeline_metadata": {
+        "extraction_method": "hybrid_pipeline",
+        "stages_executed": [
+          "noise_filter",
+          "yake",
+          "textrank",
+          "stem_dedup",
+          "semantic_dedup"
+        ],
+        "duration_ms": 139
+      },
+      "dedup_stats": {
+        "stem_removed": 1,
+        "semantic_clusters": 1,
+        "semantic_removed": 32,
+        "final_count": 0
+      }
+    }
+  ]
+}

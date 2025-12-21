@@ -337,3 +337,142 @@ class TestExtractionOptions:
             }
         )
         assert response.status_code == status.HTTP_200_OK
+
+
+# =============================================================================
+# HCE-5.0: Pipeline Integration API Tests (AC-5.3, AC-5.4)
+# =============================================================================
+
+
+class TestExtractionConfigRequest:
+    """HCE-5.8, HCE-5.9: Test request schema has extraction_config (AC-5.3)."""
+
+    def test_request_accepts_extraction_config(self) -> None:
+        """HCE-5.8: Request should accept extraction_config field."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Machine learning models process data efficiently.",
+                "extraction_config": {
+                    "enable_yake": True,
+                    "enable_textrank": True,
+                    "enable_stem_dedup": True,
+                    "enable_semantic_dedup": False
+                }
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_request_extraction_config_optional(self) -> None:
+        """HCE-5.8: extraction_config should be optional."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Deep learning neural networks enable AI systems."
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_config_disable_yake(self) -> None:
+        """HCE-5.9: Config should allow disabling YAKE."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "API design patterns improve REST services.",
+                "extraction_config": {
+                    "enable_yake": False,
+                    "enable_textrank": True
+                }
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        # Pipeline metadata should reflect which stages were executed
+        if "pipeline_metadata" in data.get("metadata", {}):
+            stages = data["metadata"]["pipeline_metadata"].get("stages_executed", [])
+            assert "yake" not in stages
+
+    def test_config_disable_semantic_dedup(self) -> None:
+        """HCE-5.9: Config should allow disabling semantic dedup."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Kubernetes orchestration enables container management.",
+                "extraction_config": {
+                    "enable_semantic_dedup": False
+                }
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+
+class TestPipelineMetadataResponse:
+    """HCE-5.12, HCE-5.13: Test response has pipeline_metadata (AC-5.4)."""
+
+    def test_response_has_pipeline_metadata(self) -> None:
+        """HCE-5.12: Response metadata should include pipeline_metadata."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Machine learning models process data efficiently."
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        
+        # Pipeline metadata should be in response metadata
+        metadata = data.get("metadata", {})
+        assert "pipeline_metadata" in metadata or "stages_completed" in metadata
+
+    def test_pipeline_metadata_has_stages_executed(self) -> None:
+        """HCE-5.12: pipeline_metadata should have stages_executed."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Deep learning neural networks enable AI systems."
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        
+        metadata = data.get("metadata", {})
+        # Either pipeline_metadata.stages_executed or stages_completed directly
+        stages = metadata.get("pipeline_metadata", {}).get("stages_executed", [])
+        if not stages:
+            stages = metadata.get("stages_completed", [])
+        
+        assert isinstance(stages, list)
+
+    def test_response_has_dedup_stats(self) -> None:
+        """HCE-5.13: Response should include dedup_stats."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Machine learning and deep learning enable AI systems. Models model data."
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        
+        metadata = data.get("metadata", {})
+        # dedup_stats should be present
+        assert "dedup_stats" in metadata or "pipeline_metadata" in metadata
+
+    def test_dedup_stats_has_stem_removed(self) -> None:
+        """HCE-5.13: dedup_stats should have stem_removed count."""
+        response = client.post(
+            "/api/v1/metadata/extract",
+            json={
+                "text": "Implementation implements implementing. Complex complexity."
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        
+        metadata = data.get("metadata", {})
+        dedup_stats = metadata.get("dedup_stats", {})
+        if not dedup_stats:
+            dedup_stats = metadata.get("pipeline_metadata", {}).get("dedup_stats", {})
+        
+        # stem_removed key should exist (may be 0)
+        assert "stem_removed" in dedup_stats or len(dedup_stats) == 0

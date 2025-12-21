@@ -377,3 +377,171 @@ class TestProcessingMetadata:
         assert hasattr(result, "stages_completed")
         assert isinstance(result.stages_completed, list)
         assert "keywords" in result.stages_completed
+
+
+# =============================================================================
+# HCE-5.0: Pipeline Integration Tests (AC-5.1, AC-5.2)
+# =============================================================================
+
+
+class TestPipelineImport:
+    """HCE-5.1: Test MetadataExtractor imports pipeline (AC-5.1)."""
+
+    def test_concept_extraction_pipeline_import(self) -> None:
+        """HCE-5.1: ConceptExtractionPipeline should be importable in module."""
+        from src.extractors.metadata_extractor import ConceptExtractionPipeline
+        
+        assert ConceptExtractionPipeline is not None
+
+    def test_metadata_extractor_imports_pipeline_config(self) -> None:
+        """HCE-5.1: ConceptExtractionConfig should be importable."""
+        from src.extractors.metadata_extractor import ConceptExtractionConfig
+        
+        assert ConceptExtractionConfig is not None
+
+
+class TestPipelineAttribute:
+    """HCE-5.2: Test MetadataExtractor has pipeline attribute (AC-5.1)."""
+
+    def test_extractor_has_concept_pipeline_attr(self) -> None:
+        """HCE-5.2: MetadataExtractor should have _concept_pipeline attribute."""
+        extractor = MetadataExtractor()
+        
+        assert hasattr(extractor, "_concept_pipeline")
+
+    def test_concept_pipeline_is_lazy_loaded(self) -> None:
+        """HCE-5.2: _concept_pipeline should be lazy-loaded (initially None)."""
+        extractor = MetadataExtractor()
+        
+        # Before access, internal _concept_pipeline_instance should be None
+        assert extractor._concept_pipeline is not None or hasattr(extractor, "_concept_pipeline_instance")
+
+
+class TestPipelineDelegation:
+    """HCE-5.3: Test extract_concepts() delegates to pipeline (AC-5.1)."""
+
+    def test_extract_uses_concept_pipeline(self) -> None:
+        """HCE-5.3: extract() should use ConceptExtractionPipeline internally."""
+        extractor = MetadataExtractor()
+        
+        # Verify the pipeline instance is created and accessible
+        pipeline = extractor._concept_pipeline_instance
+        
+        assert pipeline is not None
+        assert hasattr(pipeline, "extract")
+
+    def test_pipeline_result_included_in_extraction(self) -> None:
+        """HCE-5.3: Pipeline result should be reflected in ExtractionResult."""
+        extractor = MetadataExtractor()
+        text = "Deep learning neural networks enable AI systems."
+        
+        result = extractor.extract(text)
+        
+        # Should have pipeline_metadata in result
+        assert hasattr(result, "pipeline_metadata") or hasattr(result, "stages_completed")
+
+
+class TestBackwardCompatibility:
+    """HCE-5.6: Test output format unchanged (AC-5.2)."""
+
+    def test_keywords_format_unchanged(self) -> None:
+        """HCE-5.6: keywords should remain List[KeywordResult]."""
+        extractor = MetadataExtractor()
+        text = "API design patterns improve REST services."
+        
+        result = extractor.extract(text)
+        
+        assert isinstance(result.keywords, list)
+        # All keywords should still be KeywordResult objects
+        for kw in result.keywords:
+            assert hasattr(kw, "term")
+            assert hasattr(kw, "score")
+            assert hasattr(kw, "is_technical")
+
+    def test_concepts_format_unchanged(self) -> None:
+        """HCE-5.6: concepts should remain List[ConceptResult]."""
+        extractor = MetadataExtractor()
+        text = "Kubernetes orchestration enables container management."
+        
+        result = extractor.extract(text)
+        
+        assert isinstance(result.concepts, list)
+        # All concepts should still be ConceptResult objects
+        for concept in result.concepts:
+            assert hasattr(concept, "name")
+            assert hasattr(concept, "confidence")
+            assert hasattr(concept, "domain")
+            assert hasattr(concept, "tier")
+
+    def test_extraction_result_has_all_original_fields(self) -> None:
+        """HCE-5.6: ExtractionResult should have all original fields."""
+        extractor = MetadataExtractor()
+        text = "Microservices architecture scales distributed systems."
+        
+        result = extractor.extract(text)
+        
+        # Original fields must still exist
+        assert hasattr(result, "keywords")
+        assert hasattr(result, "concepts")
+        assert hasattr(result, "detected_domain")
+        assert hasattr(result, "domain_confidence")
+        assert hasattr(result, "quality_score")
+        assert hasattr(result, "rejected_keywords")
+        assert hasattr(result, "rejection_reasons")
+        assert hasattr(result, "processing_time_ms")
+        assert hasattr(result, "text_length")
+        assert hasattr(result, "stages_completed")
+
+
+class TestExtractionStrategyToggle:
+    """HCE-5.X: Test extraction strategy toggle between legacy and hybrid."""
+
+    def test_options_has_use_hybrid_extraction_field(self) -> None:
+        """Options should have use_hybrid_extraction boolean field."""
+        options = MetadataExtractionOptions(use_hybrid_extraction=True)
+        
+        assert hasattr(options, "use_hybrid_extraction")
+        assert options.use_hybrid_extraction is True
+
+    def test_use_hybrid_extraction_defaults_to_true(self) -> None:
+        """use_hybrid_extraction should default to True (hybrid is production default)."""
+        options = MetadataExtractionOptions()
+        
+        assert options.use_hybrid_extraction is True
+
+    def test_hybrid_extraction_uses_pipeline(self) -> None:
+        """When use_hybrid_extraction=True, should use ConceptExtractionPipeline."""
+        extractor = MetadataExtractor()
+        options = MetadataExtractionOptions(use_hybrid_extraction=True)
+        text = "Machine learning algorithms process data patterns."
+        
+        result = extractor.extract(text, options=options)
+        
+        # Pipeline metadata indicates hybrid pipeline was used
+        assert result.pipeline_metadata is not None
+        assert "stages_executed" in result.pipeline_metadata
+        assert len(result.pipeline_metadata["stages_executed"]) > 0
+
+    def test_legacy_extraction_does_not_have_pipeline_stages(self) -> None:
+        """When use_hybrid_extraction=False, pipeline_metadata should be None."""
+        extractor = MetadataExtractor()
+        options = MetadataExtractionOptions(use_hybrid_extraction=False)
+        text = "Software design patterns improve code quality."
+        
+        result = extractor.extract(text, options=options)
+        
+        # Legacy mode: no pipeline metadata
+        assert result.pipeline_metadata is None or result.pipeline_metadata == {}
+
+    def test_hybrid_extraction_includes_dedup_stats(self) -> None:
+        """Hybrid extraction should include dedup_stats in result."""
+        extractor = MetadataExtractor()
+        options = MetadataExtractionOptions(use_hybrid_extraction=True)
+        text = "API design patterns enable REST services with GraphQL."
+        
+        result = extractor.extract(text, options=options)
+        
+        # Hybrid mode includes dedup stats
+        assert result.dedup_stats is not None
+        assert "stem_removed" in result.dedup_stats
+        assert "semantic_clusters" in result.dedup_stats

@@ -40,6 +40,11 @@ WATERMARK_TERMS: Final[frozenset[str]] = frozenset({
     "pdfhive",
     "bookzz",
     "libgen",
+    # Safari Books Online watermarks
+    "safari",
+    "books",
+    "online",
+    "downloaded",
 })
 
 URL_FRAGMENT_TERMS: Final[frozenset[str]] = frozenset({

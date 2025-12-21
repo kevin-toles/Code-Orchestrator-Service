@@ -8,6 +8,7 @@ AC Reference:
 - AC-2.3: Concept Extraction - concepts with name, confidence, domain, tier
 - AC-2.5: Quality Scoring - quality_score between 0.0-1.0
 - AC-2.6: Domain Detection - detected_domain and domain_confidence
+- AC-5.1: Pipeline Integration - delegates to ConceptExtractionPipeline
 
 Anti-Patterns Avoided:
 - Anti-Pattern #12: Singleton pattern for extractors
@@ -20,8 +21,13 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 
+from src.extractors.concept_extraction_pipeline import (
+    ConceptExtractionConfig,
+    ConceptExtractionPipeline,
+    ConceptExtractionResult,
+)
 from src.models.metadata_models import (
     ConceptResult,
     KeywordResult,
@@ -109,6 +115,8 @@ class ExtractionResult:
         processing_time_ms: Processing time in milliseconds.
         text_length: Length of input text.
         stages_completed: List of completed processing stages.
+        pipeline_metadata: Metadata from hybrid extraction pipeline.
+        dedup_stats: Deduplication statistics from hybrid pipeline.
     """
 
     keywords: list[KeywordResult] = field(default_factory=list)
@@ -121,6 +129,8 @@ class ExtractionResult:
     processing_time_ms: float = 0.0
     text_length: int = 0
     stages_completed: list[str] = field(default_factory=list)
+    pipeline_metadata: dict[str, Any] | None = None
+    dedup_stats: dict[str, int] | None = None
 
 
 # =============================================================================
@@ -179,6 +189,18 @@ class MetadataExtractor:
         self._keyword_extractor: TfidfKeywordExtractor | None = None
         self._concept_extractor: ConceptExtractor | None = None
         self._noise_filter: NoiseFilter | None = None
+        self._concept_pipeline: ConceptExtractionPipeline | None = None
+
+    @property
+    def _concept_pipeline_instance(self) -> ConceptExtractionPipeline:
+        """Lazy-load concept extraction pipeline (Anti-Pattern #12: cached).
+        
+        Returns:
+            Cached ConceptExtractionPipeline instance.
+        """
+        if self._concept_pipeline is None:
+            self._concept_pipeline = ConceptExtractionPipeline()
+        return self._concept_pipeline
 
     @property
     def _keyword_extractor_instance(self) -> TfidfKeywordExtractor:
@@ -257,7 +279,10 @@ class MetadataExtractor:
 
         # Stage 4: Extract concepts
         if self.config.enable_concepts:
-            result.concepts = self._extract_concepts(text, options)
+            concepts, pipeline_meta, dedup = self._extract_concepts(text, options)
+            result.concepts = concepts
+            result.pipeline_metadata = pipeline_meta
+            result.dedup_stats = dedup
             result.stages_completed.append(STAGE_CONCEPTS)
 
         # Stage 5: Detect domain
@@ -389,15 +414,34 @@ class MetadataExtractor:
         self,
         text: str,
         options: MetadataExtractionOptions,
-    ) -> list[ConceptResult]:
-        """Extract concepts using ConceptExtractor.
+    ) -> tuple[list[ConceptResult], dict[str, Any] | None, dict[str, int] | None]:
+        """Extract concepts using legacy extractor or hybrid pipeline.
+
+        Args:
+            text: Text to extract from.
+            options: Extraction options including use_hybrid_extraction flag.
+
+        Returns:
+            Tuple of (concepts, pipeline_metadata, dedup_stats).
+            pipeline_metadata and dedup_stats are None for legacy extraction.
+        """
+        if options.use_hybrid_extraction:
+            return self._extract_concepts_hybrid(text, options)
+        return self._extract_concepts_legacy(text, options)
+
+    def _extract_concepts_legacy(
+        self,
+        text: str,
+        options: MetadataExtractionOptions,
+    ) -> tuple[list[ConceptResult], dict[str, Any] | None, dict[str, int] | None]:
+        """Extract concepts using legacy ConceptExtractor.
 
         Args:
             text: Text to extract from.
             options: Extraction options.
 
         Returns:
-            List of ConceptResult.
+            Tuple of (concepts, None, None) - no pipeline metadata for legacy.
         """
         extractor = self._concept_extractor_instance
         
@@ -417,7 +461,43 @@ class MetadataExtractor:
                     )
                 )
         
-        return results
+        return results, None, None
+
+    def _extract_concepts_hybrid(
+        self,
+        text: str,
+        options: MetadataExtractionOptions,
+    ) -> tuple[list[ConceptResult], dict[str, Any], dict[str, int]]:
+        """Extract concepts using hybrid ConceptExtractionPipeline.
+
+        Args:
+            text: Text to extract from.
+            options: Extraction options.
+
+        Returns:
+            Tuple of (concepts, pipeline_metadata, dedup_stats).
+        """
+        pipeline = self._concept_pipeline_instance
+        
+        # Run hybrid pipeline extraction
+        pipeline_result = pipeline.extract(text)
+        
+        # Map pipeline ExtractedTerms to ConceptResults
+        results: list[ConceptResult] = []
+        for term in pipeline_result.concepts[:options.top_k_concepts]:
+            # Invert YAKE score (lower = better) to confidence (higher = better)
+            confidence = 1.0 - min(term.score, 1.0)
+            if confidence >= options.min_concept_confidence:
+                results.append(
+                    ConceptResult(
+                        name=term.term,
+                        confidence=confidence,
+                        domain="",  # Hybrid pipeline doesn't assign domains yet
+                        tier="",
+                    )
+                )
+        
+        return results, pipeline_result.pipeline_metadata, pipeline_result.dedup_stats
 
     def _detect_domain(
         self,

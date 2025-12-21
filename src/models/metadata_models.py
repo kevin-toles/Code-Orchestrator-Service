@@ -105,6 +105,10 @@ class MetadataExtractionOptions(BaseModel):
         default=True,
         description="Filter noise terms from keywords",
     )
+    use_hybrid_extraction: bool = Field(
+        default=True,
+        description="Use hybrid concept extraction pipeline (YAKE+TextRank+dedup)",
+    )
 
 
 # =============================================================================
