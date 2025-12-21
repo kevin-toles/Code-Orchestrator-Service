@@ -37,6 +37,10 @@ from src.nlp.ensemble_merger import EnsembleMerger, ExtractedTerm as MergerExtra
 from src.nlp.stemmer import deduplicate_by_stem
 from src.nlp.semantic_dedup import SemanticDedupConfig, SemanticDeduplicator
 from src.nlp.concept_validator import ConceptValidator, ConceptValidationConfig
+from src.nlp.graphcodebert_validator import (
+    GraphCodeBERTConceptValidator,
+    GraphCodeBERTConfig,
+)
 
 
 # =============================================================================
@@ -59,7 +63,7 @@ DEFAULT_YAKE_DEDUP_THRESHOLD: Final[float] = 0.9
 DEFAULT_TEXTRANK_WORDS: Final[int] = 20
 DEFAULT_HDBSCAN_MIN_CLUSTER_SIZE: Final[int] = 2
 DEFAULT_SEMANTIC_SIMILARITY_THRESHOLD: Final[float] = 0.8
-DEFAULT_GRAPHCODEBERT_THRESHOLD: Final[float] = 0.7
+DEFAULT_GRAPHCODEBERT_THRESHOLD: Final[float] = 0.30
 DEFAULT_SBERT_VALIDATION_THRESHOLD: Final[float] = 0.35
 
 # Default protected terms for stemming
@@ -237,6 +241,17 @@ class ConceptExtractionPipeline:
             deduplicator=self._semantic_deduplicator,  # Share SBERT engine
         )
 
+        # Stage 5: GraphCodeBERT Validation (optional)
+        self._graphcodebert_validator: GraphCodeBERTConceptValidator | None = None
+        if self.config.enable_graphcodebert:
+            if GraphCodeBERTConceptValidator.is_available():
+                gcb_config = GraphCodeBERTConfig(
+                    min_similarity=self.config.graphcodebert_threshold,
+                )
+                self._graphcodebert_validator = GraphCodeBERTConceptValidator(
+                    config=gcb_config
+                )
+
     def extract(self, text: str) -> ConceptExtractionResult:
         """Extract concepts from text using the hybrid pipeline.
 
@@ -264,6 +279,7 @@ class ConceptExtractionPipeline:
             "validation_rejected": 0,
             "semantic_clusters": 0,
             "semantic_removed": 0,
+            "graphcodebert_rejected": 0,
             "final_count": 0,
         }
 
@@ -320,7 +336,11 @@ class ConceptExtractionPipeline:
             dedup_stats["semantic_removed"] = semantic_stats["removed_count"]
             stages_executed.append(STAGE_SEMANTIC_DEDUP)
 
-        # TODO: Stage 5 - GraphCodeBERT (existing, optional)
+        # Stage 5: GraphCodeBERT Validation (optional)
+        if self.config.enable_graphcodebert and self._graphcodebert_validator:
+            concepts, gcb_rejected = self._apply_graphcodebert_validation(concepts)
+            dedup_stats["graphcodebert_rejected"] = gcb_rejected
+            stages_executed.append(STAGE_GRAPHCODEBERT)
 
         # Calculate duration
         duration_ms = int((time.time() - start_time) * 1000)
@@ -498,3 +518,34 @@ class ConceptExtractionPipeline:
         ]
 
         return result, stats
+
+    def _apply_graphcodebert_validation(
+        self,
+        concepts: list[ExtractedTerm],
+    ) -> tuple[list[ExtractedTerm], int]:
+        """Apply GraphCodeBERT validation.
+
+        Stage 5 of the pipeline. Uses GraphCodeBERT embeddings to validate
+        that concepts are technically meaningful code/programming terms.
+
+        Args:
+            concepts: List of extracted terms to validate.
+
+        Returns:
+            Tuple of (validated_concepts, rejected_count).
+        """
+        if not concepts or self._graphcodebert_validator is None:
+            return concepts, 0
+
+        # Extract term strings for validation
+        term_strings = [c.term for c in concepts]
+
+        # Run GraphCodeBERT validation
+        result = self._graphcodebert_validator.validate(term_strings)
+
+        # Filter concepts to only valid ones
+        valid_set = set(result.valid_concepts)
+        validated = [c for c in concepts if c.term in valid_set]
+
+        rejected_count = len(concepts) - len(validated)
+        return validated, rejected_count
