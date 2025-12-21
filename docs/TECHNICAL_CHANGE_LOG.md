@@ -18,7 +18,34 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
-## 2025-01-XX
+## 2025-12-20
+
+### CL-019: CME-1.0 Complete - Configurable Metadata Extraction Feature ✅
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-20 |
+| **WBS Item** | CME-1.0 (WBS-AC2) |
+| **Change Type** | Feature |
+| **Summary** | CME-1.0 Phase 1 COMPLETE. POST /api/v1/metadata/extract endpoint with TF-IDF keyword extraction, concept extraction, noise filtering (8 categories), domain detection, and quality scoring. Full TDD implementation with 96 tests passing. |
+| **Files Changed** | See CL-018 below |
+| **Rationale** | Enable llm-document-enhancer to call orchestrator for high-quality metadata extraction instead of local StatisticalExtractor |
+| **Git Commit** | Pending |
+
+**Architecture Reference**: [CME_ARCHITECTURE.md](../../textbooks/pending/platform/CME_ARCHITECTURE.md)
+
+**Integration Status**:
+- ✅ Endpoint: POST /api/v1/metadata/extract responding on :8083
+- ✅ Request/Response schemas match architecture specification
+- ✅ Noise filtering: 8 categories (watermarks, contractions, URL fragments, etc.)
+- ✅ Quality scoring: 0.0-1.0 based on keyword/concept confidence + noise ratio
+- ✅ Domain detection: Returns detected_domain and domain_confidence
+
+**Consumer Integration**:
+- llm-document-enhancer `MetadataExtractionClient` connects successfully
+- Toggle via `--use-orchestrator` CLI flag or `EXTRACTION_USE_ORCHESTRATOR_EXTRACTION=true`
+
+---
 
 ### CL-018: CME-1.0 Phase 1 - Configurable Metadata Extraction Endpoint
 

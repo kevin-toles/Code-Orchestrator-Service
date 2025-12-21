@@ -501,6 +501,93 @@ components:
 
 ---
 
+## CME-1.0: Metadata Extraction Endpoint (NEW)
+
+**Feature**: Configurable Metadata Extraction  
+**Status**: ✅ COMPLETE (December 2025)  
+**Architecture Document**: [CME_ARCHITECTURE.md](../../textbooks/pending/platform/CME_ARCHITECTURE.md)
+
+### Endpoint: POST /api/v1/metadata/extract
+
+Unified metadata extraction with TF-IDF keywords, concept extraction, noise filtering, domain detection, and quality scoring.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  llm-document-enhancer                                                      │
+│                                                                             │
+│  ┌─────────────────────────────┐      ┌─────────────────────────────────┐   │
+│  │ MetadataExtractionClient    │─────►│ Code-Orchestrator-Service       │   │
+│  │ (httpx async client)        │      │ :8083                           │   │
+│  │ ├── extract_metadata()      │ HTTP │                                 │   │
+│  │ └── health_check()          │◄─────│ POST /api/v1/metadata/extract   │   │
+│  └─────────────────────────────┘      │ ├── TF-IDF keywords             │   │
+│                                       │ ├── Concept extraction          │   │
+│         OR (fallback)                 │ ├── Domain classification       │   │
+│                 │                     │ ├── Noise validation            │   │
+│                 ▼                     │ └── Quality scoring             │   │
+│  ┌─────────────────────────────┐      └─────────────────────────────────┘   │
+│  │ StatisticalExtractor        │                                            │
+│  │ (fallback if service down)  │                                            │
+│  └─────────────────────────────┘                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Request/Response Schema
+
+```json
+// Request
+{
+  "text": "Chapter content...",
+  "title": "Chapter Title",
+  "options": {
+    "top_k_keywords": 15,
+    "filter_noise": true
+  }
+}
+
+// Response
+{
+  "keywords": [{"term": "microservices", "score": 0.85, "is_technical": true}],
+  "concepts": [{"name": "API Design", "confidence": 0.8, "domain": "architecture"}],
+  "metadata": {"quality_score": 0.82, "detected_domain": "architecture"},
+  "rejected": {"keywords": ["oceanofpdf"], "reasons": {"oceanofpdf": "noise_watermark"}}
+}
+```
+
+### Noise Filtering Categories
+
+| Category | Examples | Rejection Reason |
+|----------|----------|------------------|
+| OCR Watermarks | oceanofpdf, ebscohost | `noise_watermark` |
+| Broken Contractions | 'll, n't, 's | `broken_contraction` |
+| URL Fragments | www, http, com | `noise_url_fragment` |
+| Generic Filler | using, used, one | `generic_filler` |
+| Code Artifacts | _add, __init__, self | `code_artifact` |
+| Page Markers | chapter 1, page 42 | `page_marker` |
+| Single Characters | a, b, c | `single_char` |
+| Pure Numbers | 123, 45 | `pure_number` |
+
+### Consumer Integration
+
+```bash
+# llm-document-enhancer can toggle between local and orchestrator:
+python3 generate_metadata_universal.py --input book.json --use-orchestrator
+
+# Or via environment variable:
+EXTRACTION_USE_ORCHESTRATOR_EXTRACTION=true python3 generate_metadata_universal.py --input book.json
+```
+
+### Files
+
+| File | Description |
+|------|-------------|
+| `src/api/metadata.py` | POST /api/v1/metadata/extract endpoint |
+| `src/models/metadata_models.py` | Request/response Pydantic models |
+| `src/extractors/metadata_extractor.py` | TF-IDF + concept extraction pipeline |
+| `src/validators/noise_filter.py` | 8-category noise filtering |
+
+---
+
 ## Use Cases
 
 | Use Case | Description |
