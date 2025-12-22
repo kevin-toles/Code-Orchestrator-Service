@@ -137,8 +137,8 @@ class ConceptExtractionConfig:
     enable_sbert_validation: bool = True  # Semantic similarity to seeds
     sbert_validation_threshold: float = DEFAULT_SBERT_VALIDATION_THRESHOLD
 
-    # Stage 5: GraphCodeBERT (Optional)
-    enable_graphcodebert: bool = False  # Off by default
+    # Stage 5: GraphCodeBERT
+    enable_graphcodebert: bool = True  # On by default
     graphcodebert_threshold: float = DEFAULT_GRAPHCODEBERT_THRESHOLD
 
 
