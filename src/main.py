@@ -20,6 +20,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.api.classify import classify_router
 from src.api.codebert import router as codebert_router
 from src.api.concepts import concepts_router
 from src.api.embed import router as embed_router
@@ -136,6 +137,7 @@ app.include_router(embed_router)  # EEP-1.5.7: Multi-modal embedding endpoints
 app.include_router(concepts_router, prefix="/api")  # EEP-2.4: Concept extraction endpoint
 app.include_router(codebert_router)  # EEP-5.2: CodeBERT embedding endpoint
 app.include_router(metadata_router, prefix="/api")  # CME-1.4: Metadata extraction endpoint
+app.include_router(classify_router, prefix="/api")  # HTC-1.0: Classification endpoint
 
 
 # =============================================================================
