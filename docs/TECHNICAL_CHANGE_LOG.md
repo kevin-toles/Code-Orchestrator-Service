@@ -18,6 +18,73 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-12-24
+
+### CL-021: HTC-1.0 WBS Creation - Hybrid Tiered Classifier Planning
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-24 |
+| **WBS Item** | HTC-1.0 (Planning Phase) |
+| **Change Type** | Documentation |
+| **Summary** | Created comprehensive WBS for Hybrid Tiered Classifier feature. 9 AC blocks mapped to WBS sections. Architecture document and WBS both created. |
+| **Files Changed** | `docs/HYBRID_TIERED_CLASSIFIER_ARCHITECTURE.md`, `docs/HYBRID_TIERED_CLASSIFIER_WBS.md` |
+| **Rationale** | Define 4-tier classification pipeline for normalizing extracted concepts/keywords into validated taxonomy terms |
+| **Git Commit** | Pending |
+
+**Architecture Summary**:
+- **Tier 1**: Alias Lookup (O(1) hash, 0ms, confidence=1.0)
+- **Tier 2**: Trained Classifier (SBERT + LogisticRegression, 5ms avg, threshold 0.7)
+- **Tier 3**: Heuristic Filter (noise_terms.yaml, 8 categories, 1ms)
+- **Tier 4**: LLM Fallback (ai-agents call, <1% of terms, caches results)
+
+**Performance Targets**:
+| Metric | Target |
+|--------|--------|
+| Accuracy | 98% |
+| Avg Latency | 10ms |
+| Cost | ~$1-5 per 10K terms |
+| Memory | < 500MB |
+
+**WBS Structure** (9 AC Blocks):
+| WBS Section | AC Block | Component |
+|-------------|----------|-----------|
+| WBS-AC1 | AC-1: Alias Lookup | `alias_lookup.py` |
+| WBS-AC2 | AC-2: Trained Classifier | `trained_classifier.py` |
+| WBS-AC3 | AC-3: Heuristic Filter | `heuristic_filter.py` |
+| WBS-AC4 | AC-4: LLM Fallback | `llm_fallback.py` |
+| WBS-AC5 | AC-5: Orchestrator Pipeline | `orchestrator.py` |
+| WBS-AC6 | AC-6: API Endpoint | `src/api/classify.py` |
+| WBS-AC7 | AC-7: Training Pipeline | `scripts/train_classifier.py` |
+| WBS-AC8 | AC-8: Anti-Pattern Compliance | All files |
+| WBS-AC9 | AC-9: Testing Requirements | All tests |
+
+**Training Data**: FINAL_AGGREGATED_RESULTS.json (3,255 concepts + 6,981 keywords = 10,236 validated examples)
+
+**Methodology**: TDD (RED → GREEN → REFACTOR)
+
+---
+
+### CL-020: Concept Discovery Module (BERTopic)
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-23 |
+| **WBS Item** | Data-Driven Concept Discovery |
+| **Change Type** | Feature |
+| **Summary** | Added BERTopic-based concept discovery module for automatic concept extraction from metadata. Replaces hardcoded seed concepts with data-driven discovery. |
+| **Files Changed** | `src/nlp/concept_discovery.py`, `scripts/generate_concept_labels.py` |
+| **Rationale** | Enable automatic discovery of abstract concepts from extracted terms using topic modeling |
+| **Git Commit** | Pending |
+
+**Key Features**:
+- BERTopic clustering with SBERT embeddings
+- Quality scoring for concept vs keyword classification
+- Noise pattern filtering
+- JSON export for runtime use
+
+---
+
 ## 2025-12-20
 
 ### CL-019: CME-1.0 Complete - Configurable Metadata Extraction Feature ✅

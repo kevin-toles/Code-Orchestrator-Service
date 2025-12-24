@@ -36,6 +36,7 @@ from src.nlp.semantic_dedup import SemanticDeduplicator
 # Default validation thresholds
 DEFAULT_SBERT_SIMILARITY_THRESHOLD: Final[float] = 0.35
 DEFAULT_MIN_CONCEPT_LENGTH: Final[int] = 2
+DEFAULT_MIN_WORD_COUNT: Final[int] = 2  # Concepts must be 2+ words (not single keywords)
 
 # Validation stage names
 STAGE_PATTERN_FILTER: Final[str] = "pattern_filter"
@@ -45,6 +46,7 @@ STAGE_SBERT_VALIDATE: Final[str] = "sbert_validate"
 REJECTION_AUTHOR_PATTERN: Final[str] = "author_pattern"
 REJECTION_NOISE_TERM: Final[str] = "noise_term"
 REJECTION_LOW_SIMILARITY: Final[str] = "low_similarity"
+REJECTION_SINGLE_WORD: Final[str] = "single_word_not_concept"
 
 
 # =============================================================================
@@ -100,24 +102,41 @@ NOISE_TERMS: Final[frozenset[str]] = frozenset({
 
 # Seed concepts representing valid programming/software terms
 # These are used for semantic similarity validation
+# NOTE: Use multi-word phrases to represent real CONCEPTS (abstract ideas),
+# not single keywords. A concept is "an abstract idea generalized from particular instances."
 SEED_PROGRAMMING_CONCEPTS: Final[tuple[str, ...]] = (
-    # Core CS concepts
-    "algorithm", "data structure", "design pattern", "API", "interface",
-    "complexity", "abstraction", "module", "dependency", "coupling",
-    "cohesion", "encapsulation", "inheritance", "polymorphism",
-    # Software design
-    "code", "software", "design", "programming", "development",
-    "documentation", "refactoring", "debugging", "testing",
-    "architecture", "scalability", "performance", "optimization",
-    # APOSD-specific concepts
-    "information hiding", "deep module", "shallow module", "comments",
-    "exception handling", "error handling", "layer", "pass-through",
-    # Development practices
-    "version control", "deployment", "monitoring", "logging",
-    "continuous integration", "code review", "unit testing",
-    # System concepts
-    "concurrency", "threading", "caching", "database", "network",
-    "protocol", "memory", "storage", "security", "authentication",
+    # Software Architecture Concepts
+    "microservice architecture", "bounded context", "domain driven design",
+    "service mesh", "API gateway", "event driven architecture",
+    "hexagonal architecture", "clean architecture", "layered architecture",
+    "circuit breaker pattern", "saga pattern", "CQRS pattern",
+    # Design Patterns (Gang of Four)
+    "factory pattern", "singleton pattern", "observer pattern",
+    "strategy pattern", "decorator pattern", "adapter pattern",
+    "dependency injection", "inversion of control",
+    # Software Quality Concepts
+    "code complexity", "technical debt", "separation of concerns",
+    "single responsibility principle", "open closed principle",
+    "interface segregation", "dependency inversion principle",
+    "information hiding", "encapsulation principle",
+    # Development Practice Concepts
+    "continuous integration", "continuous deployment", "test driven development",
+    "behavior driven development", "trunk based development",
+    "feature toggling", "blue green deployment", "canary release",
+    # Data & Persistence Concepts
+    "eventual consistency", "strong consistency", "data replication",
+    "database sharding", "connection pooling", "query optimization",
+    "event sourcing", "change data capture",
+    # Distributed Systems Concepts
+    "distributed tracing", "service discovery", "load balancing",
+    "rate limiting", "back pressure", "fault tolerance",
+    "idempotent operation", "optimistic locking", "pessimistic locking",
+    # Security Concepts
+    "authentication flow", "authorization model", "token validation",
+    "secret management", "zero trust architecture",
+    # Observability Concepts
+    "structured logging", "metric aggregation", "distributed tracing",
+    "health checking", "alerting strategy",
 )
 
 
@@ -135,6 +154,7 @@ class ConceptValidationConfig:
         enable_sbert_validation: Enable SBERT semantic similarity validation.
         sbert_similarity_threshold: Minimum similarity to seed concepts (0-1).
         min_concept_length: Minimum characters for valid concept.
+        min_word_count: Minimum words for valid concept (filters single keywords).
         additional_noise_terms: Extra terms to filter (merged with defaults).
         additional_authors: Extra author names to filter (merged with defaults).
     """
@@ -143,6 +163,7 @@ class ConceptValidationConfig:
     enable_sbert_validation: bool = True
     sbert_similarity_threshold: float = DEFAULT_SBERT_SIMILARITY_THRESHOLD
     min_concept_length: int = DEFAULT_MIN_CONCEPT_LENGTH
+    min_word_count: int = DEFAULT_MIN_WORD_COUNT
     additional_noise_terms: frozenset[str] = field(default_factory=frozenset)
     additional_authors: frozenset[str] = field(default_factory=frozenset)
 
@@ -275,6 +296,12 @@ class ConceptValidator:
             # Check minimum length
             if len(concept) < self.config.min_concept_length:
                 rejections[concept] = REJECTION_NOISE_TERM
+                continue
+
+            # Check minimum word count (concepts should be multi-word phrases)
+            word_count = len(concept.split())
+            if word_count < self.config.min_word_count:
+                rejections[concept] = REJECTION_SINGLE_WORD
                 continue
 
             # Check author patterns

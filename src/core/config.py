@@ -50,6 +50,7 @@ class Settings(BaseSettings):
         env_prefix="COS_",
         env_file=".env",
         env_file_encoding="utf-8",
+        extra="ignore",  # Ignore extra env vars like OPENROUTER_API_KEY
     )
 
 
