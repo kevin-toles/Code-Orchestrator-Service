@@ -9,6 +9,7 @@ AC Reference:
 - AC-2.5: Quality Scoring - quality_score between 0.0-1.0
 - AC-2.6: Domain Detection - detected_domain and domain_confidence
 - AC-5.1: Pipeline Integration - delegates to ConceptExtractionPipeline
+- HTC-1.0: Classification - validates terms through 4-tier classifier
 
 Anti-Patterns Avoided:
 - Anti-Pattern #12: Singleton pattern for extractors
@@ -23,6 +24,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Final
 
+from src.classifiers import (
+    AliasLookup,
+    ClassificationResponse,
+    HeuristicFilter,
+    SyncTieredClassifier,
+    TrainedClassifier,
+)
 from src.extractors.concept_extraction_pipeline import (
     ConceptExtractionConfig,
     ConceptExtractionPipeline,
@@ -72,10 +80,19 @@ STAGE_CONCEPTS: Final[str] = "concepts"
 STAGE_DOMAIN: Final[str] = "domain"
 STAGE_NOISE_FILTER: Final[str] = "noise_filter"
 STAGE_QUALITY: Final[str] = "quality"
+STAGE_CLASSIFICATION: Final[str] = "classification"
 
 # Default paths
 DEFAULT_TAXONOMY_PATH: Final[str] = "config/domain_taxonomy.json"
 DEFAULT_STOPWORDS_PATH: Final[str] = "config/technical_stopwords.json"
+DEFAULT_ALIAS_LOOKUP_PATH: Final[str] = "config/alias_lookup.json"
+DEFAULT_MODEL_PATH: Final[str] = "models/concept_classifier.joblib"
+
+# Classification constants
+CLASSIFICATION_CONCEPT: Final[str] = "concept"
+CLASSIFICATION_KEYWORD: Final[str] = "keyword"
+CLASSIFICATION_REJECTED: Final[str] = "rejected"
+TIER_ALIAS_LOOKUP: Final[int] = 1
 
 
 # =============================================================================
@@ -92,12 +109,18 @@ class MetadataExtractorConfig:
         technical_stopwords_path: Path to technical stopwords JSON.
         enable_concepts: Whether to extract concepts.
         enable_domain_detection: Whether to detect domain.
+        enable_classification: Whether to use HTC to classify terms.
+        alias_lookup_path: Path to alias lookup JSON.
+        model_path: Path to trained classifier model.
     """
 
     domain_taxonomy_path: str | None = None
     technical_stopwords_path: str | None = None
     enable_concepts: bool = True
     enable_domain_detection: bool = True
+    enable_classification: bool = True
+    alias_lookup_path: str | None = None
+    model_path: str | None = None
 
 
 @dataclass
@@ -117,6 +140,7 @@ class ExtractionResult:
         stages_completed: List of completed processing stages.
         pipeline_metadata: Metadata from hybrid extraction pipeline.
         dedup_stats: Deduplication statistics from hybrid pipeline.
+        classification_stats: Statistics from HTC classification.
     """
 
     keywords: list[KeywordResult] = field(default_factory=list)
@@ -131,6 +155,7 @@ class ExtractionResult:
     stages_completed: list[str] = field(default_factory=list)
     pipeline_metadata: dict[str, Any] | None = None
     dedup_stats: dict[str, int] | None = None
+    classification_stats: dict[str, int] | None = None
 
 
 # =============================================================================
@@ -174,6 +199,7 @@ class MetadataExtractor:
     - NoiseFilter for noise filtering (AC-2.4)
     - Quality scoring algorithm (AC-2.5)
     - Domain detection from concepts (AC-2.6)
+    - SyncTieredClassifier for term classification (HTC-1.0)
 
     Attributes:
         config: Extractor configuration.
@@ -190,6 +216,7 @@ class MetadataExtractor:
         self._concept_extractor: ConceptExtractor | None = None
         self._noise_filter: NoiseFilter | None = None
         self._concept_pipeline: ConceptExtractionPipeline | None = None
+        self._classifier: SyncTieredClassifier | None = None
 
     @property
     def _concept_pipeline_instance(self) -> ConceptExtractionPipeline:
@@ -232,6 +259,43 @@ class MetadataExtractor:
         if self._noise_filter is None:
             self._noise_filter = NoiseFilter()
         return self._noise_filter
+
+    @property
+    def _classifier_instance(self) -> SyncTieredClassifier | None:
+        """Lazy-load sync tiered classifier (Anti-Pattern #12: cached).
+
+        Returns None if classification is disabled or models not available.
+        """
+        if not self.config.enable_classification:
+            return None
+
+        if self._classifier is None:
+            # Determine paths
+            alias_path = Path(
+                self.config.alias_lookup_path or DEFAULT_ALIAS_LOOKUP_PATH
+            )
+            model_path = Path(self.config.model_path or DEFAULT_MODEL_PATH)
+
+            # Check if files exist
+            if not alias_path.exists() or not model_path.exists():
+                return None
+
+            try:
+                # Load components
+                alias_lookup = AliasLookup(lookup_path=alias_path)
+                trained_classifier = TrainedClassifier(model_path=model_path)
+                heuristic_filter = HeuristicFilter()
+
+                self._classifier = SyncTieredClassifier(
+                    alias_lookup=alias_lookup,
+                    trained_classifier=trained_classifier,
+                    heuristic_filter=heuristic_filter,
+                )
+            except Exception:
+                # If loading fails, disable classification
+                return None
+
+        return self._classifier
 
     def extract(
         self,
@@ -285,14 +349,29 @@ class MetadataExtractor:
             result.dedup_stats = dedup
             result.stages_completed.append(STAGE_CONCEPTS)
 
-        # Stage 5: Detect domain
+        # Stage 5: Classify terms using Hybrid Tiered Classifier
+        if self.config.enable_classification:
+            classification_result = self._classify_terms(
+                result.keywords, result.concepts
+            )
+            result.keywords = classification_result["keywords"]
+            result.concepts = classification_result["concepts"]
+            # Add newly rejected terms
+            for term, reason in classification_result["rejected"].items():
+                if term not in result.rejected_keywords:
+                    result.rejected_keywords.append(term)
+                    result.rejection_reasons[term] = reason
+            result.classification_stats = classification_result["stats"]
+            result.stages_completed.append(STAGE_CLASSIFICATION)
+
+        # Stage 6: Detect domain
         if self.config.enable_domain_detection and result.concepts:
             domain, confidence = self._detect_domain(result.concepts)
             result.detected_domain = domain
             result.domain_confidence = confidence
             result.stages_completed.append(STAGE_DOMAIN)
 
-        # Stage 6: Calculate quality score
+        # Stage 7: Calculate quality score
         result.quality_score = self._calculate_quality_score(result)
         result.stages_completed.append(STAGE_QUALITY)
 
@@ -409,6 +488,118 @@ class MetadataExtractor:
         ]
         term_lower = term.lower()
         return any(p in term_lower for p in technical_patterns)
+
+    def _classify_terms(
+        self,
+        keywords: list[KeywordResult],
+        concepts: list[ConceptResult],
+    ) -> dict[str, Any]:
+        """Classify all terms using Hybrid Tiered Classifier.
+
+        This method:
+        1. Runs all keywords through the classifier
+        2. Promotes keywords classified as "concept" to concepts
+        3. Runs all concepts through the classifier for validation
+        4. Rejects any terms classified as "rejected"
+
+        Args:
+            keywords: List of keyword results to classify
+            concepts: List of concept results to validate
+
+        Returns:
+            Dict with keys: keywords, concepts, rejected, stats
+        """
+        classifier = self._classifier_instance
+        if classifier is None:
+            # Classification disabled or unavailable
+            return {
+                "keywords": keywords,
+                "concepts": concepts,
+                "rejected": {},
+                "stats": None,
+            }
+
+        # Track stats
+        stats: dict[str, int] = {
+            "total_terms": len(keywords) + len(concepts),
+            "tier_1_hits": 0,
+            "tier_2_hits": 0,
+            "tier_3_rejections": 0,
+            "keywords_promoted": 0,
+        }
+        rejected: dict[str, str] = {}
+        final_keywords: list[KeywordResult] = []
+        final_concepts: list[ConceptResult] = []
+
+        # Track which terms are already concepts (by name) to avoid duplicates
+        concept_names: set[str] = {c.name.lower() for c in concepts}
+
+        # Classify keywords
+        for kw in keywords:
+            result = classifier.classify(kw.term)
+            self._update_tier_stats(stats, result)
+
+            if result.classification == CLASSIFICATION_REJECTED:
+                rejected[kw.term] = result.rejection_reason or "tier_3_noise"
+                stats["tier_3_rejections"] += 1
+            elif result.classification == CLASSIFICATION_CONCEPT:
+                # Promote to concept if not already there
+                if result.canonical_term.lower() not in concept_names:
+                    final_concepts.append(
+                        ConceptResult(
+                            name=result.canonical_term,
+                            confidence=result.confidence,
+                            domain="",  # Will be set by domain detection
+                            tier=f"T{result.tier_used}",
+                        )
+                    )
+                    concept_names.add(result.canonical_term.lower())
+                    stats["keywords_promoted"] += 1
+            else:
+                # Keep as keyword
+                final_keywords.append(kw)
+
+        # Validate existing concepts
+        for concept in concepts:
+            result = classifier.classify(concept.name)
+            self._update_tier_stats(stats, result)
+
+            if result.classification == CLASSIFICATION_REJECTED:
+                rejected[concept.name] = result.rejection_reason or "tier_3_noise"
+                stats["tier_3_rejections"] += 1
+            else:
+                # Update with validated info
+                final_concepts.append(
+                    ConceptResult(
+                        name=result.canonical_term,
+                        confidence=max(concept.confidence, result.confidence),
+                        domain=concept.domain,
+                        tier=f"T{result.tier_used}" if result.tier_used == TIER_ALIAS_LOOKUP else concept.tier,
+                    )
+                )
+
+        return {
+            "keywords": final_keywords,
+            "concepts": final_concepts,
+            "rejected": rejected,
+            "stats": stats,
+        }
+
+    def _update_tier_stats(
+        self,
+        stats: dict[str, int],
+        result: ClassificationResponse,
+    ) -> None:
+        """Update tier hit statistics.
+
+        Args:
+            stats: Stats dict to update
+            result: Classification result
+        """
+        if result.tier_used == TIER_ALIAS_LOOKUP:
+            stats["tier_1_hits"] += 1
+        elif result.tier_used == 2:
+            stats["tier_2_hits"] += 1
 
     def _extract_concepts(
         self,

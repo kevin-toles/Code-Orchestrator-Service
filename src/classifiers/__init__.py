@@ -20,6 +20,7 @@ from src.classifiers.orchestrator import (
     FakeHybridTieredClassifier,
     HybridTieredClassifier,
     HybridTieredClassifierProtocol,
+    SyncTieredClassifier,
 )
 from src.classifiers.trained_classifier import (
     ClassificationResult,
@@ -50,5 +51,6 @@ __all__ = [
     "LLMFallbackError",
     "LLMFallbackProtocol",
     "LLMFallbackResult",
+    "SyncTieredClassifier",
     "TrainedClassifier",
 ]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build Alias Lookup JSON from FINAL_AGGREGATED_RESULTS.json.
+Build Alias Lookup JSON from validated_term_filter.json.
 
 This script generates the alias_lookup.json file used by the Tier 1
 Alias Lookup component of the Hybrid Tiered Classifier.
@@ -12,7 +12,7 @@ Output:
     config/alias_lookup.json
 
 Data Source:
-    ai-agents/data/concept_validation/FINAL_AGGREGATED_RESULTS.json
+    data/validated_term_filter.json
 
 The script:
 1. Loads concepts and keywords from the aggregated results
@@ -34,12 +34,11 @@ from typing import Final
 # Constants
 # =============================================================================
 
-# Path constants - adjust based on your workspace structure
+# Path constants
 PROJECT_ROOT: Final[Path] = Path(__file__).parent.parent
-AI_AGENTS_ROOT: Final[Path] = PROJECT_ROOT.parent / "ai-agents"
 
 INPUT_FILE: Final[Path] = (
-    AI_AGENTS_ROOT / "data" / "concept_validation" / "FINAL_AGGREGATED_RESULTS.json"
+    PROJECT_ROOT / "data" / "validated_term_filter.json"
 )
 OUTPUT_FILE: Final[Path] = PROJECT_ROOT / "config" / "alias_lookup.json"
 
@@ -150,14 +149,15 @@ def build_lookup_entry(term: str, classification: str) -> dict[str, dict[str, st
 # =============================================================================
 
 
-def load_aggregated_results(input_path: Path) -> dict:
-    """Load the FINAL_AGGREGATED_RESULTS.json file."""
+def load_aggregated_results(input_path: Path) -> dict[str, list[str] | str | dict[str, int]]:
+    """Load the validated_term_filter.json file."""
     if not input_path.exists():
         print(f"ERROR: Input file not found: {input_path}")
         sys.exit(1)
 
     with input_path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+        result: dict[str, list[str] | str | dict[str, int]] = json.load(f)
+        return result
 
 
 def build_alias_lookup(concepts: list[str], keywords: list[str]) -> dict[str, dict[str, str]]:
@@ -222,8 +222,12 @@ def main() -> None:
     print(f"\nLoading: {INPUT_FILE}")
     data = load_aggregated_results(INPUT_FILE)
 
-    concepts = data.get("concepts", [])
-    keywords = data.get("keywords", [])
+    concepts_raw = data.get("concepts", [])
+    keywords_raw = data.get("keywords", [])
+
+    # Type assertion for list[str]
+    concepts: list[str] = concepts_raw if isinstance(concepts_raw, list) else []
+    keywords: list[str] = keywords_raw if isinstance(keywords_raw, list) else []
 
     print(f"  Concepts: {len(concepts):,}")
     print(f"  Keywords: {len(keywords):,}")

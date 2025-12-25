@@ -106,11 +106,11 @@ This architecture synthesizes guidance from:
 
 **Pattern:** Hashed Feature (Machine Learning Design Patterns, Ch. 2)
 
-**Data Source:** `/ai-agents/data/concept_validation/FINAL_AGGREGATED_RESULTS.json`
+**Data Source:** `data/validated_term_filter.json`
 
 ```python
 # File: src/classifiers/alias_lookup.py
-# Generated from FINAL_AGGREGATED_RESULTS.json
+# Generated from validated_term_filter.json
 
 @dataclass(frozen=True)
 class AliasLookupResult:
@@ -137,7 +137,7 @@ class AliasLookup:
 
 ```python
 # scripts/build_alias_lookup.py
-# Generates alias_lookup.json from FINAL_AGGREGATED_RESULTS.json
+# Generates alias_lookup.json from validated_term_filter.json
 
 def build_alias_lookup(taxonomy_path: Path, output_path: Path) -> None:
     """Build alias lookup from validated taxonomy."""
@@ -209,7 +209,7 @@ class TrainedClassifier:
     2. Predict using trained LogisticRegression model
     3. Return classification with confidence score
     
-    Model trained on FINAL_AGGREGATED_RESULTS.json:
+    Model trained on validated_term_filter.json:
     - 3,255 concepts (label=0)
     - 6,981 keywords (label=1)
     - Total: 10,236 validated examples
@@ -445,7 +445,7 @@ class HybridTieredClassifier:
 # scripts/train_classifier.py
 
 def prepare_training_data(taxonomy_path: Path) -> tuple[np.ndarray, np.ndarray]:
-    """Prepare training data from FINAL_AGGREGATED_RESULTS.json.
+    """Prepare training data from validated_term_filter.json.
     
     Reference: Designing Machine Learning Systems, Ch. 4 "Training Data"
     """

@@ -18,6 +18,61 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2025-12-27
+
+### CL-024: WBS-AC4 Complete - LLM Fallback (Tier 4) ✅
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2025-12-27 |
+| **WBS Item** | WBS-AC4 (LLM Fallback Tier 4) |
+| **Change Type** | Feature |
+| **Summary** | Completed Tier 4 LLM Fallback implementation. 44 tests, 96% coverage, mypy --strict passing. Implements Tool Proxy pattern calling ai-agents:8082/v1/agents/validate-concept. |
+| **Files Changed** | `src/classifiers/llm_fallback.py`, `tests/classifiers/test_llm_fallback.py`, `src/classifiers/__init__.py` |
+| **Rationale** | Final tier of 4-tier classification pipeline for unknown terms requiring LLM validation |
+| **Git Commit** | Pending |
+
+**Components Implemented**:
+- `LLMFallbackResult` - Frozen dataclass with classification, confidence, canonical_term, tier_used
+- `LLMFallbackProtocol` - Runtime-checkable Protocol for DI
+- `AliasCacheProtocol` - Protocol for high-confidence result caching
+- `LLMFallback` - Main implementation using httpx.AsyncClient
+- `FakeLLMFallback` - Test double for protocol-based testing
+
+**Test Summary**:
+| Test Class | Count | Coverage |
+|------------|-------|----------|
+| TestLLMFallbackResult | 6 | Dataclass validation |
+| TestLLMFallbackProtocol | 3 | Protocol conformance |
+| TestServiceCall | 4 | HTTP POST to ai-agents |
+| TestResponseParsing | 6 | JSON response handling |
+| TestCacheHighConfidence | 3 | Results >= 0.9 cached |
+| TestCacheLowConfidence | 3 | Results < 0.9 not cached |
+| TestAsyncContextManager | 2 | httpx.AsyncClient lifecycle |
+| TestTimeoutHandling | 4 | Timeout/error handling |
+| TestFakeLLMFallback | 6 | Test double behavior |
+| TestBatchClassification | 2 | Batch processing |
+| TestConstants | 5 | Module constants |
+| **TOTAL** | **44** | **96%** |
+
+**Quality Gates**:
+- ✅ mypy --strict: Passed
+- ✅ pytest: 44/44 passed
+- ✅ Coverage: 96% (target: 90%)
+
+**All 4 Tiers Now Complete**:
+| Tier | WBS | Tests | Coverage |
+|------|-----|-------|----------|
+| 1 | WBS-AC1 Alias Lookup | 26 | 94% |
+| 2 | WBS-AC2 Trained Classifier | 40 | 95% |
+| 3 | WBS-AC3 Heuristic Filter | 70 | 97% |
+| 4 | WBS-AC4 LLM Fallback | 44 | 96% |
+| **Total** | - | **180** | **~95%** |
+
+**Next**: WBS-AC5 (Orchestrator Pipeline) - orchestrates all 4 tiers
+
+---
+
 ## 2025-12-24
 
 ### CL-021: HTC-1.0 WBS Creation - Hybrid Tiered Classifier Planning
@@ -59,7 +114,7 @@ This document tracks all implementation changes, their rationale, and git commit
 | WBS-AC8 | AC-8: Anti-Pattern Compliance | All files |
 | WBS-AC9 | AC-9: Testing Requirements | All tests |
 
-**Training Data**: FINAL_AGGREGATED_RESULTS.json (3,255 concepts + 6,981 keywords = 10,236 validated examples)
+**Training Data**: validated_term_filter.json (3,255 concepts + 6,981 keywords = 10,236 validated examples)
 
 **Methodology**: TDD (RED → GREEN → REFACTOR)
 

@@ -1,0 +1,19 @@
+{
+  "trained": "2025-12-24T13:49:07.683253",
+  "model_name": "all-MiniLM-L6-v2",
+  "input_file": "data/validated_term_filter.json",
+  "total_terms": 10236,
+  "concept_count": 3255,
+  "keyword_count": 6981,
+  "metrics": {
+    "accuracy": 0.7490234375,
+    "precision": 0.7703084576902499,
+    "recall": 0.7490234375,
+    "f1_score": 0.7551340904940471
+  },
+  "config": {
+    "test_size": 0.2,
+    "random_state": 42,
+    "max_iter": 1000
+  }
+}

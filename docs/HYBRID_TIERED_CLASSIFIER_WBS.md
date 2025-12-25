@@ -3,7 +3,7 @@
 **Feature ID**: HTC-1.0  
 **Architecture Document**: [HYBRID_TIERED_CLASSIFIER_ARCHITECTURE.md](HYBRID_TIERED_CLASSIFIER_ARCHITECTURE.md)  
 **Date**: December 24, 2025  
-**Status**: Planning  
+**Status**: In Progress  
 **Methodology**: TDD (RED → GREEN → REFACTOR)  
 **Repository**: `Code-Orchestrator-Service`
 
@@ -29,10 +29,10 @@ Each WBS section contains ALL tasks required to fully satisfy that AC block end-
 
 | WBS Section | AC Block | Component | Status |
 |-------------|----------|-----------|--------|
-| WBS-AC1 | AC-1: Alias Lookup (Tier 1) | `alias_lookup.py` | ⬜ |
-| WBS-AC2 | AC-2: Trained Classifier (Tier 2) | `trained_classifier.py` | ⬜ |
-| WBS-AC3 | AC-3: Heuristic Filter (Tier 3) | `heuristic_filter.py` | ⬜ |
-| WBS-AC4 | AC-4: LLM Fallback (Tier 4) | `llm_fallback.py` | ⬜ |
+| WBS-AC1 | AC-1: Alias Lookup (Tier 1) | `alias_lookup.py` | ✅ |
+| WBS-AC2 | AC-2: Trained Classifier (Tier 2) | `trained_classifier.py` | ✅ |
+| WBS-AC3 | AC-3: Heuristic Filter (Tier 3) | `heuristic_filter.py` | ✅ |
+| WBS-AC4 | AC-4: LLM Fallback (Tier 4) | `llm_fallback.py` | ✅ |
 | WBS-AC5 | AC-5: Orchestrator Pipeline | `orchestrator.py` | ⬜ |
 | WBS-AC6 | AC-6: API Endpoint | `src/api/classify.py` | ⬜ |
 | WBS-AC7 | AC-7: Training Pipeline | `scripts/train_classifier.py` | ⬜ |
@@ -111,14 +111,14 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 ### Exit Criteria for WBS-AC1
 
-- [ ] `AliasLookupResult` dataclass exists with `canonical_term`, `classification`, `confidence`, `tier_used` (AC-1.1)
-- [ ] Exact match returns result with `confidence=1.0`, `tier_used=1` (AC-1.1)
-- [ ] Case-insensitive lookup works (AC-1.2)
-- [ ] Unknown term returns `None` (AC-1.3)
-- [ ] Alias resolves to canonical term (AC-1.4)
-- [ ] Loads from `alias_lookup.json` at startup (AC-1.5)
-- [ ] O(1) lookup performance verified (AC-1.6)
-- [ ] All tests pass, coverage >= 90%
+- [x] `AliasLookupResult` dataclass exists with `canonical_term`, `classification`, `confidence`, `tier_used` (AC-1.1)
+- [x] Exact match returns result with `confidence=1.0`, `tier_used=1` (AC-1.1)
+- [x] Case-insensitive lookup works (AC-1.2)
+- [x] Unknown term returns `None` (AC-1.3)
+- [x] Alias resolves to canonical term (AC-1.4)
+- [x] Loads from `alias_lookup.json` at startup (AC-1.5)
+- [x] O(1) lookup performance verified (AC-1.6)
+- [x] All tests pass, coverage >= 90% (94% achieved)
 
 ---
 
@@ -170,16 +170,16 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 ### Exit Criteria for WBS-AC2
 
-- [ ] `ConceptClassifierProtocol` exists and is runtime_checkable (AC-2.1)
-- [ ] `TrainedClassifier` passes Protocol check (AC-2.1)
-- [ ] High confidence (>=0.7) returns `concept` or `keyword` (AC-2.2)
-- [ ] Low confidence (<0.7) returns `unknown` (AC-2.3)
-- [ ] Uses `all-MiniLM-L6-v2` embedder (AC-2.4)
-- [ ] Loads model from `.joblib` file (AC-2.5)
-- [ ] Raises `ConceptClassifierError` if model not loaded (AC-2.6)
-- [ ] `predict_batch()` works for multiple terms (AC-2.7)
-- [ ] `FakeClassifier` passes Protocol and returns configured responses (AC-2.8)
-- [ ] All tests pass, coverage >= 90%
+- [x] `ConceptClassifierProtocol` exists and is runtime_checkable (AC-2.1)
+- [x] `TrainedClassifier` passes Protocol check (AC-2.1)
+- [x] High confidence (>=0.7) returns `concept` or `keyword` (AC-2.2)
+- [x] Low confidence (<0.7) returns `unknown` (AC-2.3)
+- [x] Uses `all-MiniLM-L6-v2` embedder (AC-2.4)
+- [x] Loads model from `.joblib` file (AC-2.5)
+- [x] Raises `ConceptClassifierError` if model not loaded (AC-2.6)
+- [x] `predict_batch()` works for multiple terms (AC-2.7)
+- [x] `FakeClassifier` passes Protocol and returns configured responses (AC-2.8)
+- [x] All tests pass, coverage >= 90% (95% achieved)
 
 ---
 
@@ -223,14 +223,14 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 ### Exit Criteria for WBS-AC3
 
-- [ ] Watermarks rejected with `rejection_reason="noise_watermarks"` (AC-3.1)
-- [ ] URL fragments rejected with `rejection_reason="noise_url_fragments"` (AC-3.2)
-- [ ] Filler words rejected with `rejection_reason="noise_generic_filler"` (AC-3.3)
-- [ ] Code artifacts rejected with `rejection_reason="noise_code_artifacts"` (AC-3.4)
-- [ ] Valid terms return `None` (AC-3.5)
-- [ ] Config loads from `noise_terms.yaml` (AC-3.6)
-- [ ] All 8 noise categories covered
-- [ ] All tests pass, coverage >= 90%
+- [x] Watermarks rejected with `rejection_reason="noise_watermarks"` (AC-3.1)
+- [x] URL fragments rejected with `rejection_reason="noise_url_fragments"` (AC-3.2)
+- [x] Filler words rejected with `rejection_reason="noise_generic_filler"` (AC-3.3)
+- [x] Code artifacts rejected with `rejection_reason="noise_code_artifacts"` (AC-3.4)
+- [x] Valid terms return `None` (AC-3.5)
+- [x] Config loads from `noise_terms.yaml` (AC-3.6)
+- [x] All 8 noise categories covered (5 YAML + 4 regex = 9 total)
+- [x] All tests pass, coverage >= 90% (97% achieved)
 
 ---
 
@@ -275,14 +275,14 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 ### Exit Criteria for WBS-AC4
 
-- [ ] POST to `ai-agents:8082/v1/agents/validate-concept` works (AC-4.1)
-- [ ] Response JSON parsed correctly (AC-4.2)
-- [ ] High confidence (>=0.9) results cached (AC-4.3)
-- [ ] Low confidence results not cached (AC-4.3)
-- [ ] `httpx.AsyncClient` properly managed (AC-4.4)
-- [ ] Timeout raises `LLMFallbackError` (AC-4.5)
-- [ ] `FakeLLMFallback` returns pre-configured responses (AC-4.6)
-- [ ] All tests pass, coverage >= 90%
+- [x] POST to `ai-agents:8082/v1/agents/validate-concept` works (AC-4.1)
+- [x] Response JSON parsed correctly (AC-4.2)
+- [x] High confidence (>=0.9) results cached (AC-4.3)
+- [x] Low confidence results not cached (AC-4.3)
+- [x] `httpx.AsyncClient` properly managed (AC-4.4)
+- [x] Timeout raises `LLMFallbackError` (AC-4.5)
+- [x] `FakeLLMFallback` returns pre-configured responses (AC-4.6)
+- [x] All tests pass (44/44), coverage 96%
 
 ---
 
@@ -400,7 +400,7 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 | ID | Scenario | Given | When | Then |
 |----|----------|-------|------|------|
-| AC-7.1 | Data Loading | `FINAL_AGGREGATED_RESULTS.json` exists | `prepare_training_data()` called | Returns concepts (label=0) and keywords (label=1) |
+| AC-7.1 | Data Loading | `validated_term_filter.json` exists | `prepare_training_data()` called | Returns concepts (label=0) and keywords (label=1) |
 | AC-7.2 | Model Training | Training data prepared | `train_classifier()` called | Trains LogisticRegression on SBERT embeddings |
 | AC-7.3 | Model Evaluation | Model trained | Evaluation runs | Reports accuracy, precision, recall, F1 |
 | AC-7.4 | Model Export | Training complete | Model saved | `.joblib` file created |
@@ -426,7 +426,7 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 ### Exit Criteria for WBS-AC7
 
-- [ ] Training data loads from `FINAL_AGGREGATED_RESULTS.json` (AC-7.1)
+- [ ] Training data loads from `validated_term_filter.json` (AC-7.1)
 - [ ] Model trained on SBERT embeddings (AC-7.2)
 - [ ] Evaluation reports accuracy >= 98% (AC-7.3)
 - [ ] Model exported to `models/concept_classifier.joblib` (AC-7.4)
@@ -515,9 +515,9 @@ WBS-AC7 (Training Pipeline) ─────────────────�
 
 | WBS Section | AC Block | Status | Tests | Coverage |
 |-------------|----------|--------|-------|----------|
-| WBS-AC1 | AC-1: Alias Lookup | ⬜ NOT STARTED | 0/0 | - |
-| WBS-AC2 | AC-2: Trained Classifier | ⬜ NOT STARTED | 0/0 | - |
-| WBS-AC3 | AC-3: Heuristic Filter | ⬜ NOT STARTED | 0/0 | - |
+| WBS-AC1 | AC-1: Alias Lookup | ✅ COMPLETE | 26/26 | 94% |
+| WBS-AC2 | AC-2: Trained Classifier | ✅ COMPLETE | 40/40 | 95% |
+| WBS-AC3 | AC-3: Heuristic Filter | ✅ COMPLETE | 70/70 | 97% |
 | WBS-AC4 | AC-4: LLM Fallback | ⬜ NOT STARTED | 0/0 | - |
 | WBS-AC5 | AC-5: Orchestrator | ⬜ NOT STARTED | 0/0 | - |
 | WBS-AC6 | AC-6: API Endpoint | ⬜ NOT STARTED | 0/0 | - |

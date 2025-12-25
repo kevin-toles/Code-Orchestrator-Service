@@ -311,6 +311,114 @@ class HybridTieredClassifier:
 # =============================================================================
 
 
+class SyncTieredClassifier:
+    """Synchronous classifier using Tiers 1-3 only (no LLM).
+
+    This classifier is useful for batch processing where:
+    - Most terms are handled by Tiers 1-3 (>95%)
+    - Remaining "unknown" terms can be processed separately via async classify
+
+    The sync classifier NEVER calls Tier 4 (LLM). Terms that would
+    reach Tier 4 are returned with classification="unknown".
+
+    Usage:
+        sync_classifier = SyncTieredClassifier(
+            alias_lookup=alias_lookup,
+            trained_classifier=trained_classifier,
+            heuristic_filter=heuristic_filter,
+        )
+        result = sync_classifier.classify("microservice")  # No await needed
+    """
+
+    __slots__ = (
+        "_alias_lookup",
+        "_trained_classifier",
+        "_heuristic_filter",
+    )
+
+    def __init__(
+        self,
+        alias_lookup: AliasLookup,
+        trained_classifier: ConceptClassifierProtocol,
+        heuristic_filter: HeuristicFilterProtocol,
+    ) -> None:
+        """Initialize with Tiers 1-3 components.
+
+        Args:
+            alias_lookup: Tier 1 - O(1) hash lookup
+            trained_classifier: Tier 2 - SBERT + LogisticRegression
+            heuristic_filter: Tier 3 - Noise term detection
+        """
+        self._alias_lookup = alias_lookup
+        self._trained_classifier = trained_classifier
+        self._heuristic_filter = heuristic_filter
+
+    def classify(self, term: str) -> ClassificationResponse:
+        """Classify a term through Tiers 1-3 synchronously.
+
+        Terms not resolved by Tiers 1-3 return classification="unknown".
+
+        Args:
+            term: The term to classify
+
+        Returns:
+            ClassificationResponse with tier_used 1-3, or unknown
+        """
+        # Tier 1: Alias Lookup
+        result = self._alias_lookup.get(term)
+        if result is not None:
+            return ClassificationResponse(
+                term=term,
+                classification=result.classification,
+                confidence=result.confidence,
+                canonical_term=result.canonical_term,
+                tier_used=TIER_ALIAS_LOOKUP,
+            )
+
+        # Tier 2: Trained Classifier
+        tier2_result = self._trained_classifier.predict(term)
+        if tier2_result.confidence >= CONFIDENCE_THRESHOLD:
+            return ClassificationResponse(
+                term=term,
+                classification=tier2_result.predicted_label,
+                confidence=tier2_result.confidence,
+                canonical_term=term,
+                tier_used=TIER_TRAINED_CLASSIFIER,
+            )
+
+        # Tier 3: Heuristic Filter
+        tier3_result = self._heuristic_filter.check(term)
+        if tier3_result is not None:
+            return ClassificationResponse(
+                term=term,
+                classification=CLASSIFICATION_REJECTED,
+                confidence=1.0,
+                canonical_term=term,
+                tier_used=TIER_HEURISTIC_FILTER,
+                rejection_reason=tier3_result.rejection_reason,
+            )
+
+        # Would need Tier 4 - return unknown for sync processing
+        return ClassificationResponse(
+            term=term,
+            classification=CLASSIFICATION_UNKNOWN,
+            confidence=0.0,
+            canonical_term=term,
+            tier_used=TIER_HEURISTIC_FILTER,  # Last tier checked
+        )
+
+    def classify_batch(self, terms: list[str]) -> list[ClassificationResponse]:
+        """Classify multiple terms synchronously.
+
+        Args:
+            terms: List of terms to classify
+
+        Returns:
+            List of ClassificationResponse objects
+        """
+        return [self.classify(term) for term in terms]
+
+
 class FakeHybridTieredClassifier:
     """Fake implementation for testing.
 

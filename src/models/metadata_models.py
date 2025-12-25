@@ -333,6 +333,129 @@ class MetadataExtractionResponse(BaseModel):
 
 
 # =============================================================================
+# Batch Models
+# =============================================================================
+
+
+class BatchTextItem(BaseModel):
+    """A single text item in a batch request.
+    
+    Attributes:
+        id: Unique identifier for this item (e.g., chapter_id).
+        text: The text content to extract metadata from.
+        title: Optional title for the text.
+    """
+
+    id: str = Field(
+        ...,
+        description="Unique identifier for this item",
+    )
+    text: str = Field(
+        ...,
+        min_length=MIN_TEXT_LENGTH,
+        description="Text content to extract metadata from",
+    )
+    title: str | None = Field(
+        default=None,
+        description="Optional title for the text",
+    )
+
+    @field_validator("text")
+    @classmethod
+    def validate_text_not_empty(cls, v: str) -> str:
+        """Validate that text is not empty or whitespace only."""
+        if not v or not v.strip():
+            raise ValueError(ERROR_TEXT_EMPTY)
+        return v
+
+
+class BatchExtractionRequest(BaseModel):
+    """Request for batch metadata extraction.
+    
+    Attributes:
+        items: List of text items to process.
+        book_title: Book title for domain inference (applies to all items).
+        options: Extraction options (applies to all items).
+    """
+
+    items: list[BatchTextItem] = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+        description="List of text items to process (max 100)",
+    )
+    book_title: str | None = Field(
+        default=None,
+        description="Book title for domain inference",
+    )
+    options: MetadataExtractionOptions = Field(
+        default_factory=MetadataExtractionOptions,
+        description="Extraction options (applies to all items)",
+    )
+
+
+class BatchItemResult(BaseModel):
+    """Result for a single item in batch processing.
+    
+    Attributes:
+        id: The item ID from the request.
+        success: Whether extraction succeeded.
+        result: The extraction result (if successful).
+        error: Error message (if failed).
+    """
+
+    id: str = Field(
+        ...,
+        description="The item ID from the request",
+    )
+    success: bool = Field(
+        ...,
+        description="Whether extraction succeeded",
+    )
+    result: MetadataExtractionResponse | None = Field(
+        default=None,
+        description="The extraction result (if successful)",
+    )
+    error: str | None = Field(
+        default=None,
+        description="Error message (if failed)",
+    )
+
+
+class BatchExtractionResponse(BaseModel):
+    """Response from batch metadata extraction.
+    
+    Attributes:
+        results: List of results for each item.
+        total_items: Total number of items processed.
+        successful: Number of successful extractions.
+        failed: Number of failed extractions.
+        total_processing_time_ms: Total processing time in milliseconds.
+    """
+
+    results: list[BatchItemResult] = Field(
+        ...,
+        description="List of results for each item",
+    )
+    total_items: int = Field(
+        ...,
+        description="Total number of items processed",
+    )
+    successful: int = Field(
+        ...,
+        description="Number of successful extractions",
+    )
+    failed: int = Field(
+        ...,
+        description="Number of failed extractions",
+    )
+    total_processing_time_ms: float = Field(
+        ...,
+        description="Total processing time in milliseconds",
+    )
+
+
+# =============================================================================
 # Exports
 # =============================================================================
 
@@ -345,4 +468,9 @@ __all__ = [
     "ExtractionMetadata",
     "RejectedKeywords",
     "MetadataExtractionResponse",
+    # Batch Models
+    "BatchTextItem",
+    "BatchExtractionRequest",
+    "BatchItemResult",
+    "BatchExtractionResponse",
 ]
