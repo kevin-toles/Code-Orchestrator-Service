@@ -78,18 +78,18 @@ metadata_router = APIRouter(
     Extract keywords, concepts, and metadata from text.
     
     ## Features
-    - **Keywords**: TF-IDF extracted keywords sorted by score
-    - **Concepts**: Taxonomy-matched concepts with domain/tier
+    - **Keywords**: TF-IDF extracted keywords sorted by score (ALL valid terms)
+    - **Concepts**: Taxonomy-matched concepts with domain/tier (ALL valid terms)
     - **Noise Filtering**: Removes OCR watermarks, broken contractions, etc.
     - **Quality Scoring**: 0.0-1.0 score based on extraction quality
     - **Domain Detection**: Infers domain from matched concepts
     
     ## Options
-    - `top_k_keywords`: Number of keywords to return (default: 15)
-    - `top_k_concepts`: Number of concepts to return (default: 10)
     - `min_keyword_confidence`: Minimum keyword confidence (default: 0.3)
     - `min_concept_confidence`: Minimum concept confidence (default: 0.3)
     - `filter_noise`: Enable noise filtering (default: true)
+    
+    NOTE: top_k limits removed - extracts ALL valid keywords/concepts.
     """,
     responses={
         200: {"description": "Successful extraction"},

@@ -19,8 +19,11 @@ Anti-Patterns Avoided:
 
 from __future__ import annotations
 
+import json
+import os
 import time
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Final
 
@@ -54,6 +57,10 @@ from src.validators.noise_filter import (
     NoiseFilter,
     BatchFilterResult,
 )
+from src.validators.dictionary_validator import (
+    DictionaryValidator,
+    DictionaryValidationResult,
+)
 
 
 # =============================================================================
@@ -79,12 +86,14 @@ STAGE_KEYWORDS: Final[str] = "keywords"
 STAGE_CONCEPTS: Final[str] = "concepts"
 STAGE_DOMAIN: Final[str] = "domain"
 STAGE_NOISE_FILTER: Final[str] = "noise_filter"
+STAGE_DICTIONARY: Final[str] = "dictionary_validation"
 STAGE_QUALITY: Final[str] = "quality"
 STAGE_CLASSIFICATION: Final[str] = "classification"
 
 # Default paths
 DEFAULT_TAXONOMY_PATH: Final[str] = "config/domain_taxonomy.json"
 DEFAULT_STOPWORDS_PATH: Final[str] = "config/technical_stopwords.json"
+PRE_FILTER_LOG_PATH: Final[str] = "logs/pre_filter_extraction.jsonl"
 DEFAULT_ALIAS_LOOKUP_PATH: Final[str] = "config/alias_lookup.json"
 DEFAULT_MODEL_PATH: Final[str] = "models/concept_classifier.joblib"
 
@@ -215,6 +224,7 @@ class MetadataExtractor:
         self._keyword_extractor: TfidfKeywordExtractor | None = None
         self._concept_extractor: ConceptExtractor | None = None
         self._noise_filter: NoiseFilter | None = None
+        self._dictionary_validator: DictionaryValidator | None = None
         self._concept_pipeline: ConceptExtractionPipeline | None = None
         self._classifier: SyncTieredClassifier | None = None
 
@@ -259,6 +269,13 @@ class MetadataExtractor:
         if self._noise_filter is None:
             self._noise_filter = NoiseFilter()
         return self._noise_filter
+
+    @property
+    def _dictionary_validator_instance(self) -> DictionaryValidator:
+        """Lazy-load dictionary validator (Anti-Pattern #12: cached)."""
+        if self._dictionary_validator is None:
+            self._dictionary_validator = DictionaryValidator()
+        return self._dictionary_validator
 
     @property
     def _classifier_instance(self) -> SyncTieredClassifier | None:
@@ -317,14 +334,19 @@ class MetadataExtractor:
         """
         start_time = time.perf_counter()
         options = options or MetadataExtractionOptions()
-        # book_title reserved for future domain inference enhancement
-        _ = book_title
+        
+        # Store source info for pre-filter logging
+        source_book = book_title or "unknown_book"
+        source_chapter = title or "unknown_chapter"
 
         result = ExtractionResult(text_length=len(text))
 
         # Stage 1: Extract keywords
         raw_keywords = self._extract_keywords(text, options)
         result.stages_completed.append(STAGE_KEYWORDS)
+        
+        # Capture ALL raw keywords BEFORE any filtering
+        raw_keyword_terms = [kw.keyword for kw in raw_keywords]
 
         # Stage 2: Filter noise
         if options.filter_noise:
@@ -335,21 +357,64 @@ class MetadataExtractor:
             result.stages_completed.append(STAGE_NOISE_FILTER)
         else:
             keyword_terms = [kw.keyword for kw in raw_keywords]
+        
+        # Capture keywords after noise filter but before dictionary validation
+        post_noise_keyword_terms = keyword_terms.copy()
 
-        # Stage 3: Build KeywordResult list
-        result.keywords = self._build_keyword_results(
-            keyword_terms, raw_keywords, options.top_k_keywords
-        )
+        # Stage 3: Dictionary validation - only accept approved keywords
+        if options.validate_dictionary:
+            dict_result = self._dictionary_validator_instance.validate_keywords(keyword_terms)
+            # Add rejected terms to result
+            for term in dict_result.rejected:
+                if term not in result.rejected_keywords:
+                    result.rejected_keywords.append(term)
+            result.rejection_reasons.update(dict_result.rejection_reasons)
+            keyword_terms = dict_result.accepted
+            result.stages_completed.append(STAGE_DICTIONARY)
 
-        # Stage 4: Extract concepts
+        # Stage 4: Build KeywordResult list (no top_k limit - extract ALL)
+        result.keywords = self._build_keyword_results(keyword_terms, raw_keywords)
+
+        # Stage 5: Extract concepts
+        raw_concept_names: list[str] = []
         if self.config.enable_concepts:
             concepts, pipeline_meta, dedup = self._extract_concepts(text, options)
+            
+            # Capture ALL raw concepts BEFORE dictionary validation
+            raw_concept_names = [c.name for c in concepts]
+            
+            # Dictionary validation for concepts - only accept approved concepts
+            if options.validate_dictionary:
+                concept_names = [c.name for c in concepts]
+                concept_dict_result = self._dictionary_validator_instance.validate_concepts(concept_names)
+                
+                # Filter concepts to only those in approved list
+                approved_concept_names = set(name.lower() for name in concept_dict_result.accepted)
+                concepts = [c for c in concepts if c.name.lower() in approved_concept_names]
+                
+                # Add rejected concepts to rejection tracking
+                for term in concept_dict_result.rejected:
+                    if term not in result.rejected_keywords:
+                        result.rejected_keywords.append(term)
+                result.rejection_reasons.update(concept_dict_result.rejection_reasons)
+            
             result.concepts = concepts
             result.pipeline_metadata = pipeline_meta
             result.dedup_stats = dedup
             result.stages_completed.append(STAGE_CONCEPTS)
+        
+        # MANDATORY: Log pre-filter extraction data
+        self._log_pre_filter_extraction(
+            book_title=source_book,
+            chapter_title=source_chapter,
+            raw_keywords=raw_keyword_terms,
+            post_noise_keywords=post_noise_keyword_terms,
+            final_keywords=[kw.term for kw in result.keywords],
+            raw_concepts=raw_concept_names,
+            final_concepts=[c.name for c in result.concepts],
+        )
 
-        # Stage 5: Classify terms using Hybrid Tiered Classifier
+        # Stage 6: Classify terms using Hybrid Tiered Classifier
         if self.config.enable_classification:
             classification_result = self._classify_terms(
                 result.keywords, result.concepts
@@ -381,6 +446,63 @@ class MetadataExtractor:
 
         return result
 
+    def _log_pre_filter_extraction(
+        self,
+        book_title: str,
+        chapter_title: str,
+        raw_keywords: list[str],
+        post_noise_keywords: list[str],
+        final_keywords: list[str],
+        raw_concepts: list[str],
+        final_concepts: list[str],
+    ) -> None:
+        """Log pre-filter extraction data to JSONL file.
+        
+        MANDATORY logging of all extracted terms before and after filtering
+        for pipeline analysis.
+        
+        Args:
+            book_title: Source book name.
+            chapter_title: Source chapter name/number.
+            raw_keywords: ALL keywords before any filtering.
+            post_noise_keywords: Keywords after noise filter, before dictionary.
+            final_keywords: Keywords after dictionary validation.
+            raw_concepts: ALL concepts before dictionary validation.
+            final_concepts: Concepts after dictionary validation.
+        """
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "book": book_title,
+            "chapter": chapter_title,
+            "extraction": {
+                "keywords": {
+                    "raw_count": len(raw_keywords),
+                    "raw_terms": raw_keywords,
+                    "post_noise_count": len(post_noise_keywords),
+                    "post_noise_terms": post_noise_keywords,
+                    "final_count": len(final_keywords),
+                    "final_terms": final_keywords,
+                    "noise_filtered": len(raw_keywords) - len(post_noise_keywords),
+                    "dict_filtered": len(post_noise_keywords) - len(final_keywords),
+                },
+                "concepts": {
+                    "raw_count": len(raw_concepts),
+                    "raw_terms": raw_concepts,
+                    "final_count": len(final_concepts),
+                    "final_terms": final_concepts,
+                    "dict_filtered": len(raw_concepts) - len(final_concepts),
+                },
+            },
+        }
+        
+        # Ensure logs directory exists
+        log_path = Path(PRE_FILTER_LOG_PATH)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Append to JSONL file
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(log_entry) + "\n")
+
     def _extract_keywords(
         self,
         text: str,
@@ -397,8 +519,9 @@ class MetadataExtractor:
         """
         extractor = self._keyword_extractor_instance
         
-        # Extract more than needed to allow for filtering
-        top_k = options.top_k_keywords * 2
+        # Extract ALL keywords - no top_k limit
+        # Use a very high number to get all possible candidates
+        top_k = 1000000
         
         # TfidfKeywordExtractor expects a corpus (list of strings)
         corpus = [text]
@@ -428,17 +551,15 @@ class MetadataExtractor:
         self,
         filtered_terms: list[str],
         raw_keywords: list[KeywordExtractionResult],
-        top_k: int,
     ) -> list[KeywordResult]:
         """Build KeywordResult list from filtered terms.
 
         Args:
             filtered_terms: Terms that passed noise filter.
             raw_keywords: Original keyword results with scores.
-            top_k: Maximum keywords to return.
 
         Returns:
-            List of KeywordResult sorted by score.
+            List of KeywordResult sorted by score (ALL terms, no limit).
         """
         # Create score lookup
         score_map = {kw.keyword: kw.score for kw in raw_keywords}
@@ -455,10 +576,10 @@ class MetadataExtractor:
                 )
             )
         
-        # Sort by score descending
+        # Sort by score descending - return ALL (no top_k limit)
         results.sort(key=lambda x: x.score, reverse=True)
         
-        return results[:top_k]
+        return results
 
     def _is_technical_term(self, term: str) -> bool:
         """Check if term is technical.
@@ -639,9 +760,10 @@ class MetadataExtractor:
         # ConceptExtractor.extract_concepts returns ConceptExtractionResult
         extraction_result = extractor.extract_concepts(text)
         
+        # Extract ALL concepts - no top_k limit
         results: list[ConceptResult] = []
-        for concept in extraction_result.concepts[:options.top_k_concepts]:
-            # Filter by confidence
+        for concept in extraction_result.concepts:
+            # Filter by confidence only
             if concept.confidence >= options.min_concept_confidence:
                 results.append(
                     ConceptResult(
@@ -673,9 +795,9 @@ class MetadataExtractor:
         # Run hybrid pipeline extraction
         pipeline_result = pipeline.extract(text)
         
-        # Map pipeline ExtractedTerms to ConceptResults
+        # Map pipeline ExtractedTerms to ConceptResults - ALL concepts (no top_k limit)
         results: list[ConceptResult] = []
-        for term in pipeline_result.concepts[:options.top_k_concepts]:
+        for term in pipeline_result.concepts:
             # Invert YAKE score (lower = better) to confidence (higher = better)
             confidence = 1.0 - min(term.score, 1.0)
             if confidence >= options.min_concept_confidence:

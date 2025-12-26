@@ -3,7 +3,7 @@
 # Pattern: Multi-stage build per CODING_PATTERNS_ANALYSIS.md
 
 # Stage 1: Builder - Install dependencies
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 # Stage 2: Runtime - Minimal image with wheels
-FROM python:3.11-slim as runtime
+FROM python:3.11-slim AS runtime
 
 WORKDIR /app
 
@@ -36,6 +36,7 @@ RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
 # Copy application code
 COPY src/ ./src/
 COPY config/ ./config/
+COPY data/ ./data/
 COPY pyproject.toml .
 
 # Set ownership to non-root user

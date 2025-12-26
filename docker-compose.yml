@@ -20,6 +20,7 @@ services:
       - COS_CODEBERT_MODEL=microsoft/codebert-base
     volumes:
       - model-cache:/app/cache/models
+      - ./logs:/app/logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
       interval: 30s

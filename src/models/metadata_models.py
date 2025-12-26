@@ -31,16 +31,12 @@ from src.models.constants import (
     DEFAULT_MIN_CONCEPT_CONFIDENCE,
     DEFAULT_MIN_KEYWORD_CONFIDENCE,
     DEFAULT_SUMMARY_RATIO,
-    DEFAULT_TOP_K_CONCEPTS,
-    DEFAULT_TOP_K_KEYWORDS,
     ERROR_TEXT_EMPTY,
     MAX_CONFIDENCE,
     MAX_SCORE,
-    MAX_TOP_K,
     MIN_CONFIDENCE,
     MIN_SCORE,
     MIN_TEXT_LENGTH,
-    MIN_TOP_K,
 )
 
 
@@ -53,28 +49,18 @@ class MetadataExtractionOptions(BaseModel):
     """Options for metadata extraction.
     
     Attributes:
-        top_k_keywords: Number of top keywords to return (default: 15).
-        top_k_concepts: Number of top concepts to return (default: 10).
         min_keyword_confidence: Minimum confidence for keywords (default: 0.3).
         min_concept_confidence: Minimum confidence for concepts (default: 0.3).
         enable_summary: Whether to generate summary (default: False).
         summary_ratio: Ratio of text for summary (default: 0.2).
         validate_dictionary: Validate against dictionary (default: True).
         filter_noise: Filter noise terms (default: True).
+        
+    NOTE: top_k_keywords and top_k_concepts REMOVED per user requirement.
+          Extract ALL keywords/concepts, filter with confirmed lists, then dedupe.
     """
 
-    top_k_keywords: int = Field(
-        default=DEFAULT_TOP_K_KEYWORDS,
-        ge=MIN_TOP_K,
-        le=MAX_TOP_K,
-        description="Number of top keywords to return",
-    )
-    top_k_concepts: int = Field(
-        default=DEFAULT_TOP_K_CONCEPTS,
-        ge=MIN_TOP_K,
-        le=MAX_TOP_K,
-        description="Number of top concepts to return",
-    )
+    # NOTE: top_k_keywords and top_k_concepts REMOVED - extract ALL, filter downstream
     min_keyword_confidence: float = Field(
         default=DEFAULT_MIN_KEYWORD_CONFIDENCE,
         ge=MIN_CONFIDENCE,
