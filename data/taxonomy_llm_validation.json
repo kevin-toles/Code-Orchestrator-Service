@@ -1,0 +1,1715 @@
+{
+  "timestamp": "2025-12-26T16:28:03.989505",
+  "total_terms": 248,
+  "consensus_keep": [
+    "tokenize",
+    "fine-tune",
+    "fine-tuning",
+    "llamaindex",
+    "anthropic",
+    "huggingface",
+    "rag pipeline",
+    "scipy",
+    "pytorch",
+    "lambda",
+    "dunder",
+    "__init__",
+    "__call__",
+    "pathlib",
+    "argparse",
+    "12-factor",
+    "event-driven",
+    "facade",
+    "chain of responsibility",
+    "template method",
+    "unit of work",
+    "dependency injection",
+    "inversion of control",
+    "solid",
+    "srp",
+    "ocp",
+    "lsp",
+    "isp",
+    "dip",
+    "dry",
+    "kiss",
+    "yagni",
+    "polymorphism",
+    "abstract class",
+    "value object",
+    "anti-corruption layer",
+    "clean architecture",
+    "ports and adapters",
+    "onion architecture",
+    "sql server",
+    "sequelize",
+    "prisma",
+    "hibernate",
+    "activerecord",
+    "foreign key",
+    "group by",
+    "denormalization",
+    "stored procedure",
+    "snowflake",
+    "elt",
+    "data pipeline",
+    "cdc",
+    "change data capture",
+    "integration test",
+    "end-to-end",
+    "e2e",
+    "jest",
+    "mocha",
+    "rspec",
+    "spy",
+    "parameterize",
+    "conftest",
+    "bdd",
+    "test-driven",
+    "behavior-driven",
+    "given-when-then",
+    "branch coverage",
+    "mutation testing",
+    "playwright",
+    "cypress",
+    "puppeteer",
+    "sanity test",
+    "test pyramid",
+    "test double",
+    "property-based testing",
+    "snapshot testing",
+    "continuous testing",
+    "shift-left",
+    "quality gate",
+    "sonarqube",
+    "linting",
+    "ci",
+    "cd",
+    "gitlab ci",
+    "infrastructure as code",
+    "blue-green",
+    "feature flag",
+    "a/b testing",
+    "datadog",
+    "artifactory",
+    "oidc",
+    "saml",
+    "bcrypt",
+    "argon2",
+    "salt",
+    "pepper",
+    "aes",
+    "rsa",
+    "https",
+    "pki",
+    "hmac",
+    "abac",
+    "xss",
+    "csrf",
+    "sql injection",
+    "cve",
+    "pentest",
+    "security audit",
+    "zero trust",
+    "least privilege",
+    "defense in depth",
+    "threat model",
+    "soar",
+    "secrets manager",
+    "lstm",
+    "unsupervised",
+    "backpropagation",
+    "loss function",
+    "underfitting",
+    "batch normalization",
+    "cross-validation",
+    "f1 score",
+    "confusion matrix",
+    "plotly",
+    "scikit-learn",
+    "xgboost",
+    "lightgbm",
+    "catboost",
+    "tsne",
+    "umap",
+    "computer vision",
+    "image classification",
+    "object detection",
+    "colab",
+    "kaggle",
+    "wandb",
+    "ec2",
+    "s3",
+    "elastic beanstalk",
+    "azure functions",
+    "blob storage",
+    "cosmos db",
+    "aks",
+    "cloud functions",
+    "cloud run",
+    "compute engine",
+    "cloud sql",
+    "pub/sub",
+    "vertex ai",
+    "function as a service",
+    "multi-region",
+    "reserved instances",
+    "spot instances",
+    "savings plan",
+    "rwlock",
+    "spinlock",
+    "race condition",
+    "livelock",
+    "starvation",
+    "thread safety",
+    "compare and swap",
+    "memory barrier",
+    "shared memory",
+    "simd",
+    "vectorization",
+    "dask",
+    "http",
+    "html",
+    "typescript",
+    "svelte",
+    "next.js",
+    "nuxt",
+    "gatsby",
+    "remix",
+    "astro",
+    "fastify",
+    "nestjs",
+    "koa",
+    "hapi",
+    "cors",
+    "content security policy",
+    "http2",
+    "http3",
+    "spa",
+    "ssr",
+    "ssg",
+    "isr",
+    "hydration",
+    "responsive",
+    "mobile-first",
+    "pwa",
+    "service worker",
+    "bundler",
+    "webpack",
+    "vite",
+    "rollup",
+    "esbuild",
+    "parcel",
+    "pnpm",
+    "package manager",
+    "monorepo",
+    "turborepo",
+    "c++",
+    "weak_ptr",
+    "raii",
+    "move semantics",
+    "vtable",
+    "sfinae",
+    "preprocessor",
+    "memory management",
+    "exception safety",
+    "object file",
+    "static library",
+    "dynamic library",
+    "cmake",
+    "make",
+    "ninja",
+    "bazel",
+    "conan",
+    "vcpkg",
+    "gdb",
+    "lldb",
+    "valgrind",
+    "ubsan",
+    "tsan"
+  ],
+  "consensus_reject": [
+    "index",
+    "def",
+    "class",
+    "import",
+    "table",
+    "set",
+    "resource acquisition",
+    "new",
+    "try"
+  ],
+  "deepseek_only_keep": [
+    "acr",
+    "bearer"
+  ],
+  "chatgpt_only_keep": [
+    "assert",
+    "on-call",
+    "credential",
+    "cost optimization",
+    "client-side",
+    "server-side",
+    "deallocation"
+  ],
+  "detailed_results": {
+    "tokenize": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific technical concept in NLP/LLMs referring to splitting text into tokens for processing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Tokenization is a specific NLP/LLM preprocessing step that converts text into tokens for model input."
+    },
+    "index": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too ambiguous; could refer to database indexes, array indices, or other contexts.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "Ambiguous without context since it can refer to many unrelated concepts (DB index, search index, array index)."
+    },
+    "fine-tune": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific machine learning technique of adapting a pre-trained model to a new task.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Fine-tuning is a well-defined ML practice of adapting a pretrained model to a task or dataset."
+    },
+    "fine-tuning": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Same as fine-tune - well-defined technical concept in machine learning.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Fine-tuning is a specific ML technique and a common categorization term in LLM workflows."
+    },
+    "llamaindex": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named framework/tool for building LLM applications with RAG capabilities.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "LlamaIndex is a named framework/tool used for building LLM/RAG applications."
+    },
+    "anthropic": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named AI company and technology (Claude models) in the LLM space.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Anthropic is a specific vendor/platform associated with Claude models and related APIs."
+    },
+    "huggingface": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named platform and technology for machine learning models and datasets.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Hugging Face is a named ecosystem (Transformers, Hub, etc.) widely used for ML/LLM development."
+    },
+    "rag pipeline": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific technical architecture pattern for Retrieval-Augmented Generation systems.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A RAG pipeline is a specific architecture pattern for retrieval-augmented generation systems."
+    },
+    "def": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic - Python keyword for function definition, ambiguous without context.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "\u201cdef\u201d is a Python keyword but too generic and not a meaningful standalone concept for categorization."
+    },
+    "class": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic - fundamental OOP concept, ambiguous without context.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "\u201cclass\u201d is a broad programming construct and is too ambiguous/generic as a taxonomy term."
+    },
+    "import": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic - basic programming construct for module/package inclusion.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "\u201cimport\u201d is a common keyword/concept across languages and is too generic for categorization."
+    },
+    "scipy": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Python library for scientific computing and technical computing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "SciPy is a named Python library for scientific computing commonly used in ML workflows."
+    },
+    "pytorch": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named deep learning framework and technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "PyTorch is a named deep learning framework used for model training and inference."
+    },
+    "lambda": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Refers to AWS Lambda, a specific serverless computing service.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "In the cloud_infrastructure context this commonly refers to AWS Lambda, a specific serverless compute service."
+    },
+    "dunder": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific Python terminology for methods with double underscores (like __init__).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "\u201cDunder\u201d refers specifically to Python\u2019s double-underscore special methods/attributes convention."
+    },
+    "__init__": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific Python method name for object initialization.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "__init__ is a specific Python special method used as an object initializer."
+    },
+    "__call__": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific Python method name for making objects callable.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "__call__ is a specific Python special method enabling instances to be invoked like functions."
+    },
+    "pathlib": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Python module for filesystem path operations.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "pathlib is a specific Python standard library module for filesystem paths."
+    },
+    "argparse": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Python module for command-line argument parsing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "argparse is a specific Python standard library module for command-line argument parsing."
+    },
+    "12-factor": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined methodology for building modern, scalable applications.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "The Twelve-Factor App is a well-defined set of principles for building cloud-native services."
+    },
+    "event-driven": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific architectural pattern for building responsive systems.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Event-driven architecture is a specific architectural style commonly used in microservices systems."
+    },
+    "facade": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-known design pattern for providing simplified interface to complex subsystems.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Facade is a named design pattern that provides a simplified interface to a subsystem."
+    },
+    "chain of responsibility": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined behavioral design pattern for passing requests through handlers.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Chain of Responsibility is a named design pattern for passing requests along a handler chain."
+    },
+    "template method": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined behavioral design pattern for defining algorithm skeletons.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Template Method is a named design pattern defining an algorithm skeleton with overridable steps."
+    },
+    "unit of work": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined design pattern for managing database transactions and object states.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Unit of Work is a well-defined enterprise/application pattern for batching changes into a single transaction."
+    },
+    "dependency injection": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific design pattern for dependency management in software.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined design technique for supplying dependencies to a component rather than creating them internally."
+    },
+    "inversion of control": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined software design principle that reverses control flow.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific architectural principle where control flow is delegated to a framework/container."
+    },
+    "solid": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named collection of object-oriented design principles (acronym for five principles).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named set of five object-oriented design principles commonly used to categorize design guidance."
+    },
+    "srp": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific principle (Single Responsibility Principle) from SOLID.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard acronym for the Single Responsibility Principle within SOLID."
+    },
+    "ocp": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific principle (Open-Closed Principle) from SOLID.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard acronym for the Open/Closed Principle within SOLID."
+    },
+    "lsp": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific principle (Liskov Substitution Principle) from SOLID.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard acronym for the Liskov Substitution Principle within SOLID."
+    },
+    "isp": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific principle (Interface Segregation Principle) from SOLID.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard acronym for the Interface Segregation Principle within SOLID."
+    },
+    "dip": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific principle (Dependency Inversion Principle) from SOLID.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard acronym for the Dependency Inversion Principle within SOLID."
+    },
+    "dry": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined software principle (Don't Repeat Yourself).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-known software engineering principle meaning 'Don't Repeat Yourself'."
+    },
+    "kiss": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named design principle (Keep It Simple, Stupid).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A recognized engineering principle meaning 'Keep It Simple, Stupid' used to guide design decisions."
+    },
+    "yagni": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific software development principle (You Aren't Gonna Need It).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined agile principle meaning 'You Aren't Gonna Need It' to avoid premature features."
+    },
+    "polymorphism": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Fundamental object-oriented programming concept with specific meaning.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A core object-oriented programming concept describing multiple forms via interfaces/overrides."
+    },
+    "abstract class": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific object-oriented programming construct.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific OOP construct representing a non-instantiable base type with shared behavior/contracts."
+    },
+    "value object": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined pattern in Domain-Driven Design and object-oriented programming.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A Domain-Driven Design pattern for immutable objects identified by their values rather than identity."
+    },
+    "anti-corruption layer": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific architectural pattern in Domain-Driven Design.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific DDD integration pattern that isolates a domain model from external system models."
+    },
+    "clean architecture": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named architectural pattern by Robert C. Martin.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named architectural style with clear layering and dependency rules popularized by Robert C. Martin."
+    },
+    "ports and adapters": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific architectural pattern (also known as hexagonal architecture).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named architecture (Hexagonal Architecture) defining ports/interfaces and adapters for external systems."
+    },
+    "onion architecture": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific architectural pattern with defined layering approach.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named layered architecture emphasizing domain-centric design and inward-pointing dependencies."
+    },
+    "table": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic; can refer to many types of data structures or UI elements.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "Too generic and ambiguous without context (could refer to many kinds of tables beyond databases)."
+    },
+    "sql server": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific database management system product from Microsoft.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific, named relational database product (Microsoft SQL Server)."
+    },
+    "sequelize": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific ORM (Object-Relational Mapping) library for Node.js.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific Node.js ORM library used for SQL databases."
+    },
+    "prisma": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific database toolkit and ORM technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific ORM/tooling ecosystem for database access (Prisma ORM)."
+    },
+    "hibernate": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific ORM framework for Java.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific Java ORM framework (Hibernate) widely used for persistence."
+    },
+    "activerecord": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific ORM pattern and implementation (e.g., in Ruby on Rails).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named ORM pattern and also a specific Rails ORM implementation (Active Record)."
+    },
+    "foreign key": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific relational database constraint concept.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined relational database constraint used to enforce referential integrity."
+    },
+    "group by": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named SQL clause for aggregation operations.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific SQL clause for aggregating rows by one or more columns."
+    },
+    "denormalization": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined database design optimization technique.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A recognized database design technique that trades normalization for performance."
+    },
+    "stored procedure": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific database programming construct.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific database feature for encapsulating logic in executable routines stored in the DB."
+    },
+    "snowflake": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named data warehousing technology and schema design pattern.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Commonly refers to Snowflake, a specific cloud data warehouse technology."
+    },
+    "elt": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific data integration pattern (Extract, Load, Transform).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined data integration pattern (Extract-Load-Transform) distinct from ETL."
+    },
+    "data pipeline": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined data engineering architecture concept.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard term for systems that move and transform data through staged processing."
+    },
+    "cdc": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Acronym for the specific pattern 'change data capture'.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A widely used acronym for Change Data Capture in data engineering contexts."
+    },
+    "change data capture": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined data synchronization pattern.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific technique for tracking and propagating database changes to downstream systems."
+    },
+    "assert": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic; common programming keyword/function present in many contexts.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A concrete testing/programming construct used to verify expected conditions in code."
+    },
+    "integration test": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific, well-defined level of software testing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined test type that validates interactions between multiple components."
+    },
+    "end-to-end": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific type of testing methodology (end-to-end testing).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A standard testing concept referring to validating a full workflow across the system."
+    },
+    "e2e": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Common acronym for the specific 'end-to-end' testing concept.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A common abbreviation for end-to-end testing used in engineering documentation."
+    },
+    "jest": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named JavaScript testing framework.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific JavaScript testing framework."
+    },
+    "mocha": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named JavaScript testing framework.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific JavaScript test framework commonly used with Node.js."
+    },
+    "rspec": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Ruby testing framework and DSL.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific testing framework for Ruby."
+    },
+    "spy": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific type of test double/mocking concept.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific test double concept used to record and assert interactions (calls/args)."
+    },
+    "parameterize": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific testing technique for creating parameterized tests.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific testing practice (parameterized tests) for running the same test over multiple inputs."
+    },
+    "conftest": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named testing tool for configuration validation and pytest configuration file.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A pytest-specific configuration file name used to define shared fixtures and hooks."
+    },
+    "bdd": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Acronym for the specific methodology 'behavior-driven development'.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined testing/development methodology: Behavior-Driven Development."
+    },
+    "test-driven": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Refers to the specific development practice 'test-driven development' (TDD).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Refers to Test-Driven Development, a specific development practice."
+    },
+    "behavior-driven": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Refers to the specific development methodology 'behavior-driven development' (BDD).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Refers to Behavior-Driven Development, a specific methodology related to TDD."
+    },
+    "given-when-then": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined syntax and structure for specifying behavior in BDD.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific BDD scenario structure for expressing preconditions, action, and expected outcome."
+    },
+    "branch coverage": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific, well-defined metric in code coverage analysis.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific code coverage metric measuring execution of decision branches."
+    },
+    "mutation testing": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific, advanced software testing technique.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific testing technique that evaluates test suite strength by introducing code mutations."
+    },
+    "playwright": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific end-to-end testing framework for web applications.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Playwright is a specific end-to-end browser automation/testing framework."
+    },
+    "cypress": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific front-end testing framework and tool.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Cypress is a named JavaScript end-to-end testing framework for web applications."
+    },
+    "puppeteer": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific Node library for browser automation and testing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Puppeteer is a specific Node.js library for controlling headless Chrome for automation/testing."
+    },
+    "sanity test": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific type of software test to quickly evaluate basic stability.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Sanity testing is a well-defined testing practice for quick validation of core functionality after changes."
+    },
+    "test pyramid": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined model for structuring different levels of software testing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "The test pyramid is a recognized testing strategy describing the recommended distribution of test types."
+    },
+    "test double": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific testing concept for replacing real dependencies with controlled substitutes.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Test double is a specific testing concept covering mocks, stubs, fakes, and related substitutes."
+    },
+    "property-based testing": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific testing methodology where properties of a system are verified for a range of inputs.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Property-based testing is a well-defined testing methodology based on generating inputs to validate invariants."
+    },
+    "snapshot testing": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific testing technique that compares current output to a previously stored 'snapshot'.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Snapshot testing is a specific technique that compares current output to a stored snapshot to detect regressions."
+    },
+    "continuous testing": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined DevOps practice of executing automated tests throughout the delivery pipeline.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Continuous testing is a defined practice of running automated tests throughout the delivery pipeline."
+    },
+    "shift-left": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific software practice emphasizing early testing and quality assurance in the development lifecycle.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Shift-left is a recognized practice of moving testing/quality/security activities earlier in the lifecycle."
+    },
+    "quality gate": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined checkpoint in a pipeline where predefined quality criteria must be met.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Quality gate is a specific CI/CD control concept that enforces measurable criteria before promotion/deploy."
+    },
+    "sonarqube": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific platform for continuous code quality inspection.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "SonarQube is a named tool for static code analysis and code quality management."
+    },
+    "linting": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific practice of using static analysis tools to flag programming errors or stylistic issues.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Linting is a specific practice/tooling category for static analysis to detect code issues and style violations."
+    },
+    "ci": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific, well-defined practice of Continuous Integration in software development.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "CI (Continuous Integration) is a well-defined DevOps practice for frequently integrating and validating changes."
+    },
+    "cd": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific, well-defined practice of Continuous Delivery or Continuous Deployment.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "CD (Continuous Delivery/Deployment) is a well-defined practice for automating release and deployment workflows."
+    },
+    "gitlab ci": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific CI/CD tool integrated within GitLab.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "GitLab CI is a specific CI/CD system integrated with GitLab."
+    },
+    "infrastructure as code": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined DevOps practice of managing infrastructure through machine-readable configuration files.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Infrastructure as Code is a well-defined practice for managing infrastructure via declarative/programmable definitions."
+    },
+    "blue-green": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific and well-defined deployment strategy for reducing downtime and risk.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Blue-green deployment is a specific deployment strategy using two environments to reduce downtime and risk."
+    },
+    "feature flag": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific software development technique for enabling/disabling features without code deployment.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Feature flags are a specific technique for controlling feature exposure via runtime configuration."
+    },
+    "a/b testing": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific methodology for comparing two versions of a feature or application to determine which performs better.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A/B testing is a well-defined experimentation method for comparing variants using controlled traffic splits."
+    },
+    "datadog": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific observability and security platform for cloud applications.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Datadog is a named observability platform for metrics, logs, traces, and monitoring."
+    },
+    "on-call": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic and describes a general operational role or schedule, not a specific technical concept.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "On-call is a specific operational practice/process for incident response coverage and escalation."
+    },
+    "acr": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific named technology, Azure Container Registry, for managing Docker container images.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "ACR is an ambiguous acronym without context (e.g., Azure Container Registry, American College of Radiology), so it\u2019s not reliably categorizable."
+    },
+    "artifactory": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named and specific artifact repository manager by JFrog.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "JFrog Artifactory is a specific artifact repository manager used in build and release pipelines."
+    },
+    "oidc": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific, well-defined open standard for authentication and identity layer (OpenID Connect).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "OIDC (OpenID Connect) is a well-defined authentication protocol built on OAuth 2.0."
+    },
+    "saml": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific authentication protocol (Security Assertion Markup Language).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "SAML is a specific, widely used standard for federated authentication and single sign-on."
+    },
+    "bearer": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific token type in authentication (e.g., bearer tokens).",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "\u201cBearer\u201d alone is ambiguous without context (e.g., bearer token, bearer auth) and not a standalone concept."
+    },
+    "credential": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic; refers to any authentication information.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Credentials are a well-defined security concept referring to authentication secrets like passwords, keys, or tokens."
+    },
+    "bcrypt": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific password hashing algorithm.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "bcrypt is a specific password-hashing algorithm commonly used for secure password storage."
+    },
+    "argon2": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific password hashing algorithm.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Argon2 is a specific modern password-hashing algorithm and winner of the Password Hashing Competition."
+    },
+    "salt": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific cryptographic concept for password hashing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A salt is a specific cryptographic technique used in hashing to prevent precomputed attacks like rainbow tables."
+    },
+    "pepper": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific cryptographic secret added to passwords.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A pepper is a specific password-hashing practice involving a secret value shared across hashes to add protection if the DB leaks."
+    },
+    "aes": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific encryption standard (Advanced Encryption Standard).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "AES is a specific standardized symmetric encryption algorithm (Advanced Encryption Standard)."
+    },
+    "rsa": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific public-key cryptosystem.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "RSA is a specific public-key cryptosystem used for encryption and digital signatures."
+    },
+    "https": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific secure communication protocol.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "HTTPS is a specific protocol (HTTP over TLS) used to secure web traffic."
+    },
+    "pki": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific infrastructure for public key management.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "PKI is a well-defined system for managing public-key certificates and trust chains."
+    },
+    "hmac": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific message authentication code method.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "HMAC is a specific message authentication code construction used for integrity and authenticity."
+    },
+    "abac": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific access control model (Attribute-Based Access Control).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "ABAC is a specific access control model (Attribute-Based Access Control) used in authorization systems."
+    },
+    "xss": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific web security vulnerability and mitigation (Cross-Site Scripting).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific web security vulnerability class (Cross-Site Scripting) relevant to frontend/backend handling."
+    },
+    "csrf": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific web security vulnerability and mitigation (Cross-Site Request Forgery).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific web security vulnerability class (Cross-Site Request Forgery) with well-known mitigations."
+    },
+    "sql injection": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific code injection attack technique.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "SQL injection is a specific and well-defined injection vulnerability affecting database queries."
+    },
+    "cve": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific system for identifying vulnerabilities (Common Vulnerabilities and Exposures).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "CVE is a specific standardized identifier system for publicly disclosed security vulnerabilities."
+    },
+    "pentest": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific security practice (penetration testing).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Penetration testing is a specific security practice for assessing systems by simulating attacks."
+    },
+    "security audit": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined security assessment practice.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A security audit is a defined practice for evaluating security controls, compliance, and risk posture."
+    },
+    "zero trust": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific security model/framework.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Zero Trust is a specific security architecture/model centered on continuous verification and least implicit trust."
+    },
+    "least privilege": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific security principle.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Least privilege is a well-defined security principle for limiting access rights to the minimum necessary."
+    },
+    "defense in depth": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific security strategy with layered defenses.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Defense in depth is a specific security strategy of layering multiple controls to reduce risk."
+    },
+    "threat model": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific structured approach to identifying threats.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Threat modeling is a specific practice for identifying threats, attack surfaces, and mitigations."
+    },
+    "soar": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific security operations concept (Security Orchestration, Automation, and Response).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "SOAR is a specific category of security tooling (Security Orchestration, Automation, and Response)."
+    },
+    "secrets manager": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific tool category for managing sensitive data.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Secrets manager refers to a specific class of tools/services for storing and rotating secrets like API keys and passwords."
+    },
+    "lstm": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific type of recurrent neural network architecture with a clear technical definition.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "LSTM is a specific recurrent neural network architecture (Long Short-Term Memory) used in sequence modeling."
+    },
+    "unsupervised": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined category of machine learning where models learn patterns from unlabeled data.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Unsupervised learning is a well-defined machine learning paradigm for training without labeled targets."
+    },
+    "backpropagation": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific algorithm for training neural networks through gradient calculation.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Backpropagation is a specific algorithm for computing gradients to train neural networks."
+    },
+    "loss function": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific mathematical function that measures model prediction error.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A loss function is a core ML concept defining the optimization objective during model training."
+    },
+    "underfitting": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined ML concept describing when a model is too simple to capture data patterns.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Underfitting is a specific model behavior indicating insufficient capacity or training to capture patterns."
+    },
+    "batch normalization": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific neural network technique for stabilizing and accelerating training.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Batch normalization is a specific neural network layer/technique to stabilize and accelerate training."
+    },
+    "cross-validation": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific model evaluation method that partitions data into training and validation sets.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Cross-validation is a standard evaluation methodology for estimating generalization performance."
+    },
+    "f1 score": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific metric combining precision and recall for classification model evaluation.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "F1 score is a specific classification metric combining precision and recall."
+    },
+    "confusion matrix": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific tabular visualization tool for classification model performance.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A confusion matrix is a well-defined table summarizing classification outcomes by class."
+    },
+    "plotly": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named interactive visualization library and tool.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Plotly is a specific visualization library/tool used for interactive plotting."
+    },
+    "scikit-learn": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named machine learning library for Python with specific API and tools.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "scikit-learn is a named ML library providing algorithms and utilities for modeling and evaluation."
+    },
+    "xgboost": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named gradient boosting framework with specific implementation details.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "XGBoost is a specific gradient-boosted decision tree library/implementation."
+    },
+    "lightgbm": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named gradient boosting framework developed by Microsoft.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "LightGBM is a specific gradient boosting framework optimized for performance and large datasets."
+    },
+    "catboost": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named gradient boosting library specifically designed for categorical data.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "CatBoost is a specific gradient boosting library with strong support for categorical features."
+    },
+    "tsne": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific dimensionality reduction algorithm (t-distributed Stochastic Neighbor Embedding).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "t-SNE is a specific dimensionality reduction algorithm for visualization of high-dimensional data."
+    },
+    "umap": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named dimensionality reduction technique (Uniform Manifold Approximation and Projection).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "UMAP is a specific dimensionality reduction technique used for visualization and manifold learning."
+    },
+    "computer vision": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific AI subfield dealing with how computers interpret visual information.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Computer vision is a well-defined subfield focused on extracting information from images and video."
+    },
+    "image classification": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific computer vision task of categorizing images into classes.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Image classification is a specific computer vision task of assigning labels to images."
+    },
+    "object detection": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific computer vision task of identifying and locating objects in images.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Object detection is a specific computer vision task of locating and classifying objects in images."
+    },
+    "colab": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Google product (Colaboratory) for running Python notebooks in the cloud.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Google Colab is a named hosted Jupyter notebook environment commonly used for ML experimentation."
+    },
+    "kaggle": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named platform for data science competitions and datasets.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Kaggle is a named platform for datasets, notebooks, and ML competitions used in data science workflows."
+    },
+    "wandb": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named tool (Weights & Biases) for experiment tracking and visualization.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Weights & Biases (wandb) is a specific tool for experiment tracking, metrics, and ML ops."
+    },
+    "ec2": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named AWS service (Elastic Compute Cloud) for virtual servers.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Amazon EC2 is a specific AWS compute service used for provisioning virtual servers."
+    },
+    "s3": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named AWS service (Simple Storage Service) for object storage.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Amazon S3 is a specific AWS object storage service widely used in cloud infrastructure."
+    },
+    "elastic beanstalk": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "AWS Elastic Beanstalk is a specific platform-as-a-service (PaaS) offering.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "AWS Elastic Beanstalk is a named PaaS offering for deploying and scaling applications."
+    },
+    "azure functions": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Microsoft Azure Functions is a specific serverless compute service.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Azure Functions is a specific serverless (FaaS) product from Microsoft Azure."
+    },
+    "blob storage": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Refers to Azure Blob Storage, a specific object storage service.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Azure Blob Storage is a well-defined object storage service and common infrastructure concept."
+    },
+    "cosmos db": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Azure Cosmos DB is a specific globally distributed database service.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Azure Cosmos DB is a named globally distributed NoSQL database service."
+    },
+    "aks": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Azure Kubernetes Service is a specific managed Kubernetes container orchestration service.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "AKS (Azure Kubernetes Service) is a specific managed Kubernetes offering."
+    },
+    "cloud functions": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Google Cloud Functions is a specific serverless execution environment.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Google Cloud Functions is a named serverless functions product."
+    },
+    "cloud run": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Google Cloud Run is a specific managed compute platform for containers.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Google Cloud Run is a specific managed container execution platform."
+    },
+    "compute engine": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Google Compute Engine is a specific Infrastructure-as-a-Service (IaaS) offering.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Google Compute Engine is a named IaaS virtual machine service."
+    },
+    "cloud sql": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Google Cloud SQL is a specific managed relational database service.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Google Cloud SQL is a specific managed relational database service."
+    },
+    "pub/sub": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Refers to the publish-subscribe messaging pattern and specific services like Google Pub/Sub.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Publish/subscribe is a well-defined messaging pattern and also a named Google Cloud Pub/Sub service."
+    },
+    "vertex ai": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Google Vertex AI is a specific managed machine learning platform.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Vertex AI is a named Google Cloud machine learning platform."
+    },
+    "function as a service": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "FaaS is a specific cloud computing model and well-defined architectural pattern.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "FaaS is a specific cloud computing model/category used to classify serverless offerings."
+    },
+    "multi-region": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Refers to a specific architecture pattern for distributing services across geographic regions.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Multi-region deployment is a specific infrastructure architecture concept for availability and latency."
+    },
+    "cost optimization": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic; refers to a broad business or operational goal rather than a specific technical concept.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Cost optimization is a recognized cloud practice area with concrete techniques and tooling implications."
+    },
+    "reserved instances": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific pricing and capacity reservation model used in cloud providers like AWS.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Reserved Instances are a specific cloud pricing/commitment construct (notably in AWS) used for cost management."
+    },
+    "spot instances": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific pricing model for unused cloud capacity, notably in AWS.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Spot Instances are a specific discounted, interruptible compute purchasing model offered by major clouds."
+    },
+    "savings plan": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific flexible pricing model for committed cloud usage, notably in AWS.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Savings Plans are a specific AWS pricing commitment product relevant to cloud cost management."
+    },
+    "rwlock": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Read-write lock is a specific synchronization primitive for concurrent access.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "RWLock (read-write lock) is a specific synchronization primitive used in concurrent programming."
+    },
+    "spinlock": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Spinlock is a specific type of lock where a thread waits in a loop.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A spinlock is a well-defined locking mechanism where threads busy-wait for the lock."
+    },
+    "race condition": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined concurrency problem where behavior depends on sequence/timing of events.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Race condition is a specific concurrency bug class with well-understood causes and mitigations."
+    },
+    "livelock": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific concurrency problem where processes are active but unable to progress.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Livelock is a specific concurrency failure mode where progress stops despite active execution."
+    },
+    "starvation": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific concurrency problem where a process is perpetually denied resources.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Starvation is a specific concurrency scheduling/resource-allocation problem where a thread never makes progress."
+    },
+    "thread safety": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined property indicating safe use of code or data structures in concurrent contexts.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Thread safety is a well-defined property/practice describing correctness under concurrent access."
+    },
+    "compare and swap": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific atomic operation used for synchronization in concurrent programming.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Compare-and-swap (CAS) is a specific atomic CPU operation foundational to lock-free concurrency."
+    },
+    "memory barrier": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific low-level synchronization primitive in concurrent programming.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined concurrency primitive that enforces ordering/visibility of memory operations across threads/cores."
+    },
+    "shared memory": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined model for inter-process communication and parallel computing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific parallel/concurrency model where multiple threads/processes access a common address space."
+    },
+    "simd": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named parallel computing architecture (Single Instruction, Multiple Data).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific CPU parallelism technique/instruction model (Single Instruction, Multiple Data) used for data-parallel computation."
+    },
+    "vectorization": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific optimization technique using SIMD instructions for parallel data processing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A concrete optimization technique that transforms code to use SIMD/vector instructions for parallel data processing."
+    },
+    "dask": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Python library for parallel and distributed computing.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named parallel computing library/framework in Python for distributed and parallel workloads."
+    },
+    "http": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Core technical protocol for web communication.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific, foundational web protocol used for client-server communication."
+    },
+    "html": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Standard markup language for web pages.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific markup language standard for structuring web documents."
+    },
+    "typescript": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named programming language and JavaScript superset.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named programming language (typed superset of JavaScript) widely used in web development."
+    },
+    "svelte": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific frontend JavaScript framework.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named web UI framework/compiler with a distinct component model and build approach."
+    },
+    "next.js": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named React framework for server-side rendering and static sites.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named React-based web framework with SSR/SSG and routing conventions."
+    },
+    "nuxt": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named Vue framework for server-side rendering and static sites.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named Vue-based web framework providing SSR/SSG and application structure."
+    },
+    "gatsby": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named static site generator based on React.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named static site generator/framework commonly used for building web sites with React."
+    },
+    "remix": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named full-stack web framework for React.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named web framework (Remix) with specific routing/data-loading patterns for React applications."
+    },
+    "astro": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named static site builder supporting multiple frameworks.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named web framework focused on content sites and partial hydration/islands architecture."
+    },
+    "fastify": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific web framework for Node.js.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named Node.js web framework with a specific plugin architecture and performance focus."
+    },
+    "nestjs": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific Node.js framework using TypeScript and object-oriented patterns.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named Node.js framework with an opinionated architecture (modules/controllers/providers) inspired by Angular."
+    },
+    "koa": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named web framework for Node.js, designed by Express creators.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named Node.js web framework with a middleware-based design."
+    },
+    "hapi": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific rich framework for building applications and services in Node.js.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named Node.js web framework with a configuration-driven approach."
+    },
+    "cors": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined web security mechanism (Cross-Origin Resource Sharing).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific web security mechanism (Cross-Origin Resource Sharing) governing cross-origin requests."
+    },
+    "content security policy": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific web security standard to prevent XSS and other attacks.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific web security standard (CSP) for restricting resource loading and mitigating XSS."
+    },
+    "http2": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named major version of the HTTP network protocol.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific version of the HTTP protocol with defined features like multiplexing and header compression."
+    },
+    "http3": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named major version of the HTTP protocol using QUIC transport.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific version of the HTTP protocol built on QUIC with distinct transport characteristics."
+    },
+    "spa": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined web application architecture (Single Page Application).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined web application architecture pattern (Single Page Application)."
+    },
+    "ssr": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific technical concept for Server-Side Rendering in web development.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Server-Side Rendering is a well-defined web rendering strategy used to categorize frontend architecture."
+    },
+    "ssg": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific technical concept for Static Site Generation in web development.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Static Site Generation is a specific build-time rendering approach commonly discussed in modern web frameworks."
+    },
+    "isr": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific technical concept for Incremental Static Regeneration in web development.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Incremental Static Regeneration is a specific rendering/deployment technique (notably in Next.js) with clear meaning."
+    },
+    "hydration": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined technical concept for attaching JavaScript to server-rendered HTML.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Hydration is a specific concept in SSR/SSG apps where client-side JS attaches behavior to server-rendered HTML."
+    },
+    "client-side": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Generic descriptor without specific technical meaning on its own.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Client-side is a standard technical distinction describing execution/rendering in the browser."
+    },
+    "server-side": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Generic descriptor without specific technical meaning on its own.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Server-side is a standard technical distinction describing execution/rendering on the server."
+    },
+    "responsive": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined practice for creating designs that adapt to different screen sizes.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Responsive (design) is a well-defined web UI practice for adapting layouts to different screen sizes."
+    },
+    "mobile-first": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific design approach and development practice.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Mobile-first is a specific design strategy for building layouts starting from small screens upward."
+    },
+    "pwa": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named technology concept (Progressive Web App).",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Progressive Web App is a named web application model with specific capabilities and standards."
+    },
+    "service worker": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific web API technology for offline capabilities.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Service Worker is a specific web platform API/technology enabling offline caching, background sync, and push."
+    },
+    "bundler": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific category of build tools in web development.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Bundler is a specific category of build tooling for packaging web assets and modules."
+    },
+    "webpack": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named bundler tool and technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Webpack is a named, widely used JavaScript bundler/tooling ecosystem."
+    },
+    "vite": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named build tool and development server technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Vite is a named frontend build tool/dev server with a distinct architecture and usage."
+    },
+    "rollup": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named JavaScript module bundler tool.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Rollup is a named JavaScript module bundler commonly used for libraries."
+    },
+    "esbuild": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named build tool and bundler technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "esbuild is a named JavaScript/TypeScript bundler and minifier known for performance."
+    },
+    "parcel": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named bundler tool and technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Parcel is a named zero-config web bundler/build tool."
+    },
+    "pnpm": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named package manager technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "pnpm is a named JavaScript package manager with a distinct dependency storage model."
+    },
+    "package manager": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined category of tools for dependency management.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Package manager is a specific tooling category for dependency installation and version management."
+    },
+    "monorepo": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific code repository organization strategy and practice.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Monorepo is a well-defined repository organization pattern used in software engineering."
+    },
+    "turborepo": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named monorepo build system technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "Turborepo is a named build system/tool for monorepos with caching and task orchestration."
+    },
+    "c++": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Named programming language technology.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "C++ is a specific programming language and a clear categorization term for systems development content."
+    },
+    "set": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic/common term without specific technical meaning in this context.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "Set is too ambiguous without context (could mean a verb, a math concept, or std::set) to be a reliable category."
+    },
+    "weak_ptr": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Specific smart pointer type in C++ standard library.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "weak_ptr is a specific C++ standard library smart pointer type with well-defined semantics."
+    },
+    "raii": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "Well-defined C++ programming idiom and pattern.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "RAII is a well-defined C++ resource management idiom used to structure ownership and cleanup."
+    },
+    "resource acquisition": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Ambiguous phrase without the complete RAII context; partial terminology.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "Resource acquisition alone is a generic phrase and is typically meaningful only as part of the specific idiom 'Resource Acquisition Is Initialization (RAII)'."
+    },
+    "move semantics": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A specific C++ language feature for efficient transfer of resources.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific C++ language feature governing efficient resource transfer via rvalue references."
+    },
+    "vtable": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A specific implementation mechanism for virtual functions in C++.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined implementation concept for C++ virtual dispatch (virtual method table)."
+    },
+    "sfinae": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A well-defined C++ template metaprogramming technique.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific C++ template metaprogramming rule (Substitution Failure Is Not An Error)."
+    },
+    "preprocessor": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A specific phase/component in C/C++ compilation with defined behavior.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A distinct compilation phase/tooling concept in C/C++ involving macros and conditional compilation."
+    },
+    "memory management": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A core, well-defined technical concept in systems programming.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A meaningful systems programming topic covering allocation, ownership, lifetimes, and leaks."
+    },
+    "deallocation": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "Too generic a term for memory operations without specific technical nuance.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific memory-management operation (freeing previously allocated resources)."
+    },
+    "new": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "A common keyword/operator too ambiguous without context.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "Too ambiguous/generic as a standalone term (could mean the C++ operator or just \u201cnew\u201d in English)."
+    },
+    "try": {
+      "deepseek": "REJECT",
+      "deepseek_reasoning": "A common keyword too ambiguous without context.",
+      "chatgpt": "REJECT",
+      "chatgpt_reasoning": "Too ambiguous as a standalone keyword without context (could be general English or multiple languages)."
+    },
+    "exception safety": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A well-defined C++ programming guarantee with specific levels.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A well-defined C++ concept describing guarantees (basic/strong/nothrow) under exceptions."
+    },
+    "object file": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A specific compilation output format with defined structure.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific build artifact produced by compilation (e.g., .o/.obj) with well-known semantics."
+    },
+    "static library": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A specific type of library with defined linking behavior.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific binary artifact type (e.g., .a/.lib) with distinct linking behavior."
+    },
+    "dynamic library": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A specific type of library with defined runtime linking behavior.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific binary artifact type (e.g., .so/.dll/.dylib) loaded/linked dynamically."
+    },
+    "cmake": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, widely-used build system and toolchain.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named, widely used build system/generator (CMake)."
+    },
+    "make": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, standard build automation tool.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named build automation tool (make) with a well-defined role in build pipelines."
+    },
+    "ninja": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, specific build system focused on speed.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named build system (Ninja) commonly used as a fast backend for generators like CMake."
+    },
+    "bazel": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, multi-language build and test tool.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named build and test tool (Bazel) with a distinct model and ecosystem."
+    },
+    "conan": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, specific C/C++ package manager.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named C/C++ package manager (Conan) used for dependency management."
+    },
+    "vcpkg": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, specific C/C++ package manager from Microsoft.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named C/C++ package manager (vcpkg) used for dependency acquisition and integration."
+    },
+    "gdb": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, widely-used debugger tool.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named debugger (GNU Debugger) used for native code debugging."
+    },
+    "lldb": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, modern debugger tool from the LLVM project.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named debugger (LLDB) commonly used with LLVM/Clang toolchains."
+    },
+    "valgrind": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, specific tool for memory debugging and profiling.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A named instrumentation framework/tool suite for memory debugging and profiling."
+    },
+    "ubsan": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, specific sanitizer for undefined behavior detection.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific tool/sanitizer (UndefinedBehaviorSanitizer) for detecting undefined behavior at runtime."
+    },
+    "tsan": {
+      "deepseek": "KEEP",
+      "deepseek_reasoning": "A named, specific sanitizer for thread synchronization issues.",
+      "chatgpt": "KEEP",
+      "chatgpt_reasoning": "A specific tool/sanitizer (ThreadSanitizer) for detecting data races in multithreaded code."
+    }
+  }
+}

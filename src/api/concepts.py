@@ -43,10 +43,10 @@ from src.models.concept_extractor import (
 # =============================================================================
 
 DEFAULT_DOMAIN_TAXONOMY_PATH = Path(
-    "/Users/kevintoles/POC/semantic-search-service/config/domain_taxonomy.json"
+    "/app/config/semantic-search/domain_taxonomy.json"
 )
 DEFAULT_TIER_TAXONOMY_PATH = Path(
-    "/Users/kevintoles/POC/textbooks/Taxonomies/AI-ML_taxonomy_20251128.json"
+    "/app/config/taxonomies/AI-ML_taxonomy_20251128.json"
 )
 
 # Error messages

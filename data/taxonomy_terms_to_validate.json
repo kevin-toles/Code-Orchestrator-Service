@@ -1,0 +1,994 @@
+[
+  {
+    "term": "tokenize",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "index",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "fine-tune",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "fine-tuning",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "llamaindex",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "anthropic",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "huggingface",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "rag pipeline",
+    "domain": "llm_rag"
+  },
+  {
+    "term": "def",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "class",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "import",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "scipy",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "pytorch",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "lambda",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "dunder",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "__init__",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "__call__",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "pathlib",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "argparse",
+    "domain": "python_implementation"
+  },
+  {
+    "term": "12-factor",
+    "domain": "microservices_architecture"
+  },
+  {
+    "term": "event-driven",
+    "domain": "microservices_architecture"
+  },
+  {
+    "term": "facade",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "chain of responsibility",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "template method",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "unit of work",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "dependency injection",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "inversion of control",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "solid",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "srp",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "ocp",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "lsp",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "isp",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "dip",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "dry",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "kiss",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "yagni",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "polymorphism",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "abstract class",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "value object",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "anti-corruption layer",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "clean architecture",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "ports and adapters",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "onion architecture",
+    "domain": "design_patterns"
+  },
+  {
+    "term": "table",
+    "domain": "database_storage"
+  },
+  {
+    "term": "sql server",
+    "domain": "database_storage"
+  },
+  {
+    "term": "sequelize",
+    "domain": "database_storage"
+  },
+  {
+    "term": "prisma",
+    "domain": "database_storage"
+  },
+  {
+    "term": "hibernate",
+    "domain": "database_storage"
+  },
+  {
+    "term": "activerecord",
+    "domain": "database_storage"
+  },
+  {
+    "term": "index",
+    "domain": "database_storage"
+  },
+  {
+    "term": "foreign key",
+    "domain": "database_storage"
+  },
+  {
+    "term": "group by",
+    "domain": "database_storage"
+  },
+  {
+    "term": "denormalization",
+    "domain": "database_storage"
+  },
+  {
+    "term": "stored procedure",
+    "domain": "database_storage"
+  },
+  {
+    "term": "snowflake",
+    "domain": "database_storage"
+  },
+  {
+    "term": "elt",
+    "domain": "database_storage"
+  },
+  {
+    "term": "data pipeline",
+    "domain": "database_storage"
+  },
+  {
+    "term": "cdc",
+    "domain": "database_storage"
+  },
+  {
+    "term": "change data capture",
+    "domain": "database_storage"
+  },
+  {
+    "term": "assert",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "integration test",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "end-to-end",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "e2e",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "jest",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "mocha",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "rspec",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "spy",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "parameterize",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "conftest",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "bdd",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "test-driven",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "behavior-driven",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "given-when-then",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "branch coverage",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "mutation testing",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "playwright",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "cypress",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "puppeteer",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "sanity test",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "test pyramid",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "test double",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "property-based testing",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "snapshot testing",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "continuous testing",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "shift-left",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "quality gate",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "sonarqube",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "linting",
+    "domain": "testing_quality"
+  },
+  {
+    "term": "ci",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "cd",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "gitlab ci",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "infrastructure as code",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "blue-green",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "feature flag",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "a/b testing",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "datadog",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "on-call",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "acr",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "artifactory",
+    "domain": "devops_cicd"
+  },
+  {
+    "term": "oidc",
+    "domain": "security"
+  },
+  {
+    "term": "saml",
+    "domain": "security"
+  },
+  {
+    "term": "bearer",
+    "domain": "security"
+  },
+  {
+    "term": "credential",
+    "domain": "security"
+  },
+  {
+    "term": "bcrypt",
+    "domain": "security"
+  },
+  {
+    "term": "argon2",
+    "domain": "security"
+  },
+  {
+    "term": "salt",
+    "domain": "security"
+  },
+  {
+    "term": "pepper",
+    "domain": "security"
+  },
+  {
+    "term": "aes",
+    "domain": "security"
+  },
+  {
+    "term": "rsa",
+    "domain": "security"
+  },
+  {
+    "term": "https",
+    "domain": "security"
+  },
+  {
+    "term": "pki",
+    "domain": "security"
+  },
+  {
+    "term": "hmac",
+    "domain": "security"
+  },
+  {
+    "term": "abac",
+    "domain": "security"
+  },
+  {
+    "term": "xss",
+    "domain": "security"
+  },
+  {
+    "term": "csrf",
+    "domain": "security"
+  },
+  {
+    "term": "sql injection",
+    "domain": "security"
+  },
+  {
+    "term": "cve",
+    "domain": "security"
+  },
+  {
+    "term": "pentest",
+    "domain": "security"
+  },
+  {
+    "term": "security audit",
+    "domain": "security"
+  },
+  {
+    "term": "zero trust",
+    "domain": "security"
+  },
+  {
+    "term": "least privilege",
+    "domain": "security"
+  },
+  {
+    "term": "defense in depth",
+    "domain": "security"
+  },
+  {
+    "term": "threat model",
+    "domain": "security"
+  },
+  {
+    "term": "soar",
+    "domain": "security"
+  },
+  {
+    "term": "secrets manager",
+    "domain": "security"
+  },
+  {
+    "term": "lstm",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "unsupervised",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "backpropagation",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "loss function",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "underfitting",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "batch normalization",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "cross-validation",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "f1 score",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "confusion matrix",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "scipy",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "plotly",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "scikit-learn",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "xgboost",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "lightgbm",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "catboost",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "tsne",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "umap",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "computer vision",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "image classification",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "object detection",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "colab",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "kaggle",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "wandb",
+    "domain": "data_science_ml"
+  },
+  {
+    "term": "ec2",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "s3",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "lambda",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "elastic beanstalk",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "azure functions",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "blob storage",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "cosmos db",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "aks",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "cloud functions",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "cloud run",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "compute engine",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "cloud sql",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "pub/sub",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "vertex ai",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "function as a service",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "multi-region",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "cost optimization",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "reserved instances",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "spot instances",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "savings plan",
+    "domain": "cloud_infrastructure"
+  },
+  {
+    "term": "rwlock",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "spinlock",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "race condition",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "livelock",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "starvation",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "thread safety",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "compare and swap",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "memory barrier",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "shared memory",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "simd",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "vectorization",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "dask",
+    "domain": "concurrency_parallelism"
+  },
+  {
+    "term": "http",
+    "domain": "web_development"
+  },
+  {
+    "term": "html",
+    "domain": "web_development"
+  },
+  {
+    "term": "typescript",
+    "domain": "web_development"
+  },
+  {
+    "term": "svelte",
+    "domain": "web_development"
+  },
+  {
+    "term": "next.js",
+    "domain": "web_development"
+  },
+  {
+    "term": "nuxt",
+    "domain": "web_development"
+  },
+  {
+    "term": "gatsby",
+    "domain": "web_development"
+  },
+  {
+    "term": "remix",
+    "domain": "web_development"
+  },
+  {
+    "term": "astro",
+    "domain": "web_development"
+  },
+  {
+    "term": "fastify",
+    "domain": "web_development"
+  },
+  {
+    "term": "nestjs",
+    "domain": "web_development"
+  },
+  {
+    "term": "koa",
+    "domain": "web_development"
+  },
+  {
+    "term": "hapi",
+    "domain": "web_development"
+  },
+  {
+    "term": "cors",
+    "domain": "web_development"
+  },
+  {
+    "term": "csrf",
+    "domain": "web_development"
+  },
+  {
+    "term": "xss",
+    "domain": "web_development"
+  },
+  {
+    "term": "content security policy",
+    "domain": "web_development"
+  },
+  {
+    "term": "http2",
+    "domain": "web_development"
+  },
+  {
+    "term": "http3",
+    "domain": "web_development"
+  },
+  {
+    "term": "spa",
+    "domain": "web_development"
+  },
+  {
+    "term": "ssr",
+    "domain": "web_development"
+  },
+  {
+    "term": "ssg",
+    "domain": "web_development"
+  },
+  {
+    "term": "isr",
+    "domain": "web_development"
+  },
+  {
+    "term": "hydration",
+    "domain": "web_development"
+  },
+  {
+    "term": "client-side",
+    "domain": "web_development"
+  },
+  {
+    "term": "server-side",
+    "domain": "web_development"
+  },
+  {
+    "term": "responsive",
+    "domain": "web_development"
+  },
+  {
+    "term": "mobile-first",
+    "domain": "web_development"
+  },
+  {
+    "term": "pwa",
+    "domain": "web_development"
+  },
+  {
+    "term": "service worker",
+    "domain": "web_development"
+  },
+  {
+    "term": "bundler",
+    "domain": "web_development"
+  },
+  {
+    "term": "webpack",
+    "domain": "web_development"
+  },
+  {
+    "term": "vite",
+    "domain": "web_development"
+  },
+  {
+    "term": "rollup",
+    "domain": "web_development"
+  },
+  {
+    "term": "esbuild",
+    "domain": "web_development"
+  },
+  {
+    "term": "parcel",
+    "domain": "web_development"
+  },
+  {
+    "term": "pnpm",
+    "domain": "web_development"
+  },
+  {
+    "term": "package manager",
+    "domain": "web_development"
+  },
+  {
+    "term": "monorepo",
+    "domain": "web_development"
+  },
+  {
+    "term": "turborepo",
+    "domain": "web_development"
+  },
+  {
+    "term": "c++",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "set",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "weak_ptr",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "raii",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "resource acquisition",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "move semantics",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "vtable",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "sfinae",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "preprocessor",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "memory management",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "deallocation",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "new",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "try",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "exception safety",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "object file",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "static library",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "dynamic library",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "cmake",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "make",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "ninja",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "bazel",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "conan",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "vcpkg",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "gdb",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "lldb",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "valgrind",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "ubsan",
+    "domain": "cpp_systems"
+  },
+  {
+    "term": "tsan",
+    "domain": "cpp_systems"
+  }
+]

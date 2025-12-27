@@ -1,0 +1,309 @@
+======================================================================
+CONCEPT EXTRACTION FOR AUDIT (LOW/ZERO COVERAGE CHAPTERS)
+======================================================================
+Metadata dir: /Users/kevintoles/POC/llm-document-enhancer/workflows/metadata_extraction/output
+Output file:  /Users/kevintoles/POC/Code-Orchestrator-Service/data/concept_extraction.jsonl
+Min concepts threshold: 1 (chapters with < 1 concepts)
+
+✅ Orchestrator service is healthy
+
+Processing 260 books...
+
+[1/260] 20-python-libraries-you-arent-using-but-should... +64 concepts in 8 chapters
+[2/260] A Philosophy of Software Design... +77 concepts in 15 chapters
+[3/260] ACM Digital Library Paper 3425174... +18 concepts in 2 chapters
+[4/260] AI Agents In Action... +321 concepts in 26 chapters
+[5/260] AI Agents and Applications... +367 concepts in 44 chapters
+[6/260] AI Assisted Programming for Web Learning... +234 concepts in 21 chapters
+[7/260] AI Engineering Building Applications... +201 concepts in 19 chapters
+[8/260] API Security in Action... +377 concepts in 24 chapters
+[9/260] AWS Cookbook - John Culkin Mike Zazon... +321 concepts in 27 chapters
+[10/260] AWS Networking Cookbook - Satyajit Das... +197 concepts in 30 chapters
+[11/260] AWS Well-Architected Operational Excellence Pillar... +139 concepts in 17 chapters
+[12/260] AWS in Action 3rd Edition - Andreas Wittig... +357 concepts in 22 chapters
+[13/260] Accelerate - Building and Scaling High Performing ... +55 concepts in 14 chapters
+[14/260] Accelerate... +24 concepts in 4 chapters
+[15/260] Accelerating Development Velocity Using Docker... +137 concepts in 16 chapters
+[16/260] Advanced Applied Deep Learning... +161 concepts in 27 chapters
+[17/260] Advanced Microservices... +215 concepts in 17 chapters
+[18/260] Agile Testing... +285 concepts in 43 chapters
+[19/260] AntiPatterns - William J Brown... +63 concepts in 7 chapters
+[20/260] AntiPatterns... +63 concepts in 7 chapters
+[21/260] Architecting Cloud Computing Solutions - Kevin Jac... +14 concepts in 1 chapters
+[22/260] Architecting for Scale 2nd Edition - Lee Atchison... +82 concepts in 12 chapters
+[23/260] Architecture Patterns with Python... +26 concepts in 3 chapters
+[24/260] Artificial Intelligence Generated Code Considered... +13 concepts in 1 chapters
+[25/260] Assessing the Quality and Security of AI-Generated... (no new concepts)
+[26/260] BDD in Action... +93 concepts in 5 chapters
+[27/260] Books Library Net - Unknown Title... +43 concepts in 8 chapters
+[28/260] Building Evolutionary Architectures... +50 concepts in 4 chapters
+[29/260] Building LLM Powered Applications... +366 concepts in 48 chapters
+[30/260] Building Microservices... +145 concepts in 9 chapters
+[31/260] Building Python Microservices with FastAPI... +474 concepts in 39 chapters
+[32/260] Building Secure and Reliable Systems - Heather Adk... +322 concepts in 32 chapters
+[33/260] C++ Concurrency in Action... +372 concepts in 35 chapters
+[34/260] C++ Templates_ The Complete Guide... +864 concepts in 81 chapters
+[35/260] Certified Kubernetes Security Specialist - Benjami... +58 concepts in 3 chapters
+[36/260] Clean Architecture - Robert C Martin... +44 concepts in 4 chapters
+[37/260] Clean Architecture A Craftsman's Guide to Software... +109 concepts in 23 chapters
+[38/260] Clean Code A Handbook of Agile Software Craftsmans... +301 concepts in 38 chapters
+[39/260] Clean Code Collection - Robert C Martin... +270 concepts in 26 chapters
+[40/260] Cloud Computing Concepts Technology and Architectu... +17 concepts in 3 chapters
+[41/260] Cloud FinOps - JR Storment Mike Fuller... +199 concepts in 31 chapters
+[42/260] Cloud Native DevOps with Kubernetes - John Arundel... +125 concepts in 9 chapters
+[43/260] Cloud Native Infrastructure - Justin Garrison Kris... +10 concepts in 1 chapters
+[44/260] Cloud-Native Observability with OpenTelemetry - Al... +159 concepts in 10 chapters
+[45/260] Code Complete - Steve McConnell... +279 concepts in 26 chapters
+[46/260] Computer Systems A Programmer’s Perspective... +321 concepts in 42 chapters
+[47/260] Container Security - Liz Rice... +109 concepts in 13 chapters
+[48/260] Container-Networking-Docker-Kubernetes... +4 concepts in 1 chapters
+[49/260] Continuous Delivery - Jez Humble David Farley... +14 concepts in 1 chapters
+[50/260] Continuous Integration and Delivery... +107 concepts in 11 chapters
+[51/260] Creative Prototyping with Generative AI... +223 concepts in 58 chapters
+[52/260] Data Engineering with AWS Cookbook - Tram Ngoc Pha... +388 concepts in 28 chapters
+[53/260] Data Mesh... (no new concepts)
+[54/260] Data-Oriented Design... +80 concepts in 7 chapters
+[55/260] Database Reliability Engineering... +163 concepts in 21 chapters
+[56/260] Database System Concepts 7th Edition... +486 concepts in 49 chapters
+[57/260] Deploying_to_OpenShift... +115 concepts in 11 chapters
+[58/260] Design Patterns - Elements of Reusable Object-Orie... +25 concepts in 2 chapters
+[59/260] Design Thinking in Software and AI Projects... +33 concepts in 3 chapters
+[60/260] Design Thinking... +62 concepts in 17 chapters
+[61/260] Designing Cloud Data Platforms... +64 concepts in 3 chapters
+[62/260] Designing Data-Intensive Applications... +210 concepts in 26 chapters
+[63/260] Designing Distributed Systems 2e - Brendan Burns... +85 concepts in 8 chapters
+[64/260] Designing Event-Driven Systems... +72 concepts in 12 chapters
+[65/260] Designing Machine Learning Systems An Iterative Pr... +132 concepts in 17 chapters
+[66/260] Developing Microservices with Node.js... +125 concepts in 7 chapters
+[67/260] Distributed Services with Go - Travis Jeffery... +100 concepts in 8 chapters
+[68/260] Distributed Systems - Maarten van Steen (Copy)... +135 concepts in 26 chapters
+[69/260] Distributed Systems 4e - Tanenbaum van Steen... +172 concepts in 28 chapters
+[70/260] Distributed Systems Principles and Paradigms 2nd E... +129 concepts in 26 chapters
+[71/260] Docker Deep Dive - Nigel Poulton... +165 concepts in 15 chapters
+[72/260] Effective-Python... +269 concepts in 41 chapters
+[73/260] Effective_Modern_C++... +282 concepts in 29 chapters
+[74/260] Essential Test-Driven Development... +83 concepts in 6 chapters
+[75/260] Evaluating Machine Learning Models - Alice Zheng... +12 concepts in 2 chapters
+[76/260] Feature Engineering for Machine Learning - Alice Z... +108 concepts in 14 chapters
+[77/260] Fifty Quick Ideas To Improve Your Tests... +64 concepts in 11 chapters
+[78/260] Fluent Python 2nd... +457 concepts in 38 chapters
+[79/260] From APIs to Microservices - Design and Build... +15 concepts in 6 chapters
+[80/260] Game Design Workshop... +270 concepts in 35 chapters
+[81/260] Game Programming Gems 1... +324 concepts in 54 chapters
+[82/260] Game Programming Gems 2... +290 concepts in 48 chapters
+[83/260] Game Programming Gems 3... +368 concepts in 59 chapters
+[84/260] Game Programming Gems 4... (no new concepts)
+[85/260] Game Programming Gems 6... (no new concepts)
+[86/260] Game Programming Gems 7... +307 concepts in 50 chapters
+[87/260] Game Programming Gems 8... +351 concepts in 49 chapters
+[88/260] Game_Engine_Architecture... +204 concepts in 23 chapters
+[89/260] Generative AI with LangChain_2e... +487 concepts in 46 chapters
+[90/260] GitOps Cookbook - Red Hat... +182 concepts in 18 chapters
+[91/260] Growing Object Oriented Software Guided by Tests... +321 concepts in 36 chapters
+[92/260] Growing Object-Oriented Software Guided by Tests... +5 concepts in 4 chapters
+[93/260] HTTP2-high-perf-browser-networking... +18 concepts in 4 chapters
+[94/260] Hands-On Machine Learning with Scikit-Learn Keras ... +68 concepts in 8 chapters
+[95/260] Hands-on Test-Driven Development Using Ruby... +194 concepts in 24 chapters
+[96/260] High Performance MySQL 4th Edition... +264 concepts in 38 chapters
+[97/260] Impact Mapping... +34 concepts in 10 chapters
+[98/260] Incident Response and Computer Forensics 3e - Jaso... +437 concepts in 53 chapters
+[99/260] Infrastructure as Code 2nd Edition - Kief Morris... +84 concepts in 5 chapters
+[100/260] Infrastructure as Code 2nd Edition... +231 concepts in 19 chapters
+[101/260] Investigating The Smells of LLM Generated Code... +20 concepts in 1 chapters
+[102/260] Kafka Streams in Action... +137 concepts in 19 chapters
+[103/260] Kubeflow for Machine Learning - Trevor Grant... +88 concepts in 5 chapters
+[104/260] Kubernetes Microservices with Docker... +108 concepts in 13 chapters
+[105/260] Kubernetes Patterns - Bilgin Ibryam Roland Huss... +151 concepts in 20 chapters
+[106/260] Kubernetes Security - Liz Rice... +18 concepts in 2 chapters
+[107/260] Kubernetes Up and Running 3rd Edition - Brendan Bu... +91 concepts in 7 chapters
+[108/260] Kubernetes in Action 2nd Edition - Marko Luksa... +39 concepts in 2 chapters
+[109/260] Kubernetes_OpenShift... +23 concepts in 3 chapters
+[110/260] LLM Engineers Handbook - Paul Iusztin... +102 concepts in 4 chapters
+[111/260] LLM-Engineers-Handbook... +438 concepts in 38 chapters
+[112/260] Learning GitHub Copilot... +122 concepts in 8 chapters
+[113/260] Learning Python Ed6... +114 concepts in 10 chapters
+[114/260] Lessons Learned in Software Testing... +136 concepts in 24 chapters
+[115/260] Machine Learning Design Patterns... +177 concepts in 22 chapters
+[116/260] Machine Learning Engineering... +18 concepts in 2 chapters
+[117/260] Machine Learning Production Systems - Robert Crowe... +210 concepts in 13 chapters
+[118/260] Machine Learning in Microservices - Mohamed Abouah... +103 concepts in 11 chapters
+[119/260] Machine Learning in Production - Suhas Pote... +228 concepts in 18 chapters
+[120/260] Managing Risk and Information Security... +69 concepts in 10 chapters
+[121/260] Managing_Kubernetes... +45 concepts in 6 chapters
+[122/260] Mastering Microservices with Java... +123 concepts in 6 chapters
+[123/260] Mastering Test-Driven Development with PHP 8... +262 concepts in 45 chapters
+[124/260] Microservice APIs Using Python Flask FastAPI... +392 concepts in 27 chapters
+[125/260] Microservice Architecture - ALIGNING PRINCIPLES, P... +54 concepts in 7 chapters
+[126/260] Microservices Architecture for eCommerce... +68 concepts in 9 chapters
+[127/260] Microservices Best Practices for Java... +101 concepts in 9 chapters
+[128/260] Microservices Deployment Cookbook... +185 concepts in 7 chapters
+[129/260] Microservices Patterns... +70 concepts in 7 chapters
+[130/260] Microservices Up and Running... +247 concepts in 19 chapters
+[131/260] Microservices for the Enterprise - Designing, Deve... +50 concepts in 5 chapters
+[132/260] Microservices from Day One - Build robust and scal... +198 concepts in 20 chapters
+[133/260] Microservices from Theory to Practice - Creating A... +71 concepts in 8 chapters
+[134/260] Microservices in Action... +193 concepts in 24 chapters
+[135/260] Modern C for Machine Learning - Aarav Joshi... +1007 concepts in 71 chapters
+[136/260] MongoDB The Definitive Guide... +260 concepts in 46 chapters
+[137/260] Monitoring Distributed Systems - Google SRE... +15 concepts in 2 chapters
+[138/260] Monitoring with Prometheus - James Turnbull... +99 concepts in 8 chapters
+[139/260] More Effective C++... +252 concepts in 32 chapters
+[140/260] Observability Engineering - Charity Majors... +146 concepts in 17 chapters
+[141/260] PHP Microservices... +211 concepts in 20 chapters
+[142/260] Platform Engineering on Kubernetes - Mauricio Sala... +109 concepts in 10 chapters
+[143/260] PostgreSQL 14 Internals... +188 concepts in 29 chapters
+[144/260] PostgreSQL Up and Running... +135 concepts in 9 chapters
+[145/260] Practical DataOps... (no new concepts)
+[146/260] Practical Statistics for Data Scientists... +61 concepts in 5 chapters
+[147/260] Practical_Time_Series_Analysis_MemSQL... +22 concepts in 2 chapters
+[148/260] Pragmatic Unit Testing In CSharp with NUnit 2nd Ed... +110 concepts in 16 chapters
+[149/260] Principles of Transaction Processing (2nd copy)... +195 concepts in 25 chapters
+[150/260] Principles of Transaction Processing... +195 concepts in 25 chapters
+[151/260] Pro DevOps with Google Cloud Platform - With Docke... +130 concepts in 6 chapters
+[152/260] Production Kubernetes - Josh Rosso... +149 concepts in 18 chapters
+[153/260] Production-Ready Microservices... (no new concepts)
+[154/260] Programming in Python 3 (2nd copy)... +384 concepts in 61 chapters
+[155/260] Programming in Python 3... +384 concepts in 61 chapters
+[156/260] Prometheus Up and Running 2nd Edition - Brian Braz... +132 concepts in 13 chapters
+[157/260] Python Architecture Patterns... +239 concepts in 12 chapters
+[158/260] Python Cookbook 3rd... +180 concepts in 13 chapters
+[159/260] Python Data Analysis 3rd... +73 concepts in 9 chapters
+[160/260] Python Distilled... +262 concepts in 36 chapters
+[161/260] Python Essential Reference 4th... +394 concepts in 35 chapters
+[162/260] Python Microservices Development... +374 concepts in 28 chapters
+[163/260] Readings in Database Systems... +20 concepts in 3 chapters
+[164/260] Real World Natural Language Processing... +277 concepts in 33 chapters
+[165/260] Refactoring - Martin Fowler... +104 concepts in 12 chapters
+[166/260] Refactoring Improving the Design of Existing Code ... +287 concepts in 43 chapters
+[167/260] Release It! Design and Deploy Production-Ready Sof... +259 concepts in 26 chapters
+[168/260] Reliable Machine Learning... +147 concepts in 16 chapters
+[169/260] Remote Team Interactions Workbook - Matthew Skelto... +19 concepts in 3 chapters
+[170/260] SQL Performance Explained... +145 concepts in 28 chapters
+[171/260] SQL for Data Analysis... +134 concepts in 28 chapters
+[172/260] SafeGenBench - A Benchmark Framework for Security ... +35 concepts in 3 chapters
+[173/260] Security Chaos Engineering - Kelly Shortridge Aaro... +50 concepts in 3 chapters
+[174/260] Security and Quality in LLM-Generated Code... +12 concepts in 1 chapters
+[175/260] Security-Focused Guide for AI Code Assistant Instr... +33 concepts in 2 chapters
+[176/260] Seeking SRE - David Blank-Edelman... +195 concepts in 18 chapters
+[177/260] Serverless Architectures on AWS 2nd Edition - Pete... +139 concepts in 12 chapters
+[178/260] Serverless Architectures with AWS - Mohit Gupta... +80 concepts in 9 chapters
+[179/260] Seven Databases in Seven Weeks... +156 concepts in 8 chapters
+[180/260] Site Reliability Engineering - Betsy Beyer... +187 concepts in 18 chapters
+[181/260] Software Architecture in Practice 3rd Edition... +278 concepts in 39 chapters
+[182/260] Software Architecture... +140 concepts in 24 chapters
+[183/260] Software Engineering v3... +457 concepts in 43 chapters
+[184/260] Software Testing A Craftsmans Approach 4th Edition... +109 concepts in 24 chapters
+[185/260] Spring Microservices - Build scalable microservice... +92 concepts in 5 chapters
+[186/260] Streaming Systems - Tyler Akidau... +44 concepts in 5 chapters
+[187/260] Supercharged Coding With Genai From Vibe Coding To... +50 concepts in 4 chapters
+[188/260] Team Topologies 2nd Edition - Matthew Skelton... +82 concepts in 19 chapters
+[189/260] Terraform Up and Running - Yevgeniy Brikman... +271 concepts in 23 chapters
+[190/260] Test-Driven Development by Example - Kent Beck... +89 concepts in 17 chapters
+[191/260] Testing Microservices with Mountebank... +81 concepts in 6 chapters
+[192/260] The Art of Scalability - Martin Abbott... +246 concepts in 35 chapters
+[193/260] The Art of Software Testing 3rd Edition... +56 concepts in 9 chapters
+[194/260] The Data Warehouse Toolkit 3rd Edition... +323 concepts in 51 chapters
+[195/260] The Design of Everyday Things... +143 concepts in 38 chapters
+[196/260] The DevOps Handbook - Gene Kim... +225 concepts in 36 chapters
+[197/260] The DevOps Handbook... +248 concepts in 34 chapters
+[198/260] The Hidden Risks of LLM-Generated Web Application ... +16 concepts in 2 chapters
+[199/260] The Lean Startup... +165 concepts in 32 chapters
+[200/260] The Little Book Of Python-Anti-Patterns... +57 concepts in 8 chapters
+[201/260] The Phoenix Project - Gene Kim... +171 concepts in 32 chapters
+[202/260] The Practice of Cloud System Administration - Tom ... +254 concepts in 32 chapters
+[203/260] The Practice of System and Network Administration ... +500 concepts in 44 chapters
+[204/260] The Pragmatic Programmer - David Thomas... +94 concepts in 5 chapters
+[205/260] The Pragmatic Programmer... +271 concepts in 37 chapters
+[206/260] The Site Reliability Workbook - Betsy Beyer... +239 concepts in 27 chapters
+[207/260] The Unicorn Project - Gene Kim... +118 concepts in 12 chapters
+[208/260] The Web Application Hackers Handbook 2nd Edition... +402 concepts in 34 chapters
+[209/260] Thinking in Systems... +91 concepts in 23 chapters
+[210/260] Threat Modeling... +90 concepts in 5 chapters
+[211/260] Unknown Book - Feb Download... +278 concepts in 55 chapters
+[212/260] Vibe Coding The Future of Programming... +28 concepts in 2 chapters
+[213/260] Working Effectively with Legacy Code - Michael Fea... +281 concepts in 34 chapters
+[214/260] Writing Great Specifications... +56 concepts in 6 chapters
+[215/260] anomaly-detection-monitoring... +7 concepts in 1 chapters
+[216/260] antifragile-systems-and-teams... +8 concepts in 2 chapters
+[217/260] architecting-data-lakes... (no new concepts)
+[218/260] azure-for-developers... +23 concepts in 3 chapters
+[219/260] beyond-the-twelve-factor-app... +32 concepts in 5 chapters
+[220/260] building-reactive-microservices-in-java... +10 concepts in 1 chapters
+[221/260] chatops... +72 concepts in 11 chapters
+[222/260] cl-cloud-native-container-design-whitepaper-f8808k... +8 concepts in 1 chapters
+[223/260] compliance-at-speed... +19 concepts in 3 chapters
+[224/260] cracking-security-misconceptions... +3 concepts in 1 chapters
+[225/260] designing-great-web-apis... (no new concepts)
+[226/260] devopssec... +20 concepts in 2 chapters
+[227/260] docker-networking-and-service-delivery... +11 concepts in 2 chapters
+[228/260] docker-security... +48 concepts in 5 chapters
+[229/260] effective-performance-engineering... +6 concepts in 1 chapters
+[230/260] enterprise-devops-playbook... +13 concepts in 2 chapters
+[231/260] everything-is-distributed... +9 concepts in 2 chapters
+[232/260] evolving-architectures-of-fintech... +7 concepts in 1 chapters
+[233/260] fast-data-smart-and-at-scale... +5 concepts in 1 chapters
+[234/260] functional-programming-python... +28 concepts in 4 chapters
+[235/260] getting-started-with-innersource... +20 concepts in 3 chapters
+[236/260] hadoop-and-spark-performance-for-the-enterprise... +6 concepts in 1 chapters
+[237/260] hadoop-what-you-need-to-know... +3 concepts in 1 chapters
+[238/260] hadoop-with-python... +19 concepts in 3 chapters
+[239/260] how-to-make-mistakes-in-python... +65 concepts in 6 chapters
+[240/260] immutable-infrastructure... (no new concepts)
+[241/260] learning-from-first-responders... +11 concepts in 2 chapters
+[242/260] makinggames... +109 concepts in 32 chapters
+[243/260] managing-kubernetes-performance-at-scale... +25 concepts in 3 chapters
+[244/260] microservices-antipatterns-and-pitfalls... +8 concepts in 2 chapters
+[245/260] microservices-in-production... (no new concepts)
+[246/260] microservices-vs-service-oriented-architecture... +7 concepts in 1 chapters
+[247/260] migrating-cloud-native-application-architectures... (no new concepts)
+[248/260] migrating-to-microservice-databases... +15 concepts in 2 chapters
+[249/260] operating_systems_three_easy_pieces... +301 concepts in 53 chapters
+[250/260] optimizing-cloud-migration... +3 concepts in 1 chapters
+[251/260] patrolling-the-dark-net... +21 concepts in 2 chapters
+[252/260] reactive-microservices-architecture-orm... (no new concepts)
+[253/260] release-engineering... (no new concepts)
+[254/260] security-data-lake... (no new concepts)
+[255/260] serverless-ops... +10 concepts in 2 chapters
+[256/260] software-architecture-patterns... +8 concepts in 2 chapters
+[257/260] the-human-side-of-postmortems... +12 concepts in 4 chapters
+[258/260] unikernels... +42 concepts in 5 chapters
+[259/260] unsung-tools-of-devops... +18 concepts in 3 chapters
+[260/260] xUnit Test Patterns... +269 concepts in 21 chapters
+
+======================================================================
+EXTRACTION COMPLETE - READY FOR AUDIT
+======================================================================
+Time elapsed: 0:00:13.723266
+Books processed: 260
+Books with extractions: 246
+
+Chapters total: 7010
+Chapters with sufficient concepts (>= 1): 2593
+Chapters with low/no concepts: 4417
+  - With keywords (processed): 4417
+  - No keywords (skipped): 0
+
+Total concepts extracted: 37141
+Unique concepts: 199
+
+Domain breakdown:
+  cpp_systems: 16341
+  devops_cicd: 5883
+  web_development: 3548
+  python_implementation: 3017
+  llm_rag: 2181
+  database_storage: 1294
+  security: 1213
+  cloud_infrastructure: 1034
+  design_patterns: 949
+  microservices_architecture: 482
+  concurrency_parallelism: 455
+  testing_quality: 437
+  data_science_ml: 307
+
+Output saved to: /Users/kevintoles/POC/Code-Orchestrator-Service/data/concept_extraction.jsonl
+
+Next steps:
+  1. Run: python3 scripts/prepare_concepts_for_llm_audit.py
+  2. Send to DeepSeek + ChatGPT for consensus filtering
+  3. Run backfill with validated concepts

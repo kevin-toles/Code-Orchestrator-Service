@@ -21,6 +21,9 @@ services:
     volumes:
       - model-cache:/app/cache/models
       - ./logs:/app/logs
+      - ./data:/app/data
+      - /Users/kevintoles/POC/semantic-search-service/config:/app/config/semantic-search
+      - /Users/kevintoles/POC/textbooks/Taxonomies:/app/config/taxonomies
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
       interval: 30s
