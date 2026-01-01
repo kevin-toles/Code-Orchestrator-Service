@@ -89,6 +89,7 @@ STAGE_NOISE_FILTER: Final[str] = "noise_filter"
 STAGE_DICTIONARY: Final[str] = "dictionary_validation"
 STAGE_QUALITY: Final[str] = "quality"
 STAGE_CLASSIFICATION: Final[str] = "classification"
+STAGE_SUMMARY: Final[str] = "summary"
 
 # Default paths
 DEFAULT_TAXONOMY_PATH: Final[str] = "config/domain_taxonomy.json"
@@ -119,8 +120,10 @@ class MetadataExtractorConfig:
         enable_concepts: Whether to extract concepts.
         enable_domain_detection: Whether to detect domain.
         enable_classification: Whether to use HTC to classify terms.
+        enable_summary: Whether to generate LLM summary via inference-service.
         alias_lookup_path: Path to alias lookup JSON.
         model_path: Path to trained classifier model.
+        inference_service_url: URL of inference-service for summary generation.
     """
 
     domain_taxonomy_path: str | None = None
@@ -128,8 +131,10 @@ class MetadataExtractorConfig:
     enable_concepts: bool = True
     enable_domain_detection: bool = True
     enable_classification: bool = True
+    enable_summary: bool = True
     alias_lookup_path: str | None = None
     model_path: str | None = None
+    inference_service_url: str | None = None
 
 
 @dataclass
@@ -154,6 +159,7 @@ class ExtractionResult:
 
     keywords: list[KeywordResult] = field(default_factory=list)
     concepts: list[ConceptResult] = field(default_factory=list)
+    summary: str | None = None
     detected_domain: str | None = None
     domain_confidence: float | None = None
     quality_score: float = 0.0
@@ -165,6 +171,8 @@ class ExtractionResult:
     pipeline_metadata: dict[str, Any] | None = None
     dedup_stats: dict[str, int] | None = None
     classification_stats: dict[str, int] | None = None
+    summary_model: str | None = None
+    summary_tokens: int = 0
 
 
 # =============================================================================
@@ -445,6 +453,70 @@ class MetadataExtractor:
         result.processing_time_ms = (end_time - start_time) * 1000
 
         return result
+
+    async def extract_async(
+        self,
+        text: str,
+        title: str | None = None,
+        book_title: str | None = None,
+        options: MetadataExtractionOptions | None = None,
+    ) -> ExtractionResult:
+        """Extract metadata from text with async summary generation.
+
+        Same as extract() but adds LLM-generated summary via inference-service.
+        Internal microservice communication - does NOT go through Gateway.
+
+        Args:
+            text: The text to extract metadata from.
+            title: Optional title for context.
+            book_title: Optional book title for domain inference.
+            options: Extraction options (enable_summary controls summary generation).
+
+        Returns:
+            ExtractionResult with keywords, concepts, domain, quality, and summary.
+        """
+        # Run synchronous extraction first
+        result = self.extract(text, title, book_title, options)
+        
+        # Generate summary if enabled
+        opts = options or MetadataExtractionOptions()
+        if opts.enable_summary and self.config.enable_summary:
+            summary_result = await self._generate_summary_async(text, title)
+            if summary_result:
+                result.summary = summary_result.summary
+                result.summary_model = summary_result.model
+                result.summary_tokens = summary_result.tokens_used
+                result.stages_completed.append(STAGE_SUMMARY)
+
+        return result
+
+    async def _generate_summary_async(
+        self,
+        text: str,
+        title: str | None = None,
+    ) -> "SummaryResult | None":
+        """Generate summary using inference-service.
+
+        Internal call to inference-service (port 8085) - does NOT use Gateway.
+        
+        Args:
+            text: Chapter text to summarize.
+            title: Optional chapter title for context.
+
+        Returns:
+            SummaryResult or None if generation fails.
+        """
+        try:
+            from src.clients.inference_client import InferenceClient
+            
+            inference_url = self.config.inference_service_url or "http://localhost:8085"
+            async with InferenceClient(base_url=inference_url) as client:
+                return await client.generate_summary(text, title)
+        except Exception as e:
+            # Log error but don't fail extraction
+            import logging
+            logging.warning(f"Summary generation failed: {e}")
+            return None
 
     def _log_pre_filter_extraction(
         self,

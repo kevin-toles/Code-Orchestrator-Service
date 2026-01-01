@@ -110,24 +110,33 @@ async def extract_metadata(
         request: MetadataExtractionRequest with text and options.
 
     Returns:
-        MetadataExtractionResponse with keywords, concepts, metadata.
+        MetadataExtractionResponse with keywords, concepts, summary, metadata.
     """
     # Get cached extractor (Anti-Pattern #12)
     extractor = get_metadata_extractor()
 
-    # Perform extraction
-    result = extractor.extract(
-        text=request.text,
-        title=request.title,
-        book_title=request.book_title,
-        options=request.options,
-    )
+    # Use async extraction if summary is enabled (calls inference-service)
+    opts = request.options or MetadataExtractionOptions()
+    if opts.enable_summary:
+        result = await extractor.extract_async(
+            text=request.text,
+            title=request.title,
+            book_title=request.book_title,
+            options=request.options,
+        )
+    else:
+        result = extractor.extract(
+            text=request.text,
+            title=request.title,
+            book_title=request.book_title,
+            options=request.options,
+        )
 
     # Build response
     return MetadataExtractionResponse(
         keywords=result.keywords,
         concepts=result.concepts,
-        summary=None,  # Summary not implemented yet
+        summary=result.summary,
         metadata=ExtractionMetadata(
             processing_time_ms=result.processing_time_ms,
             text_length=result.text_length,
