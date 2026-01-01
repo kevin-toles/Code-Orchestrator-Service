@@ -18,6 +18,62 @@ This document tracks all implementation changes, their rationale, and git commit
 
 ---
 
+## 2026-01-01
+
+### CL-025: Graceful Model Degradation & Think Tag Stripping
+
+| Field | Value |
+|-------|-------|
+| **Date/Time** | 2026-01-01 |
+| **WBS Item** | WBS-KB10 (Summarization Pipeline Support) |
+| **Change Type** | Feature |
+| **Summary** | Implemented graceful model degradation in InferenceClient - system now uses whatever LLM is loaded rather than failing. Added think tag stripping for DeepSeek-R1 output. Increased max_tokens for thinking models. |
+| **Files Changed** | `src/clients/inference_client.py` |
+| **Rationale** | Hardcoded model preference caused failures when requested model wasn't loaded. Thinking models (DeepSeek-R1) include `<think>...</think>` reasoning blocks that shouldn't appear in final output. 500 max_tokens was insufficient for thinking models that spend 80% of tokens on reasoning. |
+| **Git Commit** | Pending |
+
+**Changes Implemented**:
+
+| Component | Change | Purpose |
+|-----------|--------|---------|
+| `DEFAULT_MODEL` | Changed from `"qwen2.5-7b"` to `None` | No hardcoded model preference |
+| `get_loaded_models()` | New method | Query inference-service for loaded models |
+| `_resolve_model()` | New method | Graceful degradation - use any loaded model |
+| `_strip_think_tags()` | New method | Remove `<think>...</think>` blocks from output |
+| `max_tokens` | Increased from 500 to 1500 | Thinking models need more output tokens |
+
+**Graceful Degradation Logic**:
+```python
+def _resolve_model(self, requested_model: str | None) -> str:
+    """Use requested model if loaded, else use any loaded model."""
+    loaded = self.get_loaded_models()
+    if not loaded:
+        raise RuntimeError("No models loaded in inference-service")
+    if requested_model and requested_model in loaded:
+        return requested_model
+    # Fallback to first loaded model
+    logger.warning(f"Model '{requested_model}' not loaded, using '{loaded[0]}'")
+    return loaded[0]
+```
+
+**Think Tag Stripping** (regex-based):
+```python
+def _strip_think_tags(self, text: str) -> str:
+    """Remove DeepSeek-R1 <think>...</think> reasoning blocks."""
+    # Complete tags
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL)
+    # Incomplete opening tags (streaming edge case)
+    text = re.sub(r'<think>.*$', '', text, flags=re.DOTALL)
+    return text.strip()
+```
+
+**Architecture Alignment**:
+- ✅ Kitchen Brigade: Code-Orchestrator (Line Cook) adapts to available resources
+- ✅ Follows WBS-KB10: Supports summarization pipeline with any loaded model
+- ✅ Anti-Pattern #12: Graceful degradation prevents hard failures
+
+---
+
 ## 2025-12-27
 
 ### CL-024: WBS-AC4 Complete - LLM Fallback (Tier 4) ✅

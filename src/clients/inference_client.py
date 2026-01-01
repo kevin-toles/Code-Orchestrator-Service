@@ -38,8 +38,9 @@ DEFAULT_RETRY_DELAY: Final[float] = 1.0
 ENDPOINT_CHAT: Final[str] = "/v1/chat/completions"
 ENDPOINT_MODELS: Final[str] = "/v1/models"
 
-# Default model for summarization (fast, good quality)
-DEFAULT_MODEL: Final[str] = os.getenv("INFERENCE_SUMMARY_MODEL", "qwen2.5-7b")
+# Default model - None means let inference-service decide via graceful degradation
+# The inference-service will use whatever model is currently loaded
+DEFAULT_MODEL: Final[str | None] = os.getenv("INFERENCE_SUMMARY_MODEL") or None
 
 # Summary generation prompt template
 SUMMARY_PROMPT_TEMPLATE: Final[str] = """Generate a concise summary of the following chapter content.
@@ -152,18 +153,63 @@ class InferenceClient:
             await self._client.aclose()
             self._client = None
 
+    async def get_loaded_models(self) -> list[str]:
+        """Get list of currently loaded models from inference-service.
+        
+        Returns:
+            List of model IDs that are currently loaded and ready.
+        """
+        if self._client is None:
+            raise InferenceClientError("Client not initialized. Use async context manager.")
+        
+        try:
+            response = await self._client.get(ENDPOINT_MODELS)
+            response.raise_for_status()
+            data = response.json()
+            # Return only models with status "loaded"
+            return [m["id"] for m in data.get("data", []) if m.get("status") == "loaded"]
+        except Exception:
+            return []
+
+    async def _resolve_model(self) -> str:
+        """Resolve which model to use for generation.
+        
+        Strategy (graceful degradation):
+        1. Query inference-service for loaded models
+        2. If preferred model (self.model) is loaded, use it
+        3. Otherwise, use first available loaded model
+        4. If nothing loaded, raise clear error
+        
+        Returns:
+            Model ID to use for generation.
+            
+        Raises:
+            InferenceClientError: If no models are loaded.
+        """
+        loaded = await self.get_loaded_models()
+        
+        if not loaded:
+            raise InferenceClientError("No models loaded in inference-service")
+        
+        if self.model and self.model in loaded:
+            # Preferred model is loaded - use it
+            return self.model
+        
+        # Use first loaded model (graceful degradation)
+        return loaded[0]
+
     async def generate_summary(
         self,
         text: str,
         title: str | None = None,
-        max_tokens: int = 500,
+        max_tokens: int = 1500,
     ) -> SummaryResult:
         """Generate a summary for the given text using LLM.
 
         Args:
             text: Chapter/document text to summarize
             title: Optional title for context
-            max_tokens: Maximum tokens in response
+            max_tokens: Maximum tokens in response (1500 to accommodate thinking models)
 
         Returns:
             SummaryResult with generated summary
@@ -176,6 +222,9 @@ class InferenceClient:
         if self._client is None:
             raise InferenceClientError("Client not initialized. Use async context manager.")
 
+        # Resolve which model to use (prefer loaded models)
+        model_to_use = await self._resolve_model()
+
         # Build prompt
         prompt = SUMMARY_PROMPT_TEMPLATE.format(
             title=title or "Untitled",
@@ -184,7 +233,7 @@ class InferenceClient:
 
         # Build request payload (OpenAI-compatible format)
         payload = {
-            "model": self.model,
+            "model": model_to_use,
             "messages": [
                 {"role": "user", "content": prompt}
             ],
@@ -236,19 +285,51 @@ class InferenceClient:
         """
         choices = data.get("choices", [])
         if not choices:
-            return SummaryResult(summary="", model=self.model)
+            return SummaryResult(summary="", model=self.model or "unknown")
 
         message = choices[0].get("message", {})
         content = message.get("content", "").strip()
+        
+        # Strip chain-of-thought <think> tags from deepseek models
+        content = self._strip_think_tags(content)
 
         usage = data.get("usage", {})
         tokens_used = usage.get("total_tokens", 0)
 
         return SummaryResult(
             summary=content,
-            model=data.get("model", self.model),
+            model=data.get("model", self.model or "unknown"),
             tokens_used=tokens_used,
         )
+
+    @staticmethod
+    def _strip_think_tags(content: str) -> str:
+        """Strip <think> tags from model output.
+        
+        DeepSeek models include chain-of-thought reasoning in <think> tags.
+        This removes those tags and returns only the final response.
+        
+        Handles:
+        - Complete <think>...</think> blocks
+        - Incomplete <think>... blocks (no closing tag - hit max_tokens)
+        
+        Args:
+            content: Raw model output
+            
+        Returns:
+            Content with thinking removed, or empty string if only thinking
+        """
+        import re
+        
+        # First try to remove complete <think>...</think> blocks
+        cleaned = re.sub(r'<think>.*?</think>\s*', '', content, flags=re.DOTALL)
+        
+        # If still has unclosed <think> tag, remove everything from <think> onwards
+        # This handles cases where model hit max_tokens during thinking
+        if '<think>' in cleaned:
+            cleaned = re.sub(r'<think>.*$', '', cleaned, flags=re.DOTALL)
+        
+        return cleaned.strip()
 
     async def health_check(self) -> bool:
         """Check if inference-service is healthy.
