@@ -506,17 +506,47 @@ class MetadataExtractor:
         Returns:
             SummaryResult or None if generation fails.
         """
+        from src.clients.inference_client import (
+            InferenceClient,
+            InferenceClientError,
+            InferenceConnectionError,
+            InferenceTimeoutError,
+            DEFAULT_INFERENCE_URL,
+        )
+        from src.core.logging import get_logger
+        
+        logger = get_logger(__name__)
+        inference_url = self.config.inference_service_url or DEFAULT_INFERENCE_URL
+        
         try:
-            from src.clients.inference_client import InferenceClient
-            
-            inference_url = self.config.inference_service_url or "http://localhost:8085"
             async with InferenceClient(base_url=inference_url) as client:
-                return await client.generate_summary(text, title)
-        except Exception as e:
-            # Log error but don't fail extraction
-            import logging
-            logging.warning(f"Summary generation failed: {e}")
-            return None
+                result = await client.generate_summary(text, title)
+                logger.info(
+                    "summary_generated",
+                    model=result.model,
+                    tokens=result.tokens_used,
+                    time_ms=result.generation_time_ms,
+                )
+                return result
+        except InferenceConnectionError as e:
+            logger.error(
+                "inference_connection_failed",
+                url=inference_url,
+                error=str(e),
+            )
+            raise RuntimeError(
+                f"Cannot connect to inference-service at {inference_url}. "
+                "Ensure inference-service is running with a model loaded."
+            ) from e
+        except InferenceTimeoutError as e:
+            logger.error("inference_timeout", url=inference_url, error=str(e))
+            raise RuntimeError(
+                f"Inference-service timeout at {inference_url}. "
+                "The model may be overloaded or text too long."
+            ) from e
+        except InferenceClientError as e:
+            logger.error("inference_error", url=inference_url, error=str(e))
+            raise RuntimeError(f"Inference-service error: {e}") from e
 
     def _log_pre_filter_extraction(
         self,
