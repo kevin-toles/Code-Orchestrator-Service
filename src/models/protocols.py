@@ -4,8 +4,7 @@ Code-Orchestrator-Service - Model Protocols
 WBS 2.1-2.4: Model Loading Infrastructure
 Defines Protocol interfaces for duck typing support.
 
-NOTE: These are HuggingFace model wrapper protocols, NOT autonomous agent protocols.
-Autonomous agents (LangGraph workflows) live in the ai-agents service.
+Models loaded from local paths in models/ directory.
 
 Naming Convention:
 - ExtractorProtocol: For models that extract/generate terms (CodeT5+)
@@ -15,39 +14,12 @@ Naming Convention:
 Patterns Applied:
 - Protocol typing for duck typing (CODING_PATTERNS_ANALYSIS.md line 130)
 - Structural subtyping (no inheritance required)
-
-Anti-Patterns Avoided:
-- Tight coupling to concrete implementations
 """
 
 from typing import Any, Protocol
 
 import numpy as np
 import numpy.typing as npt
-
-
-class ModelRegistryProtocol(Protocol):
-    """Protocol for ModelRegistry duck typing.
-
-    Enables FakeModelRegistry for testing without real HuggingFace models.
-    Pattern: Repository Pattern + FakeClient per CODING_PATTERNS_ANALYSIS.md line 130
-    """
-
-    def get_model(self, model_name: str) -> Any | None:
-        """Get a loaded model by name."""
-        ...
-
-    def is_loaded(self, model_name: str) -> bool:
-        """Check if a model is loaded."""
-        ...
-
-    def register_model(self, model_name: str, model: Any) -> None:
-        """Register a model in the cache."""
-        ...
-
-    def all_models_loaded(self) -> bool:
-        """Check if all required models are loaded."""
-        ...
 
 
 class ExtractorProtocol(Protocol):

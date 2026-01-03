@@ -1,39 +1,69 @@
 """
-Code-Orchestrator-Service - CodeT5+ Keyword Extractor
+Code-Orchestrator-Service - CodeT5+ Term Extractor
 
-WBS 2.2: CodeT5+ Extractor (Model Wrapper)
-Extracts technical terms from text using CodeT5+ model.
+WBS 2.2: Term Extractor (Model Wrapper)
+Extracts technical terms from text using CodeT5+ seq2seq model.
 
-NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
-Autonomous agents (LangGraph workflows) live in the ai-agents service.
+Uses locally hosted Salesforce/codet5p-220m for keyword generation.
+
+Architecture Role: GENERATOR
+- Encoder-decoder architecture enables text generation
+- Trained on NL↔Code pairs
+- Generates primary_terms, related_terms, code_patterns
 
 Patterns Applied:
 - Model Wrapper Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
-- FakeModelRegistry for testing (no real HuggingFace model in unit tests)
+- Generative extraction: Use T5 model to generate relevant terms
 - Pydantic response models for structured output
 
 Anti-Patterns Avoided:
-- #12: New model per request (uses cached model from registry)
+- #12: New model per request (caches tokenizer and model)
 """
 
 from __future__ import annotations
 
-import signal
-from collections.abc import Generator
-from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any
+import re
+from pathlib import Path
+from typing import Any
 
+import torch
 from pydantic import BaseModel
+from transformers import AutoTokenizer, T5ForConditionalGeneration
 
-from src.models.registry import ModelRegistry
-from src.core.exceptions import ModelNotReadyError
 from src.core.logging import get_logger
-
-if TYPE_CHECKING:
-    from src.models.registry import ModelRegistryProtocol
 
 # Get logger
 logger = get_logger(__name__)
+
+# Local model path
+_LOCAL_MODEL_PATH = Path(__file__).parent.parent.parent / "models" / "codet5"
+
+# Singleton model instances
+_tokenizer: Any | None = None
+_model: T5ForConditionalGeneration | None = None
+
+
+def _get_codet5() -> tuple[Any, T5ForConditionalGeneration]:
+    """Get or create singleton CodeT5+ model and tokenizer from local path."""
+    global _tokenizer, _model
+    if _tokenizer is None or _model is None:
+        model_path = str(_LOCAL_MODEL_PATH)
+        if not _LOCAL_MODEL_PATH.exists():
+            # Fallback to HuggingFace if local not found
+            model_path = "Salesforce/codet5p-220m"
+            logger.warning("local_codet5_not_found", path=str(_LOCAL_MODEL_PATH), using=model_path)
+        else:
+            logger.info("loading_codet5_from_local", path=model_path)
+
+        _tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        _model = T5ForConditionalGeneration.from_pretrained(model_path, trust_remote_code=True)
+
+        # Move to GPU if available
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        _model = _model.to(device)
+        logger.info("codet5_model_loaded", device=device)
+
+    return _tokenizer, _model
 
 
 class ExtractionResult(BaseModel):
@@ -50,118 +80,200 @@ class ExtractionResult(BaseModel):
 
 
 class CodeT5Extractor:
-    """CodeT5+ model wrapper for keyword extraction.
+    """CodeT5+ term extractor using generative approach.
 
-    WBS 2.2: Extracts technical terms from chapter text using CodeT5+ model.
+    WBS 2.2: Extracts technical terms from chapter text using CodeT5+ seq2seq model.
+    Uses locally hosted Salesforce/codet5p-220m.
 
-    NOTE: This is a HuggingFace model wrapper, NOT an autonomous agent.
-    - Extractor role: Generates candidate keywords from text
-    - Uses model from registry (Anti-Pattern #12 prevention)
+    Architecture Role: GENERATOR (STATE 1: EXTRACTION)
+    - Input: "Extract technical search terms for: <query>"
+    - Output: primary_terms[], related_terms[], code_patterns[]
 
-    Attributes:
-        DEFAULT_TIMEOUT_SECONDS: Default inference timeout (30s per WBS spec)
+    Approach:
+    1. Prompt CodeT5+ with extraction task
+    2. Generate keyword sequences using beam search
+    3. Parse and deduplicate extracted terms
+    4. Return top terms as primary, remaining as related
     """
 
-    DEFAULT_TIMEOUT_SECONDS: float = 30.0
+    # Common stopwords to filter from generated output
+    STOPWORDS = frozenset([
+        "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for",
+        "of", "with", "by", "from", "as", "is", "was", "are", "were", "been",
+        "be", "have", "has", "had", "do", "does", "did", "will", "would",
+        "could", "should", "may", "might", "must", "shall", "can", "need",
+        "it", "its", "this", "that", "these", "those", "such", "very", "so",
+        "just", "also", "than", "more", "most", "less", "least", "any", "some",
+    ])
 
-    def __init__(self, registry: ModelRegistryProtocol | None = None) -> None:
-        """Initialize CodeT5 extractor.
+    def __init__(self) -> None:
+        """Initialize CodeT5+ extractor with local model."""
+        self._tokenizer, self._model = _get_codet5()
+        self._device = next(self._model.parameters()).device
+        logger.info("codet5_extractor_initialized", device=str(self._device))
 
-        Args:
-            registry: ModelRegistry instance (or FakeModelRegistry for testing)
-
-        Raises:
-            ModelNotReadyError: If codet5 model not loaded in registry
-        """
-        self._registry = registry or ModelRegistry.get_registry()
-
-        # Get model from registry
-        model_tuple = self._registry.get_model("codet5")
-        if model_tuple is None:
-            raise ModelNotReadyError("CodeT5 model not loaded in registry")
-
-        self._model, self._tokenizer = model_tuple
-        logger.info("codet5_extractor_initialized")
-
-    @contextmanager
-    def _timeout_context(self, seconds: float) -> Generator[None, None, None]:
-        """Context manager for inference timeout.
+    def _generate_candidates(self, text: str) -> list[str]:
+        """Generate n-gram candidates from text as fallback.
 
         Args:
-            seconds: Timeout in seconds
+            text: Input text
 
-        Yields:
-            None
-
-        Raises:
-            TimeoutError: If code in context exceeds timeout
+        Returns:
+            List of candidate terms (1-grams, 2-grams, 3-grams)
         """
-        def _timeout_handler(signum: int, frame: Any) -> None:  # noqa: ARG001
-            raise TimeoutError(f"Inference exceeded {seconds}s timeout")
+        # Handle empty text
+        if not text or not text.strip():
+            return []
 
-        # Only use SIGALRM on Unix-like systems
-        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
-        signal.setitimer(signal.ITIMER_REAL, seconds)
-        try:
-            yield
-        finally:
-            signal.setitimer(signal.ITIMER_REAL, 0)
-            signal.signal(signal.SIGALRM, old_handler)
+        # Clean text and split into words
+        words = re.findall(r"\b[a-zA-Z][a-zA-Z0-9_-]*\b", text)
+
+        # Filter short words and stopwords for base terms
+        words = [w for w in words if len(w) > 1 and w.lower() not in self.STOPWORDS]
+
+        if not words:
+            return []
+
+        candidates = []
+
+        # 1-grams (individual words)
+        candidates.extend(words)
+
+        # 2-grams
+        for i in range(len(words) - 1):
+            candidates.append(f"{words[i]} {words[i+1]}")
+
+        # 3-grams
+        for i in range(len(words) - 2):
+            candidates.append(f"{words[i]} {words[i+1]} {words[i+2]}")
+
+        # Deduplicate while preserving order
+        seen = set()
+        unique = []
+        for c in candidates:
+            lower_c = c.lower()
+            if lower_c not in seen:
+                seen.add(lower_c)
+                unique.append(c)
+
+        return unique
+
+    def _parse_generated_terms(self, generated_text: str) -> list[str]:
+        """Parse individual terms from generated text.
+
+        Args:
+            generated_text: Raw output from CodeT5+
+
+        Returns:
+            List of parsed individual terms
+        """
+        terms = []
+
+        # Split on common delimiters
+        for delimiter in [",", ";", "\n", "|", "•", "-", ":"]:
+            if delimiter in generated_text:
+                parts = generated_text.split(delimiter)
+                for p in parts:
+                    cleaned = p.strip()
+                    if cleaned and len(cleaned) > 1:
+                        # Filter stopwords
+                        if cleaned.lower() not in self.STOPWORDS:
+                            terms.append(cleaned)
+                return terms
+
+        # No delimiter found - extract words/phrases
+        words = re.findall(r"\b[a-zA-Z][a-zA-Z0-9_-]*\b", generated_text)
+        for w in words:
+            if len(w) > 2 and w.lower() not in self.STOPWORDS:
+                terms.append(w)
+
+        return terms
 
     def extract_terms(
         self,
         text: str,
-        timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
+        top_k: int = 5,
+        related_k: int = 5,
+        max_length: int = 64,
+        num_beams: int = 4,
     ) -> ExtractionResult:
-        """Extract technical terms from text.
+        """Extract technical terms from text using CodeT5+ generation.
 
         WBS 2.2.2: Input text → Output primary_terms[], related_terms[]
 
+        Architecture: STATE 1 EXTRACTION using CodeT5+ seq2seq
+
         Args:
             text: Input text to extract terms from
-            timeout_seconds: Maximum time for inference (default 30s)
+            top_k: Number of primary terms to return
+            related_k: Number of related terms to return
+            max_length: Maximum generation length
+            num_beams: Number of beams for beam search
 
         Returns:
             ExtractionResult with primary and related terms
-
-        Raises:
-            TimeoutError: If inference exceeds timeout
         """
-        logger.debug("extracting_terms", text_length=len(text))
+        logger.debug("extracting_terms_codet5", text_length=len(text))
 
-        # Build prompt for term extraction
-        prompt = f"Extract technical terms from: {text}"
+        # Handle empty or whitespace-only input
+        if not text or not text.strip():
+            logger.info("empty_text_input")
+            return ExtractionResult(primary_terms=[], related_terms=[])
 
-        try:
-            with self._timeout_context(timeout_seconds):
-                # Tokenize
-                inputs = self._tokenizer(
-                    prompt,
-                    return_tensors="pt",
-                    max_length=512,
-                    truncation=True,
-                )
+        # Truncate input if too long (CodeT5+ has 512 token limit)
+        truncated_text = text[:1500] if len(text) > 1500 else text
 
-                # Generate
-                outputs = self._model.generate(
-                    inputs["input_ids"],
-                    max_length=100,
-                    num_beams=4,
-                    early_stopping=True,
-                )
+        # Format as code-like prompt (CodeT5+ works better with code-style input)
+        prompt = f"# Extract keywords from: {truncated_text}"
 
-                # Decode
-                generated = self._tokenizer.decode(outputs[0], skip_special_tokens=True)
+        # Tokenize
+        inputs = self._tokenizer(
+            prompt,
+            return_tensors="pt",
+            max_length=512,
+            truncation=True,
+        ).to(self._device)
 
-        except TimeoutError:
-            logger.warning("extraction_timeout", timeout=timeout_seconds)
-            raise
+        # Generate with beam search
+        with torch.no_grad():
+            outputs = self._model.generate(
+                **inputs,
+                max_length=max_length,
+                num_beams=num_beams,
+                num_return_sequences=min(num_beams, 3),
+                early_stopping=True,
+                do_sample=False,
+            )
 
-        # Parse generated output
-        primary_terms, related_terms = self._parse_output(generated)
+        # Decode generated sequences
+        generated_texts = self._tokenizer.batch_decode(outputs, skip_special_tokens=True)
+
+        # Parse terms from all generated sequences
+        all_terms: list[str] = []
+        for gen_text in generated_texts:
+            parsed = self._parse_generated_terms(gen_text)
+            all_terms.extend(parsed)
+
+        # If CodeT5+ output is poor, fall back to n-gram extraction
+        if len(all_terms) < 3:
+            logger.info("codet5_fallback_to_ngrams", generated_count=len(all_terms))
+            all_terms = self._generate_candidates(text)
+
+        # Deduplicate while preserving order
+        seen = set()
+        unique_terms = []
+        for term in all_terms:
+            lower_term = term.lower().strip()
+            if lower_term and lower_term not in seen and len(lower_term) > 1:
+                seen.add(lower_term)
+                unique_terms.append(term.strip())
+
+        # Split into primary and related
+        primary_terms = unique_terms[:top_k]
+        related_terms = unique_terms[top_k:top_k + related_k]
 
         logger.info(
-            "terms_extracted",
+            "codet5_terms_extracted",
             primary_count=len(primary_terms),
             related_count=len(related_terms),
         )
@@ -170,69 +282,6 @@ class CodeT5Extractor:
             primary_terms=primary_terms,
             related_terms=related_terms,
         )
-
-    def _parse_output(self, generated: str) -> tuple[list[str], list[str]]:
-        """Parse model output into primary and related terms.
-
-        Args:
-            generated: Raw model output string
-
-        Returns:
-            Tuple of (primary_terms, related_terms)
-        """
-        primary_terms: list[str] = []
-        related_terms: list[str] = []
-
-        # Look for "primary:" and "related:" markers
-        lower_gen = generated.lower()
-
-        if "primary:" in lower_gen:
-            parts = generated.split("primary:", 1)
-            if len(parts) > 1:
-                primary_part = parts[1]
-                if "related:" in primary_part.lower():
-                    primary_part = primary_part.lower().split("related:")[0]
-                primary_terms = self._extract_terms_from_text(primary_part)
-
-        if "related:" in lower_gen:
-            parts = lower_gen.split("related:", 1)
-            if len(parts) > 1:
-                related_terms = self._extract_terms_from_text(parts[1])
-
-        # Fallback: if no markers, split by comma/semicolon
-        if not primary_terms and not related_terms:
-            all_terms = self._extract_terms_from_text(generated)
-            # First half as primary, second half as related
-            mid = len(all_terms) // 2 if len(all_terms) > 1 else len(all_terms)
-            primary_terms = all_terms[:mid] if mid > 0 else all_terms
-            related_terms = all_terms[mid:] if mid < len(all_terms) else []
-
-        return primary_terms, related_terms
-
-    def _extract_terms_from_text(self, text: str) -> list[str]:
-        """Extract individual terms from text.
-
-        Args:
-            text: Text containing terms separated by commas or semicolons
-
-        Returns:
-            List of cleaned term strings
-        """
-        # Split by common delimiters
-        import re
-
-        terms = re.split(r"[,;]", text)
-
-        # Clean and filter
-        cleaned = []
-        for term in terms:
-            t = term.strip()
-            # Remove quotes and trailing punctuation
-            t = t.strip("\"'")
-            if t and len(t) > 1:
-                cleaned.append(t)
-
-        return cleaned
 
     def extract_terms_batch(self, texts: list[str]) -> list[ExtractionResult]:
         """Batch process multiple texts.
@@ -248,12 +297,12 @@ class CodeT5Extractor:
         if not texts:
             return []
 
-        logger.info("batch_extraction_started", count=len(texts))
+        logger.info("codet5_batch_extraction_started", count=len(texts))
 
         results = []
         for text in texts:
             result = self.extract_terms(text)
             results.append(result)
 
-        logger.info("batch_extraction_completed", count=len(results))
+        logger.info("codet5_batch_extraction_completed", count=len(results))
         return results

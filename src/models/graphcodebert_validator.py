@@ -1,44 +1,79 @@
 """
 Code-Orchestrator-Service - GraphCodeBERT Term Validator
 
-WBS 2.3: GraphCodeBERT Validator (Model Wrapper)
-Validates and filters technical terms using GraphCodeBERT model embeddings.
+WBS 2.3: Term Validator (Model Wrapper)
+Validates and filters technical terms using GraphCodeBERT model.
 
-NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
-Autonomous agents (LangGraph workflows) live in the ai-agents service.
+Uses locally hosted microsoft/graphcodebert-base for semantic validation.
 
-GraphCodeBERT Capabilities Used:
-- Semantic embeddings for term-query relevance scoring
-- Cosine similarity for term validation (threshold-based filtering)
-- Domain classification via embedding space clustering
+Architecture Role: VALIDATOR (STATE 2: VALIDATION)
+- Understands code structure via data flow graphs
+- Catches semantic mismatches
+- Filters generic terms ("split", "data")
+- Domain classification
+
+GraphCodeBERT Capabilities:
+- 768-dimensional embeddings (RoBERTa-based)
+- Code structure awareness from pre-training
+- Semantic validation via cosine similarity
 
 Patterns Applied:
 - Model Wrapper Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
-- FakeModelRegistry for testing (no real HuggingFace model in unit tests)
+- Singleton model loading for efficiency
 - Pydantic response models for structured output
 
 Anti-Patterns Avoided:
-- #12: New model per request (uses cached model from registry)
+- #12: New model per request (uses cached singleton)
 - #12: Embedding cache to avoid recomputation
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+import torch
 from pydantic import BaseModel
+from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine
+from transformers import AutoModel, AutoTokenizer
 
-from src.models.registry import ModelRegistry
-from src.core.exceptions import ModelNotReadyError
 from src.core.logging import get_logger
-
-if TYPE_CHECKING:
-    from src.models.registry import ModelRegistryProtocol
 
 # Get logger
 logger = get_logger(__name__)
+
+# Local model path
+_LOCAL_MODEL_PATH = Path(__file__).parent.parent.parent / "models" / "graphcodebert"
+
+# Singleton model instances
+_tokenizer: Any | None = None
+_model: Any | None = None
+
+
+def _get_graphcodebert() -> tuple[Any, Any]:
+    """Get or create singleton GraphCodeBERT model and tokenizer from local path."""
+    global _tokenizer, _model
+    if _tokenizer is None or _model is None:
+        model_path = str(_LOCAL_MODEL_PATH)
+        if not _LOCAL_MODEL_PATH.exists():
+            # Fallback to HuggingFace if local not found
+            model_path = "microsoft/graphcodebert-base"
+            logger.warning("local_graphcodebert_not_found", path=str(_LOCAL_MODEL_PATH), using=model_path)
+        else:
+            logger.info("loading_graphcodebert_from_local", path=model_path)
+
+        _tokenizer = AutoTokenizer.from_pretrained(model_path)
+        _model = AutoModel.from_pretrained(model_path)
+
+        # Move to GPU if available
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        _model = _model.to(device)
+        _model.eval()  # Set to evaluation mode
+        logger.info("graphcodebert_model_loaded", device=device)
+
+    return _tokenizer, _model
 
 # Validation thresholds
 MIN_SEMANTIC_SIMILARITY: float = 0.15  # Minimum cosine similarity to query
@@ -122,38 +157,26 @@ class ValidationResult(BaseModel):
 
 
 class GraphCodeBERTValidator:
-    """GraphCodeBERT model wrapper for term validation and filtering.
+    """GraphCodeBERT-based term validator and filter.
 
-    WBS 2.3: Validates terms using GraphCodeBERT embeddings for semantic relevance.
+    WBS 2.3: Validates terms using GraphCodeBERT embeddings (768-dim).
+    Uses locally hosted microsoft/graphcodebert-base.
+
+    Architecture Role: VALIDATOR (STATE 2: VALIDATION)
+    - Filters generic terms ("split", "data")
+    - Computes semantic similarity to query context
+    - Domain classification via embedding space
 
     Uses actual model inference for:
-    - Semantic similarity scoring between terms and query context
-    - Embedding-based domain classification
-    - Term expansion via nearest neighbors in embedding space
-
-    NOTE: This is a HuggingFace model wrapper, NOT an autonomous agent.
-    - Validator role: Filters and validates candidate terms
-    - Uses model from registry (Anti-Pattern #12 prevention)
-    - Caches embeddings to avoid recomputation (Anti-Pattern #12)
+    - 768-dim semantic embeddings for each term
+    - Cosine similarity scoring between terms and query
+    - Domain classification via reference embedding comparison
     """
 
-    def __init__(self, registry: ModelRegistryProtocol | None = None) -> None:
-        """Initialize GraphCodeBERT validator.
-
-        Args:
-            registry: ModelRegistry instance (or FakeModelRegistry for testing)
-
-        Raises:
-            ModelNotReadyError: If graphcodebert model not loaded in registry
-        """
-        self._registry = registry or ModelRegistry.get_registry()
-
-        # Get model from registry
-        model_tuple = self._registry.get_model("graphcodebert")
-        if model_tuple is None:
-            raise ModelNotReadyError("GraphCodeBERT model not loaded in registry")
-
-        self._model, self._tokenizer = model_tuple
+    def __init__(self) -> None:
+        """Initialize GraphCodeBERT validator with local model."""
+        self._tokenizer, self._model = _get_graphcodebert()
+        self._device = next(self._model.parameters()).device
 
         # Embedding cache (Anti-Pattern #12: avoid recomputation)
         self._embedding_cache: dict[str, npt.NDArray[np.floating[Any]]] = {}
@@ -161,12 +184,12 @@ class GraphCodeBERTValidator:
         # Pre-compute domain reference embeddings
         self._domain_embeddings: dict[str, npt.NDArray[np.floating[Any]]] = {}
 
-        logger.info("graphcodebert_validator_initialized")
+        logger.info("graphcodebert_validator_initialized", device=str(self._device))
 
     def _get_embedding(self, text: str) -> npt.NDArray[np.floating[Any]]:
-        """Generate embedding for text using GraphCodeBERT.
+        """Generate 768-dim embedding for text using GraphCodeBERT.
 
-        Uses mean pooling over the last hidden state.
+        Uses mean pooling of last hidden states.
 
         Args:
             text: Input text to embed
@@ -186,22 +209,23 @@ class GraphCodeBERTValidator:
             max_length=512,
             truncation=True,
             padding=True,
-        )
+        ).to(self._device)
 
-        # Get model output
-        outputs = self._model(**inputs)
-
-        # Mean pooling over sequence dimension
-        # outputs.last_hidden_state shape: (batch, seq_len, hidden_dim=768)
-        embedding = outputs.last_hidden_state.mean(dim=1).squeeze()
-
-        # Convert to numpy
-        embedding_np: npt.NDArray[np.floating[Any]] = embedding.detach().numpy()
+        # Get embeddings from GraphCodeBERT
+        with torch.no_grad():
+            outputs = self._model(**inputs)
+            # Mean pooling of last hidden states
+            last_hidden = outputs.last_hidden_state
+            attention_mask = inputs["attention_mask"]
+            mask_expanded = attention_mask.unsqueeze(-1).expand(last_hidden.size()).float()
+            sum_embeddings = torch.sum(last_hidden * mask_expanded, dim=1)
+            sum_mask = mask_expanded.sum(dim=1)
+            embedding = (sum_embeddings / sum_mask).cpu().numpy()[0]
 
         # Cache the result
-        self._embedding_cache[cache_key] = embedding_np
+        self._embedding_cache[cache_key] = embedding
 
-        return embedding_np
+        return embedding
 
     def _cosine_similarity(
         self,
@@ -215,19 +239,10 @@ class GraphCodeBERTValidator:
             vec2: Second embedding vector
 
         Returns:
-            Cosine similarity score (-1 to 1, normalized to 0-1)
+            Cosine similarity score (0 to 1)
         """
-        dot_product = np.dot(vec1, vec2)
-        norm1 = np.linalg.norm(vec1)
-        norm2 = np.linalg.norm(vec2)
-
-        if norm1 == 0 or norm2 == 0:
-            return 0.0
-
-        similarity = float(dot_product / (norm1 * norm2))
-
-        # Normalize to 0-1 range (cosine can be negative)
-        return max(0.0, similarity)
+        similarity = sklearn_cosine([vec1], [vec2])[0][0]
+        return max(0.0, float(similarity))
 
     def validate_terms(
         self,
@@ -236,13 +251,18 @@ class GraphCodeBERTValidator:
         domain: str,
         min_similarity: float = MIN_SEMANTIC_SIMILARITY,
     ) -> ValidationResult:
-        """Validate terms using GraphCodeBERT semantic embeddings.
+        """Validate terms using GraphCodeBERT 768-dim embeddings.
 
         WBS 2.3.2: Filters terms based on semantic relevance to query.
 
+        Architecture Role: STATE 2 VALIDATION
+        - Filters generic terms ("split", "data")
+        - Computes similarity using GraphCodeBERT embeddings
+        - Returns validation result with scores
+
         Validation Pipeline:
         1. Pre-filter generic terms (fast, no model inference)
-        2. Compute query embedding once
+        2. Compute query embedding once (768-dim)
         3. For each term, compute embedding and cosine similarity
         4. Filter terms below similarity threshold
 

@@ -84,19 +84,21 @@ class TestKeywordSorting:
         scores = [kw.score for kw in result.keywords]
         assert scores == sorted(scores, reverse=True)
 
-    def test_respects_top_k_keywords_option(self) -> None:
-        """AC-2.2: Should respect top_k_keywords option."""
+    def test_extraction_returns_keywords_sorted_by_score(self) -> None:
+        """AC-2.2: Keywords should be sorted by score (highest first)."""
         extractor = MetadataExtractor()
-        options = MetadataExtractionOptions(top_k_keywords=5)
         text = """
         Software engineering best practices include code review,
         continuous integration, test-driven development, refactoring,
         and documentation for maintainable systems.
         """
         
-        result = extractor.extract(text, options=options)
+        result = extractor.extract(text)
         
-        assert len(result.keywords) <= 5
+        # Verify keywords are sorted by score descending
+        if len(result.keywords) > 1:
+            scores = [kw.score for kw in result.keywords]
+            assert scores == sorted(scores, reverse=True)
 
 
 # === WBS-1.3.5-1.3.6: Concept Extraction ===

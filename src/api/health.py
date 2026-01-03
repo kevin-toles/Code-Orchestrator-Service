@@ -75,7 +75,6 @@ class HealthService:
         """
         self._version = version
         self._models_loaded = False
-        self._model_registry: Any | None = None
 
     def check_health(self) -> dict[str, Any]:
         """Check basic service health.
@@ -93,24 +92,12 @@ class HealthService:
         """Check if service is ready to accept requests.
 
         WBS 1.2.3: Returns 503 until models loaded
-        WBS 2.1: If model registry is set, check all_models_loaded()
-        WBS 2.x Integration Test: Returns model-specific status
+        Checks SBERT model status (all-MiniLM-L6-v2)
 
         Returns:
             Tuple of (readiness dict, is_ready bool)
         """
-        # Check model registry if available (Phase 2)
-        models_status: dict[str, str] = {}
-        if self._model_registry is not None:
-            models_loaded = self._model_registry.all_models_loaded()
-            # Get individual model status for Phase 2 integration test
-            for model_name in ["codet5", "graphcodebert", "codebert"]:
-                if self._model_registry.is_loaded(model_name):
-                    models_status[model_name] = "loaded"
-                else:
-                    models_status[model_name] = "not_loaded"
-        else:
-            models_loaded = self._models_loaded
+        models_loaded = self._models_loaded
 
         checks = {
             "models_loaded": models_loaded,
@@ -124,10 +111,6 @@ class HealthService:
             "checks": checks,
         }
 
-        # Include models status if registry is available
-        if models_status:
-            result["models"] = models_status
-
         return result, is_ready
 
     def set_models_loaded(self, loaded: bool) -> None:
@@ -139,17 +122,6 @@ class HealthService:
             loaded: Whether models are loaded
         """
         self._models_loaded = loaded
-
-    def set_model_registry(self, registry: Any) -> None:
-        """Set model registry for readiness checks.
-
-        WBS 2.1: Integrates ModelRegistry with health checks.
-        Registry should implement ModelRegistryProtocol.
-
-        Args:
-            registry: ModelRegistry or FakeModelRegistry instance
-        """
-        self._model_registry = registry
 
 
 # Global health service instance

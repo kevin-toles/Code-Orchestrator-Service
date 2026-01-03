@@ -1,7 +1,7 @@
 # Code-Orchestrator-Service Docker Compose
 # WBS 1.1.5: Service on port 8083 per Kitchen Brigade architecture
 # Role: SOUS CHEF - Metadata extraction, code understanding
-# Reference: ai-platform-data/docs/NETWORK_ARCHITECTURE.md
+# Models loaded from local ./models/ directory
 
 services:
   code-orchestrator:
@@ -15,17 +15,13 @@ services:
       - COS_HOST=0.0.0.0
       - COS_PORT=8083
       - COS_LOG_LEVEL=INFO
-      - COS_MODEL_CACHE_DIR=/app/cache/models
-      # HuggingFace model IDs
-      - COS_CODET5_MODEL=Salesforce/codet5p-220m
-      - COS_GRAPHCODEBERT_MODEL=microsoft/graphcodebert-base
-      - COS_CODEBERT_MODEL=microsoft/codebert-base
       # Inference service (native on host for Metal GPU)
       - INFERENCE_SERVICE_URL=http://host.docker.internal:8085
     volumes:
-      - model-cache:/app/cache/models
+      - ./models:/app/models:ro
       - ./logs:/app/logs
       - ./data:/app/data
+      - ./config:/app/config
       - /Users/kevintoles/POC/semantic-search-service/config:/app/config/semantic-search
       - /Users/kevintoles/POC/textbooks/Taxonomies:/app/config/taxonomies
     healthcheck:
@@ -33,20 +29,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 60s
-    restart: unless-stopped
+      start_period: 120s
+    restart: "no"  # Manual control via Platform Control Panel
     networks:
       - ai-platform-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # GPU support (uncomment for CUDA)
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
 
 # ==============================================================================
 # Networks - Tiered network architecture
@@ -55,7 +43,3 @@ networks:
   ai-platform-network:
     name: ai-platform-network
     external: true
-
-volumes:
-  model-cache:
-    driver: local

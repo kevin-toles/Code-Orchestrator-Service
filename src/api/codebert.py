@@ -3,16 +3,16 @@ EEP-5.2: CodeBERT Embedding API Endpoints
 
 WBS Mapping:
 - AC-5.2.1: Use existing CodeBERTRanker from codebert_ranker.py
-- AC-5.2.2: Generate 768-dim embeddings for each code block
+- AC-5.2.2: Generate 768-dim embeddings using CodeBERT (microsoft/codebert-base)
 - AC-5.2.3: Cache embeddings to avoid recomputation (Anti-Pattern #12)
 
 Patterns Applied:
 - Uses existing CodeBERTRanker (Anti-Pattern #12 compliant - model cached)
 - Pydantic models for request/response
-- FakeModelRegistry for testing
+- CodeBERT for NL↔Code bimodal embeddings
 
 Anti-Patterns Avoided:
-- #12: Uses CodeBERTRanker with cached model from registry
+- #12: Uses CodeBERTRanker with cached singleton model
 - S1192: Extracted constants for repeated strings
 - S3776: Helper functions for low cognitive complexity
 """
@@ -34,12 +34,18 @@ logger = logging.getLogger(__name__)
 # Constants (Anti-Pattern S1192 Prevention)
 # =============================================================================
 
-_EMBEDDING_DIM = 768
 _DESC_CODE = "Source code to embed"
 _DESC_CODES = "List of source codes to embed"
 _DESC_CODE_A = "First code for similarity comparison"
 _DESC_CODE_B = "Second code for similarity comparison"
 _ERROR_MODEL_NOT_READY = "CodeBERT model not loaded. Please load model first."
+
+
+def _get_embedding_dim() -> int:
+    """Get embedding dimension from the actual model."""
+    ranker = _get_ranker()
+    sample_emb = ranker.get_embedding("test")
+    return len(sample_emb)
 
 
 # =============================================================================
@@ -74,13 +80,10 @@ class CodeBERTSimilarityRequest(BaseModel):
 
 
 class CodeBERTEmbedResponse(BaseModel):
-    """Response for single code embedding.
+    """Response for single code embedding."""
 
-    AC-5.2.2: Returns 768-dimensional embedding vector.
-    """
-
-    embedding: list[float] = Field(..., description="768-dimensional embedding vector")
-    dimension: int = Field(default=_EMBEDDING_DIM, description="Embedding dimension")
+    embedding: list[float] = Field(..., description="Embedding vector from model")
+    dimension: int = Field(..., description="Embedding dimension")
 
 
 class CodeBERTEmbedBatchResponse(BaseModel):
@@ -147,6 +150,19 @@ def _reset_ranker() -> None:
 # Fake Ranker for Testing
 # =============================================================================
 
+# Get embedding dimension from real model (lazy init)
+_cached_embedding_dim: int | None = None
+
+
+def _get_model_embedding_dim() -> int:
+    """Get embedding dimension from real model."""
+    global _cached_embedding_dim
+    if _cached_embedding_dim is None:
+        from src.models.codebert_ranker import CodeBERTRanker
+        ranker = CodeBERTRanker()
+        _cached_embedding_dim = len(ranker.get_embedding("test"))
+    return _cached_embedding_dim
+
 
 class FakeCodeBERTRanker:
     """Fake CodeBERT ranker for testing without real model.
@@ -159,17 +175,17 @@ class FakeCodeBERTRanker:
         import hashlib
 
         self._hashlib = hashlib
+        self._dim = _get_model_embedding_dim()
 
     def get_embedding(self, text: str) -> np.ndarray:
         """Generate deterministic fake embedding."""
         if not text or not text.strip():
-            return np.zeros(_EMBEDDING_DIM, dtype=np.float32)
+            return np.zeros(self._dim, dtype=np.float32)
 
         # Hash-based deterministic embedding
         hash_bytes = self._hashlib.sha256(text.encode()).digest()
-        # Expand to 768 dimensions
         np.random.seed(int.from_bytes(hash_bytes[:4], "big"))
-        embedding = np.random.randn(_EMBEDDING_DIM).astype(np.float32)
+        embedding = np.random.randn(self._dim).astype(np.float32)
         # Normalize
         norm = np.linalg.norm(embedding)
         if norm > 0:

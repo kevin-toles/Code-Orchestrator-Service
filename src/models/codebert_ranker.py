@@ -1,38 +1,77 @@
 """
-Code-Orchestrator-Service - CodeBERT Similarity Ranker
+Code-Orchestrator-Service - CodeBERT Term Ranker
 
-WBS 2.4: CodeBERT Ranker (Model Wrapper)
+WBS 2.4: Term Ranker (Model Wrapper)
 Generates embeddings and ranks terms by semantic relevance using CodeBERT model.
 
-NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
-Autonomous agents (LangGraph workflows) live in the ai-agents service.
+Uses locally hosted microsoft/codebert-base for NL↔Code bimodal similarity.
+
+Architecture Role: RANKER (STATE 3: RANKING)
+- 768-dimensional embeddings for code/text
+- Fast similarity scoring
+- Well-established baseline for ranking
+
+CodeBERT Capabilities:
+- 768-dim embeddings (RoBERTa-based, bimodal NL↔Code)
+- Pre-trained on code-text pairs
+- Optimized for code search and ranking
 
 Patterns Applied:
 - Model Wrapper Pattern with Protocol typing (CODING_PATTERNS_ANALYSIS.md)
-- FakeModelRegistry for testing (no real HuggingFace model in unit tests)
+- Singleton model loading for efficiency
 - Pydantic response models for structured output
 
 Anti-Patterns Avoided:
-- #12: New model per request (uses cached model from registry)
+- #12: New model per request (uses cached singleton)
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+import torch
 from pydantic import BaseModel
+from sklearn.metrics.pairwise import cosine_similarity
+from transformers import AutoModel, AutoTokenizer
 
-from src.models.registry import ModelRegistry
-from src.core.exceptions import ModelNotReadyError
 from src.core.logging import get_logger
-
-if TYPE_CHECKING:
-    from src.models.registry import ModelRegistryProtocol
 
 # Get logger
 logger = get_logger(__name__)
+
+# Local model path
+_LOCAL_MODEL_PATH = Path(__file__).parent.parent.parent / "models" / "codebert"
+
+# Singleton model instances
+_tokenizer: Any | None = None
+_model: Any | None = None
+
+
+def _get_codebert() -> tuple[Any, Any]:
+    """Get or create singleton CodeBERT model and tokenizer from local path."""
+    global _tokenizer, _model
+    if _tokenizer is None or _model is None:
+        model_path = str(_LOCAL_MODEL_PATH)
+        if not _LOCAL_MODEL_PATH.exists():
+            # Fallback to HuggingFace if local not found
+            model_path = "microsoft/codebert-base"
+            logger.warning("local_codebert_not_found", path=str(_LOCAL_MODEL_PATH), using=model_path)
+        else:
+            logger.info("loading_codebert_from_local", path=model_path)
+
+        _tokenizer = AutoTokenizer.from_pretrained(model_path)
+        _model = AutoModel.from_pretrained(model_path)
+
+        # Move to GPU if available
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        _model = _model.to(device)
+        _model.eval()  # Set to evaluation mode
+        logger.info("codebert_model_loaded", device=device)
+
+    return _tokenizer, _model
 
 
 class RankedTerm(BaseModel):
@@ -59,33 +98,53 @@ class RankingResult(BaseModel):
 
 
 class CodeBERTRanker:
-    """CodeBERT Ranker for embedding generation and term ranking.
+    """CodeBERT-based Ranker for embedding generation and term ranking.
 
     WBS 2.4: Generates 768-dim embeddings and ranks terms by cosine similarity.
+    Uses locally hosted microsoft/codebert-base.
 
-    Pattern: Model Wrapper Pattern per HuggingFace integration
-    - Ranker role: Scores and ranks candidate terms
-    - Uses model from registry (Anti-Pattern #12 prevention)
+    Architecture Role: RANKER (STATE 3: RANKING)
+    - Computes 768-dim embeddings for terms and query
+    - Calculates cosine similarity
+    - Sorts terms by relevance score descending
     """
 
-    def __init__(self, registry: ModelRegistryProtocol | None = None) -> None:
-        """Initialize CodeBERT ranker.
+    def __init__(self) -> None:
+        """Initialize CodeBERT ranker with local model."""
+        self._tokenizer, self._model = _get_codebert()
+        self._device = next(self._model.parameters()).device
+        logger.info("codebert_ranker_initialized", device=str(self._device))
+
+    def _encode(self, text: str) -> npt.NDArray[np.floating[Any]]:
+        """Generate 768-dim embedding using CodeBERT with mean pooling.
 
         Args:
-            registry: ModelRegistry instance (or FakeModelRegistry for testing)
+            text: Input text to embed
 
-        Raises:
-            ModelNotReadyError: If codebert model not loaded in registry
+        Returns:
+            Numpy array of shape (768,)
         """
-        self._registry = registry or ModelRegistry.get_registry()
+        # Tokenize
+        inputs = self._tokenizer(
+            text,
+            return_tensors="pt",
+            max_length=512,
+            truncation=True,
+            padding=True,
+        ).to(self._device)
 
-        # Get model from registry
-        model_tuple = self._registry.get_model("codebert")
-        if model_tuple is None:
-            raise ModelNotReadyError("CodeBERT model not loaded in registry")
+        # Get embeddings from CodeBERT
+        with torch.no_grad():
+            outputs = self._model(**inputs)
+            # Mean pooling of last hidden states
+            last_hidden = outputs.last_hidden_state
+            attention_mask = inputs["attention_mask"]
+            mask_expanded = attention_mask.unsqueeze(-1).expand(last_hidden.size()).float()
+            sum_embeddings = torch.sum(last_hidden * mask_expanded, dim=1)
+            sum_mask = mask_expanded.sum(dim=1)
+            embedding = (sum_embeddings / sum_mask).cpu().numpy()[0]
 
-        self._model, self._tokenizer = model_tuple
-        logger.info("codebert_ranker_initialized")
+        return embedding
 
     def get_embedding(self, text: str) -> npt.NDArray[np.floating[Any]]:
         """Generate embedding vector for text.
@@ -96,30 +155,10 @@ class CodeBERTRanker:
             text: Input text to embed
 
         Returns:
-            Numpy array of shape (768,) or (1, 768)
+            Numpy array of shape (768,)
         """
-        logger.debug("generating_embedding", text_length=len(text))
-
-        # Tokenize
-        inputs = self._tokenizer(
-            text,
-            return_tensors="pt",
-            max_length=512,
-            truncation=True,
-            padding=True,
-        )
-
-        # Get model output
-        outputs = self._model(**inputs)
-
-        # Mean pooling over sequence dimension
-        # outputs.last_hidden_state shape: (batch, seq_len, hidden_dim=768)
-        embeddings = outputs.last_hidden_state.mean(dim=1)
-
-        # Convert to numpy
-        embedding: npt.NDArray[np.floating[Any]] = embeddings.detach().numpy()
-
-        return embedding
+        logger.debug("generating_codebert_embedding", text_length=len(text))
+        return self._encode(text)
 
     def get_embeddings_batch(self, texts: list[str]) -> list[npt.NDArray[np.floating[Any]]]:
         """Generate embeddings for multiple texts.
@@ -128,36 +167,18 @@ class CodeBERTRanker:
             texts: List of input texts
 
         Returns:
-            List of embedding arrays
+            List of embedding arrays (each 768-dim)
         """
         if not texts:
             return []
 
-        logger.debug("batch_embedding_started", count=len(texts))
-
-        # Tokenize all at once
-        inputs = self._tokenizer(
-            texts,
-            return_tensors="pt",
-            max_length=512,
-            truncation=True,
-            padding=True,
-        )
-
-        # Get model output
-        outputs = self._model(**inputs)
-
-        # Mean pooling
-        embeddings = outputs.last_hidden_state.mean(dim=1)
-
-        # Convert to list of numpy arrays
-        result = [embeddings[i].detach().numpy() for i in range(len(texts))]
-
-        logger.info("batch_embedding_complete", count=len(result))
+        logger.debug("codebert_batch_embedding_started", count=len(texts))
+        result = [self._encode(text) for text in texts]
+        logger.info("codebert_batch_embedding_complete", count=len(result))
         return result
 
     def calculate_similarity(self, term: str, query: str) -> float:
-        """Calculate cosine similarity between term and query.
+        """Calculate cosine similarity between term and query using CodeBERT.
 
         WBS 2.4.3: Returns score between 0.0 and 1.0.
 
@@ -169,36 +190,26 @@ class CodeBERTRanker:
             Cosine similarity score (0.0 to 1.0)
         """
         # Get embeddings
-        term_emb = self.get_embedding(term)
-        query_emb = self.get_embedding(query)
+        term_emb = self._encode(term)
+        query_emb = self._encode(query)
 
-        # Flatten to 1D if needed
-        term_emb = term_emb.flatten()
-        query_emb = query_emb.flatten()
-
-        # Cosine similarity
-        dot_product = np.dot(term_emb, query_emb)
-        norm_term = np.linalg.norm(term_emb)
-        norm_query = np.linalg.norm(query_emb)
-
-        if norm_term == 0 or norm_query == 0:
-            return 0.0
-
-        similarity = dot_product / (norm_term * norm_query)
-
-        # Clamp to [0, 1] range (cosine can be negative)
-        similarity = max(0.0, min(1.0, float(similarity)))
-
-        return similarity
+        similarity = cosine_similarity([term_emb], [query_emb])[0][0]
+        # Clamp to [0, 1] range
+        return max(0.0, min(1.0, float(similarity)))
 
     def rank_terms(
         self,
         terms: list[str],
         query: str,
     ) -> RankingResult:
-        """Rank terms by relevance to query.
+        """Rank terms by relevance to query using CodeBERT embeddings.
 
         WBS 2.4.4: Sort by relevance score descending.
+
+        Architecture Role: STATE 3 RANKING
+        - Computes 768-dim embeddings for all terms
+        - Calculates cosine similarity to query
+        - Returns sorted list by score
 
         Args:
             terms: List of terms to rank
@@ -207,7 +218,7 @@ class CodeBERTRanker:
         Returns:
             RankingResult with terms sorted by score descending
         """
-        logger.debug("ranking_terms", term_count=len(terms))
+        logger.debug("codebert_ranking_terms", term_count=len(terms))
 
         # Calculate similarity for each term
         scored_terms: list[RankedTerm] = []
@@ -219,7 +230,7 @@ class CodeBERTRanker:
         scored_terms.sort(key=lambda x: x.score, reverse=True)
 
         logger.info(
-            "ranking_complete",
+            "codebert_ranking_complete",
             term_count=len(scored_terms),
             top_score=scored_terms[0].score if scored_terms else 0,
         )

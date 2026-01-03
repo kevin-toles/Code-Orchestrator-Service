@@ -70,7 +70,6 @@ class TestMetadataExtractionRequest:
         )
 
         options = MetadataExtractionOptions(
-            top_k_keywords=20,
             filter_noise=True,
         )
         request = MetadataExtractionRequest(
@@ -83,7 +82,7 @@ class TestMetadataExtractionRequest:
         assert request.text == VALID_TEXT
         assert request.title == VALID_TITLE
         assert request.book_title == VALID_BOOK_TITLE
-        assert request.options.top_k_keywords == 20
+        assert request.options.filter_noise is True
 
     def test_empty_text_raises_validation_error(self) -> None:
         """Empty text should raise ValidationError.
@@ -124,25 +123,11 @@ class TestMetadataExtractionOptions:
 
         options = MetadataExtractionOptions()
         
-        assert options.top_k_keywords == DEFAULT_TOP_K_KEYWORDS
-        assert options.top_k_concepts == DEFAULT_TOP_K_CONCEPTS
+        # top_k_keywords and top_k_concepts were REMOVED per requirement
         assert options.min_keyword_confidence == DEFAULT_MIN_KEYWORD_CONFIDENCE
         assert options.min_concept_confidence == DEFAULT_MIN_CONCEPT_CONFIDENCE
         assert options.enable_summary is False
         assert options.filter_noise is True
-
-    def test_invalid_top_k_keywords_raises_validation_error(self) -> None:
-        """Negative top_k_keywords should raise ValidationError.
-        
-        AC Reference: AC-2.8 - Invalid Options
-        """
-        from src.models.metadata_models import MetadataExtractionOptions
-
-        with pytest.raises(ValidationError) as exc_info:
-            MetadataExtractionOptions(top_k_keywords=INVALID_TOP_K)
-        
-        errors = exc_info.value.errors()
-        assert len(errors) >= 1
 
     def test_invalid_confidence_raises_validation_error(self) -> None:
         """Confidence outside 0-1 range should raise ValidationError."""

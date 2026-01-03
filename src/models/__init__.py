@@ -1,16 +1,16 @@
-"""Model wrappers for keyword extraction, validation, and ranking.
+"""Model wrappers for code understanding, validation, and ranking.
 
-NOTE: These are HuggingFace model wrappers, NOT autonomous agents.
-Autonomous agents (LangGraph workflows) live in the ai-agents service.
+Models and their purposes:
+- CodeT5Extractor: Code generation/completion (NOT for keyword extraction)
+- GraphCodeBERTValidator: Filters terms using GraphCodeBERT embeddings
+- CodeBERTRanker: Scores and ranks by CodeBERT embedding similarity
 
-Model Wrappers:
-- CodeT5Extractor: Extracts terms from text using CodeT5+ model
-- GraphCodeBERTValidator: Filters generic terms using GraphCodeBERT model
-- CodeBERTRanker: Scores and ranks by similarity using CodeBERT model
+Note: For metadata/keyword extraction, use YAKE+TextRank (src/nlp/).
+CodeT5+ is a generative model trained on code completion, not extraction.
 
 Patterns applied from CODING_PATTERNS_ANALYSIS.md:
-- Repository Pattern with Protocol (Phase 2)
-- FakeClient for testing (Anti-Pattern #12)
+- Singleton pattern for model caching
+- Protocol typing for dependency injection
 """
 
 from src.models.codebert_ranker import CodeBERTRanker, RankedTerm, RankingResult
@@ -21,14 +21,12 @@ from src.models.graphcodebert_validator import (
 )
 from src.models.protocols import (
     ExtractorProtocol,
-    ModelRegistryProtocol,
     RankerProtocol,
     ValidatorProtocol,
 )
-from src.models.registry import FakeModelRegistry, ModelRegistry
 
 __all__ = [
-    # Extractors
+    # Code Generation (NOT for keyword extraction)
     "CodeT5Extractor",
     "ExtractionResult",
     # Validators
@@ -42,8 +40,4 @@ __all__ = [
     "ExtractorProtocol",
     "ValidatorProtocol",
     "RankerProtocol",
-    "ModelRegistryProtocol",
-    # Registry
-    "ModelRegistry",
-    "FakeModelRegistry",
 ]

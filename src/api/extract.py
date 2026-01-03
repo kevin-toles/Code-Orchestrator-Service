@@ -6,10 +6,18 @@ POST /api/v1/extract - Main term extraction endpoint
 - Returns consensus terms with model agreement
 - Tracks processing time and stages
 
+Uses REAL models loaded from local paths:
+- YAKE + TextRank for term extraction (statistical, no hallucinations)
+- GraphCodeBERT for validation (models/graphcodebert/)
+- CodeBERT for ranking (models/codebert/)
+
+Note: CodeT5+ removed - it's a code generation model that outputs license
+headers instead of extracting keywords. YAKE+TextRank are proper extractors.
+
 Patterns Applied:
 - FastAPI router (Anti-Pattern #9)
 - Pydantic request/response models
-- Dependency injection for Orchestrator
+- Local model loading
 """
 
 import time
@@ -18,7 +26,57 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
+from src.nlp.yake_extractor import YAKEExtractor, YAKEConfig
+from src.nlp.textrank_extractor import TextRankExtractor, TextRankConfig
+from src.nlp.ensemble_merger import EnsembleMerger
+from src.models.graphcodebert_validator import GraphCodeBERTValidator
+from src.models.codebert_ranker import CodeBERTRanker
 from src.orchestrator.consensus import ConsensusBuilder
+from src.core.logging import get_logger
+
+logger = get_logger(__name__)
+
+# Lazy-loaded model instances (singleton pattern)
+_yake_extractor: YAKEExtractor | None = None
+_textrank_extractor: TextRankExtractor | None = None
+_graphcodebert_validator: GraphCodeBERTValidator | None = None
+_codebert_ranker: CodeBERTRanker | None = None
+
+
+def _get_yake() -> YAKEExtractor:
+    """Get or create YAKE extractor instance."""
+    global _yake_extractor
+    if _yake_extractor is None:
+        logger.info("initializing_yake_extractor")
+        _yake_extractor = YAKEExtractor(YAKEConfig(top_n=20, n_gram_size=3))
+    return _yake_extractor
+
+
+def _get_textrank() -> TextRankExtractor:
+    """Get or create TextRank extractor instance."""
+    global _textrank_extractor
+    if _textrank_extractor is None:
+        logger.info("initializing_textrank_extractor")
+        _textrank_extractor = TextRankExtractor(TextRankConfig(words=20))
+    return _textrank_extractor
+
+
+def _get_graphcodebert() -> GraphCodeBERTValidator:
+    """Get or create GraphCodeBERT validator instance."""
+    global _graphcodebert_validator
+    if _graphcodebert_validator is None:
+        logger.info("initializing_graphcodebert_validator")
+        _graphcodebert_validator = GraphCodeBERTValidator()
+    return _graphcodebert_validator
+
+
+def _get_codebert() -> CodeBERTRanker:
+    """Get or create CodeBERT ranker instance."""
+    global _codebert_ranker
+    if _codebert_ranker is None:
+        logger.info("initializing_codebert_ranker")
+        _codebert_ranker = CodeBERTRanker()
+    return _codebert_ranker
 
 # =============================================================================
 # Request/Response Models
@@ -135,59 +193,104 @@ async def extract_terms(request: ExtractRequest) -> ExtractResponse:
 
 
 # =============================================================================
-# Helper Functions (will be replaced with orchestrator integration)
+# Model Integration Functions - Use REAL models
 # =============================================================================
 
 
-def _generate_terms(query: str, _domain: str) -> list[str]:
-    """Generate candidate terms from query.
-
-    TODO: Replace with CodeT5+ generator integration.
+def _generate_terms(query: str, domain: str | None) -> list[str]:
+    """Generate candidate terms from query using YAKE + TextRank ensemble.
+    
     Args:
         query: The search query to extract terms from
-        _domain: Domain context (unused until model integration)
+        domain: Domain context for extraction (unused, for API compatibility)
+        
+    Returns:
+        List of extracted terms
     """
-    # Simple word extraction for now
-    words = query.lower().split()
-    # Filter common stop words
-    stop_words = {"the", "a", "an", "is", "are", "with", "for", "to", "of", "and", "in"}
-    return [w for w in words if w not in stop_words and len(w) > 2]
+    try:
+        yake = _get_yake()
+        textrank = _get_textrank()
+        
+        # Extract with both methods
+        yake_terms = yake.extract(query)
+        textrank_terms = textrank.extract(query)
+        
+        # Merge using ensemble merger
+        merger = EnsembleMerger()
+        merged = merger.merge(yake_terms, textrank_terms)
+        
+        terms = [t.term for t in merged]
+        logger.info("ensemble_generated_terms", 
+                   yake_count=len(yake_terms), 
+                   textrank_count=len(textrank_terms),
+                   merged_count=len(terms))
+        return terms
+    except Exception as e:
+        logger.warning("ensemble_extraction_failed", error=str(e))
+        # Fallback to simple word extraction
+        words = query.lower().split()
+        stop_words = {"the", "a", "an", "is", "are", "with", "for", "to", "of", "and", "in"}
+        return [w for w in words if w not in stop_words and len(w) > 2]
 
 
-def _validate_terms(terms: list[str], _domain: str) -> list[str]:
-    """Validate terms for domain relevance.
-
-    TODO: Replace with GraphCodeBERT validator integration.
+def _validate_terms(terms: list[str], domain: str | None) -> list[str]:
+    """Validate terms for domain relevance using GraphCodeBERT.
+    
     Args:
         terms: List of candidate terms to validate
-        _domain: Domain context (unused until model integration)
+        domain: Domain context for validation
+        
+    Returns:
+        List of validated terms
     """
-    # For now, accept all terms
-    return terms
+    if not terms:
+        return []
+    
+    try:
+        validator = _get_graphcodebert()
+        result = validator.validate_terms(
+            terms=terms,
+            query_context=domain or "general programming",
+        )
+        validated = result.valid_terms
+        logger.info("graphcodebert_validated_terms", 
+                   input_count=len(terms), output_count=len(validated))
+        return validated
+    except Exception as e:
+        logger.warning("graphcodebert_validation_failed", error=str(e))
+        # Fallback: accept all terms
+        return terms
 
 
-def _rank_terms(terms: list[str], _query: str) -> list[dict[str, Any]]:
-    """Rank terms by relevance.
-
-    TODO: Replace with CodeBERT ranker integration.
+def _rank_terms(terms: list[str], query: str) -> list[dict[str, Any]]:
+    """Rank terms by relevance using CodeBERT embeddings.
+    
     Args:
         terms: List of validated terms to rank
-        _query: Original query for relevance scoring (unused until model integration)
+        query: Original query for relevance scoring
+        
+    Returns:
+        List of dicts with term and score
     """
-    # Simple ranking based on term length and position
-    ranked = []
-    for i, term in enumerate(terms):
-        # Higher score for earlier terms and longer terms
-        position_score = 1.0 - (i / max(len(terms), 1)) * 0.3
-        length_score = min(len(term) / 10, 1.0)
-        score = (position_score + length_score) / 2
-
-        ranked.append({
-            "term": term,
-            "score": score,
-        })
-
-    return sorted(ranked, key=lambda x: x["score"], reverse=True)
+    if not terms:
+        return []
+    
+    try:
+        ranker = _get_codebert()
+        result = ranker.rank_terms(terms=terms, query=query)
+        ranked = [{"term": t.term, "score": t.score} for t in result.ranked_terms]
+        logger.info("codebert_ranked_terms", count=len(ranked))
+        return ranked
+    except Exception as e:
+        logger.warning("codebert_ranking_failed", error=str(e))
+        # Fallback: simple ranking
+        ranked = []
+        for i, term in enumerate(terms):
+            position_score = 1.0 - (i / max(len(terms), 1)) * 0.3
+            length_score = min(len(term) / 10, 1.0)
+            score = (position_score + length_score) / 2
+            ranked.append({"term": term, "score": score})
+        return sorted(ranked, key=lambda x: x["score"], reverse=True)
 
 
 def _build_term_data(

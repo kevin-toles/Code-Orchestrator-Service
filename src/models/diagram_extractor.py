@@ -56,8 +56,12 @@ ASCII_ART_THRESHOLD = 0.05
 DEFAULT_CONTEXT_LINES_BEFORE = 3
 DEFAULT_CONTEXT_LINES_AFTER = 3
 
-# Embedding dimensions
-SBERT_EMBEDDING_DIM = 384
+
+def _get_sbert_embedding_dim() -> int:
+    """Get SBERT embedding dimension from actual model."""
+    from src.models.codebert_ranker import CodeBERTRanker
+    ranker = CodeBERTRanker()
+    return len(ranker.get_embedding("test"))
 
 
 # =============================================================================
@@ -201,7 +205,8 @@ class FakeDiagramExtractor:
             return self._fake_embeddings[diagram]
         # Generate deterministic embedding based on caption
         np.random.seed(hash(diagram.caption) % (2**32))
-        embedding = np.random.randn(SBERT_EMBEDDING_DIM)
+        dim = _get_sbert_embedding_dim()
+        embedding = np.random.randn(dim)
         embedding = embedding / np.linalg.norm(embedding)
         return embedding
 
@@ -542,7 +547,8 @@ class _MockSBERTModel:
         """Generate deterministic embedding from text."""
         # Use hash to generate deterministic but varied embeddings
         np.random.seed(hash(text) % (2**32))
-        embedding = np.random.randn(SBERT_EMBEDDING_DIM)
+        dim = _get_sbert_embedding_dim()
+        embedding = np.random.randn(dim)
 
         if normalize_embeddings:
             embedding = embedding / np.linalg.norm(embedding)

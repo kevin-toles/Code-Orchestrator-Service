@@ -60,6 +60,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan context manager for startup/shutdown events.
 
     WBS 1.2.1: FastAPI app with lifespan handler
+    Kitchen Brigade: Load all BERT models at startup for healthy service
 
     Uses the modern lifespan pattern instead of deprecated @app.on_event.
     Pattern: CODING_PATTERNS_ANALYSIS.md line 1940-1954
@@ -86,9 +87,43 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     app.state.initialized = True
     app.state.environment = settings.environment
 
-    # NOTE: Model loading deferred to Phase 2 (WBS 2.x)
-    # When implemented: load models and call get_health_service().set_models_loaded(True)
-    # For now, models_loaded remains False, so /ready returns 503
+    # =========================================================================
+    # MODEL LOADING - Load SBERT model at startup
+    # =========================================================================
+    from src.api.health import get_health_service
+    from src.models.sbert.model_loader import get_sbert_model
+
+    health_service = get_health_service()
+    models_loaded = True
+
+    try:
+        # Load SBERT model (all-MiniLM-L6-v2) for similarity/extraction/validation
+        logger.info("loading_sbert_model")
+        sbert_loader = get_sbert_model()
+        app.state.sbert_model = sbert_loader
+        logger.info(
+            "sbert_model_loaded",
+            model="all-MiniLM-L6-v2",
+            using_fallback=sbert_loader.using_fallback,
+        )
+        
+        # Pre-warm the model wrappers
+        # Note: CodeT5+ removed - it's a code generation model, not keyword extractor
+        from src.models.codebert_ranker import CodeBERTRanker
+        from src.models.graphcodebert_validator import GraphCodeBERTValidator
+        
+        logger.info("initializing_model_wrappers")
+        _ = CodeBERTRanker()   # Warms up ranker
+        _ = GraphCodeBERTValidator()  # Warms up validator
+        logger.info("model_wrappers_initialized")
+        
+    except Exception as e:
+        logger.error("model_load_failed", error=str(e))
+        models_loaded = False
+
+    if models_loaded:
+        health_service.set_models_loaded(True)
+        logger.info("all_models_ready")
 
     yield
 
@@ -100,7 +135,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Clean up resources
     app.state.initialized = False
 
-    # NOTE: Model cleanup deferred to Phase 2 (WBS 2.x)
+    # Reset model loaders
+    from src.models.sbert.model_loader import reset_sbert_model
+    reset_sbert_model()
 
 
 # =============================================================================

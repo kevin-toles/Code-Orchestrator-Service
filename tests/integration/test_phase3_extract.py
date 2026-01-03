@@ -140,16 +140,16 @@ class TestExtractEndpoint:
 
         assert response.status_code == 422
 
-    def test_extract_returns_422_without_domain(self) -> None:
-        """Extract endpoint returns 422 without domain field."""
+    def test_extract_works_without_domain(self) -> None:
+        """Extract endpoint works without domain field (optional)."""
         client = TestClient(app)
 
         response = client.post(
             "/v1/extract",
-            json={"query": "test"},  # Missing domain
+            json={"query": "test"},  # Domain is optional
         )
 
-        assert response.status_code == 422
+        assert response.status_code == 200
 
     def test_extract_search_terms_have_score(self) -> None:
         """Each search term has a score field."""

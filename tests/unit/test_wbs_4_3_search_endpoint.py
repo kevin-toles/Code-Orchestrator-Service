@@ -117,16 +117,16 @@ class TestSearchValidation:
 
         assert response.status_code == 422
 
-    def test_search_returns_422_without_domain(self) -> None:
-        """Search returns 422 without domain field."""
+    def test_search_works_without_domain(self) -> None:
+        """Search works without domain field (optional)."""
         client = TestClient(app)
 
         response = client.post(
             "/v1/search",
-            json={"query": "test"},  # Missing domain
+            json={"query": "test"},  # Domain is optional
         )
 
-        assert response.status_code == 422
+        assert response.status_code == 200
 
     def test_search_accepts_options_parameter(self) -> None:
         """Search accepts options in request body."""
