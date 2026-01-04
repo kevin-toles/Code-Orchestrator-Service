@@ -3,3 +3,8 @@ logs/
 .scannerwork/
 .scannerwork/
 .scannerwork/
+
+# Local model files (download via script)
+models/codebert/
+models/codet5/
+models/graphcodebert/
