@@ -8,3 +8,5 @@ logs/
 models/codebert/
 models/codet5/
 models/graphcodebert/
+__pycache__/
+.venv/
