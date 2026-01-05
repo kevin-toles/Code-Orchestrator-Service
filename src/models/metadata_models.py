@@ -262,6 +262,15 @@ class ExtractionMetadata(BaseModel):
         default_factory=list,
         description="List of processing stages completed",
     )
+    summary_model: str | None = Field(
+        default=None,
+        description="Model used for summary generation (e.g., 'phi-4', 'statistical-fallback')",
+    )
+    summary_tokens: int = Field(
+        default=0,
+        ge=0,
+        description="Tokens used for summary generation (0 if statistical)",
+    )
 
 
 class RejectedKeywords(BaseModel):

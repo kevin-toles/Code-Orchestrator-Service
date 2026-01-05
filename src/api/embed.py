@@ -135,6 +135,84 @@ class SimilarityResponse(BaseModel):
     source_embedding_dim: int = Field(..., description="Dimension of source embedding")
 
 
+# -----------------------------------------------------------------------------
+# Direct Model Access Request/Response Models
+# -----------------------------------------------------------------------------
+
+
+class BGEEmbedRequest(BaseModel):
+    """Request for direct BGE embedding."""
+
+    text: str = Field(..., description="Text to embed")
+
+
+class BGEBatchEmbedRequest(BaseModel):
+    """Request for batch BGE embedding."""
+
+    texts: list[str] = Field(..., description="Texts to embed")
+
+
+class BGEEmbedResponse(BaseModel):
+    """Response with BGE embedding."""
+
+    embedding: list[float] = Field(..., description=f"BGE embedding [{DIM_BGE}]")
+    dimension: int = Field(DIM_BGE, description="Embedding dimension")
+    model: str = Field("BAAI/bge-small-en-v1.5", description="Model used")
+
+
+class BGEBatchEmbedResponse(BaseModel):
+    """Response with batch BGE embeddings."""
+
+    embeddings: list[list[float]] = Field(..., description="BGE embeddings")
+    count: int = Field(..., description="Number of embeddings")
+    model: str = Field("BAAI/bge-small-en-v1.5", description="Model used")
+
+
+class UnixCoderEmbedRequest(BaseModel):
+    """Request for direct UnixCoder embedding."""
+
+    code: str = Field(..., description="Code to embed")
+
+
+class UnixCoderBatchEmbedRequest(BaseModel):
+    """Request for batch UnixCoder embedding."""
+
+    codes: list[str] = Field(..., description="Codes to embed")
+
+
+class UnixCoderEmbedResponse(BaseModel):
+    """Response with UnixCoder embedding."""
+
+    embedding: list[float] = Field(..., description=f"UnixCoder embedding [{DIM_UNIXCODER}]")
+    dimension: int = Field(DIM_UNIXCODER, description="Embedding dimension")
+    model: str = Field("microsoft/unixcoder-base", description="Model used")
+
+
+class UnixCoderBatchEmbedResponse(BaseModel):
+    """Response with batch UnixCoder embeddings."""
+
+    embeddings: list[list[float]] = Field(..., description="UnixCoder embeddings")
+    count: int = Field(..., description="Number of embeddings")
+    model: str = Field("microsoft/unixcoder-base", description="Model used")
+
+
+class InstructorConceptsRequest(BaseModel):
+    """Request for Instructor concept embedding."""
+
+    concepts: list[str] = Field(..., description="Concepts to embed", min_length=1)
+    domain: str = Field("general", description="Domain for context (ai-ml, systems, web, data)")
+
+
+class InstructorConceptsResponse(BaseModel):
+    """Response with Instructor concept embedding."""
+
+    embedding: list[float] = Field(..., description=f"Concept embedding [{DIM_INSTRUCTOR}]")
+    dimension: int = Field(DIM_INSTRUCTOR, description="Embedding dimension")
+    concept_count: int = Field(..., description="Number of concepts embedded")
+    domain: str = Field(..., description="Domain used")
+    model: str = Field("hkunlp/instructor-xl", description="Model used")
+
+
 # Global embedder instances (lazy loaded)
 _embedders: dict[str, Any] = {}
 _fusion_layer: Any = None
@@ -459,4 +537,161 @@ async def compute_unified_similarity(request: SimilarityRequest) -> SimilarityRe
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Similarity computation failed: {str(e)}",
+        ) from e
+
+
+# -----------------------------------------------------------------------------
+# Direct Model Access Endpoints
+# -----------------------------------------------------------------------------
+
+
+@router.post("/bge/embed", response_model=BGEEmbedResponse)
+async def bge_embed(request: BGEEmbedRequest) -> BGEEmbedResponse:
+    """Generate BGE embedding for text (direct access).
+
+    Architecture: Direct access to BGE model bypassing fusion layer.
+    Use for text-only similarity without code context.
+
+    Args:
+        request: Text to embed
+
+    Returns:
+        384-dimensional BGE embedding
+    """
+    try:
+        embedders = _get_embedders()
+        embedding = embedders["bge"].embed(request.text)
+
+        return BGEEmbedResponse(
+            embedding=embedding.tolist(),
+            dimension=len(embedding),
+        )
+
+    except Exception as e:
+        logger.exception("BGE embedding failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"BGE embedding failed: {str(e)}",
+        ) from e
+
+
+@router.post("/bge/embed/batch", response_model=BGEBatchEmbedResponse)
+async def bge_embed_batch(request: BGEBatchEmbedRequest) -> BGEBatchEmbedResponse:
+    """Generate BGE embeddings for multiple texts (direct access).
+
+    Args:
+        request: Texts to embed
+
+    Returns:
+        List of 384-dimensional BGE embeddings
+    """
+    try:
+        embedders = _get_embedders()
+        embeddings = embedders["bge"].batch_embed(request.texts)
+
+        return BGEBatchEmbedResponse(
+            embeddings=[emb.tolist() for emb in embeddings],
+            count=len(embeddings),
+        )
+
+    except Exception as e:
+        logger.exception("BGE batch embedding failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"BGE batch embedding failed: {str(e)}",
+        ) from e
+
+
+@router.post("/unixcoder/embed", response_model=UnixCoderEmbedResponse)
+async def unixcoder_embed(request: UnixCoderEmbedRequest) -> UnixCoderEmbedResponse:
+    """Generate UnixCoder embedding for code (direct access).
+
+    Architecture: Direct access to UnixCoder model bypassing fusion layer.
+    Use for code-only similarity without text context.
+
+    Args:
+        request: Code to embed
+
+    Returns:
+        768-dimensional UnixCoder embedding
+    """
+    try:
+        embedders = _get_embedders()
+        embedding = embedders["unixcoder"].embed(request.code)
+
+        return UnixCoderEmbedResponse(
+            embedding=embedding.tolist(),
+            dimension=len(embedding),
+        )
+
+    except Exception as e:
+        logger.exception("UnixCoder embedding failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"UnixCoder embedding failed: {str(e)}",
+        ) from e
+
+
+@router.post("/unixcoder/embed/batch", response_model=UnixCoderBatchEmbedResponse)
+async def unixcoder_embed_batch(request: UnixCoderBatchEmbedRequest) -> UnixCoderBatchEmbedResponse:
+    """Generate UnixCoder embeddings for multiple codes (direct access).
+
+    Args:
+        request: Codes to embed
+
+    Returns:
+        List of 768-dimensional UnixCoder embeddings
+    """
+    try:
+        embedders = _get_embedders()
+        embeddings = embedders["unixcoder"].batch_embed(request.codes)
+
+        return UnixCoderBatchEmbedResponse(
+            embeddings=[emb.tolist() for emb in embeddings],
+            count=len(embeddings),
+        )
+
+    except Exception as e:
+        logger.exception("UnixCoder batch embedding failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"UnixCoder batch embedding failed: {str(e)}",
+        ) from e
+
+
+@router.post("/instructor/concepts", response_model=InstructorConceptsResponse)
+async def instructor_embed_concepts(request: InstructorConceptsRequest) -> InstructorConceptsResponse:
+    """Generate Instructor embedding for domain concepts.
+
+    Uses Instructor-XL's domain-aware instruction following to embed
+    a set of concepts into a single 768-dimensional vector.
+
+    Architecture: Direct access to Instructor model with domain context.
+    Use for concept similarity and categorization.
+
+    Args:
+        request: Concepts and domain to embed
+
+    Returns:
+        Single 768-dimensional embedding for all concepts
+    """
+    try:
+        embedders = _get_embedders()
+        embedding = embedders["instructor"].embed_concepts(
+            concepts=request.concepts,
+            domain=request.domain,
+        )
+
+        return InstructorConceptsResponse(
+            embedding=embedding.tolist(),
+            dimension=len(embedding),
+            concept_count=len(request.concepts),
+            domain=request.domain,
+        )
+
+    except Exception as e:
+        logger.exception("Instructor concept embedding failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Instructor concept embedding failed: {str(e)}",
         ) from e

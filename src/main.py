@@ -22,9 +22,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.classify import classify_router
 from src.api.codebert import router as codebert_router
+from src.api.codet5 import router as codet5_router
 from src.api.concepts import concepts_router
 from src.api.embed import router as embed_router
 from src.api.extract import extract_router
+from src.api.graphcodebert import router as graphcodebert_router
 from src.api.health import router as health_router
 from src.api.keywords import keywords_router
 from src.api.metadata import metadata_router
@@ -107,15 +109,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             using_fallback=sbert_loader.using_fallback,
         )
         
-        # Pre-warm the model wrappers
-        # Note: CodeT5+ removed - it's a code generation model, not keyword extractor
+        # Pre-warm the model wrappers - all BERT models for Sous Chef
         from src.models.codebert_ranker import CodeBERTRanker
+        from src.models.codet5_model import get_codet5_model
         from src.models.graphcodebert_validator import GraphCodeBERTValidator
         
         logger.info("initializing_model_wrappers")
         _ = CodeBERTRanker()   # Warms up ranker
         _ = GraphCodeBERTValidator()  # Warms up validator
-        logger.info("model_wrappers_initialized")
+        _ = get_codet5_model()  # Warms up CodeT5+ (summarization, generation, etc.)
+        logger.info("model_wrappers_initialized", models=["CodeBERT", "GraphCodeBERT", "CodeT5+"])
         
     except Exception as e:
         logger.error("model_load_failed", error=str(e))
@@ -173,6 +176,8 @@ app.include_router(topics_router)
 app.include_router(embed_router)  # EEP-1.5.7: Multi-modal embedding endpoints
 app.include_router(concepts_router, prefix="/api")  # EEP-2.4: Concept extraction endpoint
 app.include_router(codebert_router)  # EEP-5.2: CodeBERT embedding endpoint
+app.include_router(codet5_router)  # CodeT5+: summarize, generate, translate, complete, understand, detect
+app.include_router(graphcodebert_router)  # GraphCodeBERT: validate, classify, expand, embeddings, similarity
 app.include_router(metadata_router, prefix="/api")  # CME-1.4: Metadata extraction endpoint
 app.include_router(classify_router, prefix="/api")  # HTC-1.0: Classification endpoint
 

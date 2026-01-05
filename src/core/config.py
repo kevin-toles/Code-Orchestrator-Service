@@ -36,6 +36,14 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = True
 
+    # LLM Summary Generation Configuration
+    # When True (default), uses inference-service:8085 for chapter summaries
+    # Falls back to statistical extraction if LLM unavailable
+    enable_llm_summary: bool = True
+    inference_service_url: str = "http://host.docker.internal:8085"
+    llm_summary_timeout: float = 120.0  # 2 minutes for longer chapters
+    llm_summary_fallback: bool = True  # Fallback to statistical if LLM fails
+
     # Model configuration (Phase 2)
     model_cache_dir: str = "./cache/models"
     codet5_model: str = "Salesforce/codet5p-220m"

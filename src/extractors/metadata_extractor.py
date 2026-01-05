@@ -465,6 +465,11 @@ class MetadataExtractor:
 
         Same as extract() but adds LLM-generated summary via inference-service.
         Internal microservice communication - does NOT go through Gateway.
+        
+        LLM Summary Behavior (controlled by config):
+        - enable_llm_summary=True (default): Uses inference-service for summaries
+        - llm_summary_fallback=True (default): Falls back to statistical if LLM fails
+        - If LLM unavailable and fallback disabled, raises error
 
         Args:
             text: The text to extract metadata from.
@@ -475,20 +480,132 @@ class MetadataExtractor:
         Returns:
             ExtractionResult with keywords, concepts, domain, quality, and summary.
         """
+        # Import settings here to avoid circular imports
+        from src.core.config import get_settings
+        settings = get_settings()
+        
         # Run synchronous extraction first
         result = self.extract(text, title, book_title, options)
         
-        # Generate summary if enabled
+        # Generate summary if enabled (LLM by default with fallback)
         opts = options or MetadataExtractionOptions()
-        if opts.enable_summary and self.config.enable_summary:
-            summary_result = await self._generate_summary_async(text, title)
+        if opts.enable_summary and self.config.enable_summary and settings.enable_llm_summary:
+            summary_result = await self._generate_summary_with_fallback(
+                text, title, settings.llm_summary_fallback
+            )
             if summary_result:
                 result.summary = summary_result.summary
                 result.summary_model = summary_result.model
                 result.summary_tokens = summary_result.tokens_used
                 result.stages_completed.append(STAGE_SUMMARY)
+        elif opts.enable_summary and not settings.enable_llm_summary:
+            # LLM disabled - use statistical summary (extractive)
+            result.summary = self._generate_statistical_summary(text, title)
+            result.summary_model = "statistical"
+            result.stages_completed.append(STAGE_SUMMARY)
 
         return result
+    
+    def _generate_statistical_summary(
+        self,
+        text: str,
+        title: str | None = None,
+    ) -> str:
+        """Generate a basic extractive summary without LLM.
+        
+        Falls back to this when LLM is unavailable or disabled.
+        Uses first few sentences + key concept mentions.
+        
+        Args:
+            text: Chapter text to summarize.
+            title: Optional chapter title.
+            
+        Returns:
+            Extractive summary string.
+        """
+        # Simple extractive summary: first 3 sentences + title
+        import re
+        sentences = re.split(r'(?<=[.!?])\s+', text.strip())
+        summary_sentences = sentences[:3]
+        
+        if title:
+            summary = f"{title}: " + " ".join(summary_sentences)
+        else:
+            summary = " ".join(summary_sentences)
+        
+        # Truncate to reasonable length
+        if len(summary) > 500:
+            summary = summary[:497] + "..."
+        
+        return summary
+    
+    async def _generate_summary_with_fallback(
+        self,
+        text: str,
+        title: str | None = None,
+        enable_fallback: bool = True,
+    ) -> "SummaryResult | None":
+        """Generate summary using LLM with fallback to statistical.
+        
+        Args:
+            text: Chapter text to summarize.
+            title: Optional chapter title for context.
+            enable_fallback: If True, use statistical summary on LLM failure.
+            
+        Returns:
+            SummaryResult or None if all methods fail.
+        """
+        from src.clients.inference_client import (
+            InferenceClient,
+            InferenceClientError,
+            InferenceConnectionError,
+            InferenceTimeoutError,
+            SummaryResult,
+        )
+        from src.core.config import get_settings
+        from src.core.logging import get_logger
+        
+        logger = get_logger(__name__)
+        settings = get_settings()
+        inference_url = self.config.inference_service_url or settings.inference_service_url
+        
+        try:
+            async with InferenceClient(
+                base_url=inference_url,
+                timeout=settings.llm_summary_timeout,
+            ) as client:
+                result = await client.generate_summary(text, title)
+                logger.info(
+                    "llm_summary_generated",
+                    model=result.model,
+                    tokens=result.tokens_used,
+                    time_ms=result.generation_time_ms,
+                )
+                return result
+                
+        except (InferenceConnectionError, InferenceTimeoutError, InferenceClientError) as e:
+            logger.warning(
+                "llm_summary_failed_attempting_fallback",
+                url=inference_url,
+                error=str(e),
+                fallback_enabled=enable_fallback,
+            )
+            
+            if enable_fallback:
+                # Fallback to statistical summary
+                statistical_summary = self._generate_statistical_summary(text, title)
+                logger.info("statistical_summary_fallback_used")
+                return SummaryResult(
+                    summary=statistical_summary,
+                    model="statistical-fallback",
+                    tokens_used=0,
+                    generation_time_ms=0.0,
+                )
+            else:
+                # No fallback - propagate error
+                raise RuntimeError(
+                    f"LLM summary generation failed and fallback disabled: {e}"
+                ) from e
 
     async def _generate_summary_async(
         self,
@@ -496,6 +613,8 @@ class MetadataExtractor:
         title: str | None = None,
     ) -> "SummaryResult | None":
         """Generate summary using inference-service.
+        
+        DEPRECATED: Use _generate_summary_with_fallback instead.
 
         Internal call to inference-service (port 8085) - does NOT use Gateway.
         

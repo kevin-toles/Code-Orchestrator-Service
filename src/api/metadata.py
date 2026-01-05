@@ -165,10 +165,16 @@ async def extract_metadata(
     - Shared options and book_title across all items
     - Individual success/failure tracking per item
     - Aggregate statistics (total, successful, failed)
+    - **LLM-generated summaries** via inference-service (default)
+    
+    ## LLM Summary Behavior
+    - By default, summaries are generated using the local LLM via inference-service
+    - If LLM is unavailable, falls back to statistical/extractive summary
+    - Control via `enable_summary` option and `COS_ENABLE_LLM_SUMMARY` env var
     
     ## Performance
     - Uses cached extractor singleton
-    - Sequential processing with shared model state
+    - Async processing with LLM calls
     - Ideal for chapter-by-chapter book processing
     
     ## Response
@@ -190,6 +196,11 @@ async def extract_metadata_batch(
 
     Optimized for processing multiple chapters from a single book.
     Uses cached extractor to avoid re-initialization overhead.
+    
+    LLM Summary Generation:
+    - Default: Uses inference-service for LLM-generated summaries
+    - Fallback: Statistical extractive summary if LLM unavailable
+    - Control: COS_ENABLE_LLM_SUMMARY=false to disable LLM
 
     Args:
         request: BatchExtractionRequest with items and shared options.
@@ -206,21 +217,24 @@ async def extract_metadata_batch(
     successful = 0
     failed = 0
     
+    # Use async extraction with LLM summary generation
+    opts = request.options or MetadataExtractionOptions()
+    
     for item in request.items:
         try:
-            # Perform extraction
-            result = extractor.extract(
+            # Use async extraction (includes LLM summary with fallback)
+            result = await extractor.extract_async(
                 text=item.text,
                 title=item.title,
                 book_title=request.book_title,
-                options=request.options,
+                options=opts,
             )
             
             # Build item response
             extraction_response = MetadataExtractionResponse(
                 keywords=result.keywords,
                 concepts=result.concepts,
-                summary=None,
+                summary=result.summary,  # Now includes LLM-generated summary
                 metadata=ExtractionMetadata(
                     processing_time_ms=result.processing_time_ms,
                     text_length=result.text_length,
@@ -228,6 +242,8 @@ async def extract_metadata_batch(
                     domain_confidence=result.domain_confidence,
                     quality_score=result.quality_score,
                     stages_completed=result.stages_completed,
+                    summary_model=result.summary_model,  # Track which model generated summary
+                    summary_tokens=result.summary_tokens,
                 ),
                 rejected=RejectedKeywords(
                     keywords=result.rejected_keywords,

@@ -101,6 +101,27 @@ class CodeBERTSimilarityResponse(BaseModel):
     )
 
 
+class CodeBERTRankRequest(BaseModel):
+    """Request to rank terms by relevance to query."""
+
+    terms: list[str] = Field(..., description="Terms to rank", min_length=1)
+    query: str = Field(..., description="Query for ranking context", min_length=1)
+
+
+class RankedTermItem(BaseModel):
+    """A single ranked term with score."""
+
+    term: str = Field(..., description="The term")
+    score: float = Field(..., ge=0.0, le=1.0, description="Relevance score")
+
+
+class CodeBERTRankResponse(BaseModel):
+    """Response with ranked terms."""
+
+    ranked_terms: list[RankedTermItem] = Field(..., description="Terms ranked by score")
+    query: str = Field(..., description="Query used for ranking")
+
+
 # =============================================================================
 # Lazy Ranker Loader (Anti-Pattern #12 Prevention)
 # =============================================================================
@@ -296,3 +317,34 @@ async def calculate_code_similarity(
     similarity = ranker.calculate_similarity(request.code_a, request.code_b)
 
     return CodeBERTSimilarityResponse(similarity=similarity)
+
+
+@router.post("/rank", response_model=CodeBERTRankResponse)
+async def rank_terms(request: CodeBERTRankRequest) -> CodeBERTRankResponse:
+    """Rank terms by semantic relevance to a query.
+
+    Uses CodeBERT embeddings to calculate similarity scores between
+    each term and the query, then returns terms sorted by relevance.
+
+    Architecture Role: RANKING (Sous Chef)
+    - Used for sorting search results by relevance
+    - Supports AI agent term prioritization
+
+    Args:
+        request: Terms and query for ranking
+
+    Returns:
+        Terms ranked by similarity score (highest first)
+    """
+    ranker = _get_ranker()
+    result = ranker.rank_terms(terms=request.terms, query=request.query)
+
+    ranked_items = [
+        RankedTermItem(term=rt.term, score=rt.score)
+        for rt in result.ranked_terms
+    ]
+
+    return CodeBERTRankResponse(
+        ranked_terms=ranked_items,
+        query=request.query,
+    )
